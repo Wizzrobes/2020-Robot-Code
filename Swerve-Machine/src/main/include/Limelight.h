@@ -1,15 +1,15 @@
 /*
 class Limelight
 
-Constructors: Limelight: Creates a limelight on the default NetworkTable.
+Constructors
 
-Public Methods:
+    Limelight: Creates a limelight on the default NetworkTable.
 
-double getHorizontalOffset(): Returns the horizontal offset (tx).
+Public Methods
 
-double getVerticalOffset(): Returns the vertival ofset (ty).
-
-bool getTarget(): Returns true if there is a target in-sight, false otherwise.
+    double getHorizontalOffset(): Returns the horizontal offset (tx).
+    double getVerticalOffset(): Returns the vertival ofset (ty).
+    bool getTarget(): Returns true if there is a target in-sight, false otherwise.
 */
 
 #pragma once

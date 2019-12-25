@@ -1,10 +1,16 @@
 #include <iostream>
 
-#include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/XboxController.h>
 
 #include "Robot.h"
+#include "RobotMap.h"
 
-void Robot::RobotInit() {}
+frc::XboxController* playerOne;
+
+void Robot::RobotInit() {
+
+    playerOne = new frc::XboxController(R_playerOneControllerPort);
+}
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}

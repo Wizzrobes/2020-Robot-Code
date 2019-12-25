@@ -16,4 +16,5 @@
 /*___End PCM Pin Declarations___*/
 
 /*_____Global Robot Variable Settigns_____*/
+const int R_playerOneControllerPort = 0;
 /*___End Global Robot Variable Settings___*/

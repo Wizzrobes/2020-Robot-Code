@@ -1,21 +1,17 @@
 /*
 class NavX
 
-Constructors:
+Constructors
 
-NavX(const int): Creates a NavX on the specified interface (kUSB, kMXP)
+    NavX(const int&): Creates a NavX on the specified interface (kUSB, kMXP)
 
-Public Methods:
+Public Methods
 
-double getYaw(): Returns the yaw value.
-
-double getRate(): Returns the rate value as degrees.
-
-double getAngle(): Returns the angle value.
-
-double getAbsoluteAngle(): Returns the absolute value of the angle value.
-
-void resetYaw(): Sets the yaw value to zero.
+    double getYaw(): Returns the yaw value.
+    double getRate(): Returns the rate value as degrees.
+    double getAngle(): Returns the angle value.
+    double getAbsoluteAngle(): Returns the absolute value of the angle value.
+    void resetYaw(): Sets the yaw value to zero.
 */
 
 #pragma once
@@ -29,7 +25,7 @@ void resetYaw(): Sets the yaw value to zero.
 class NavX {
 
     public:
-        NavX(const int connectionType) {
+        NavX(const int &connectionType) {
 
             if (connectionType == 0) {
 
