@@ -7,8 +7,8 @@ Constructors
 
 Public Methods
 
-    double getHorizontalOffset(): Returns the horizontal offset (tx).
-    double getVerticalOffset(): Returns the vertival ofset (ty).
+    double getHorizontalOffset(): Returns the horizontal offset of the target (tx).
+    double getVerticalOffset(): Returns the vertical ofset of the target (ty).
     bool getTarget(): Returns true if there is a target in-sight, false otherwise.
 */
 
