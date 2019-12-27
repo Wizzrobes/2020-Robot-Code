@@ -3,7 +3,15 @@
 #include <frc/XboxController.h>
 
 #include "Robot.h"
+#include "SwerveModule.h"
+#include "SwerveTrain.h"
 #include "RobotMap.h"
+
+SwerveModule frontRightModule(R_frontRightDriveMotorCANID, R_frontRightSwerveMotorCANID);
+SwerveModule frontLeftModule(R_frontLeftDriveMotorCANID, R_frontLeftSwerveMotorCANID);
+SwerveModule rearLeftModule(R_rearLeftDriveMotorCANID, R_rearLeftSwerveMotorCANID);
+SwerveModule rearRightModule(R_rearRightDriveMotorCANID, R_rearRightSwerveMotorCANID);
+SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule);
 
 frc::XboxController *playerOne;
 

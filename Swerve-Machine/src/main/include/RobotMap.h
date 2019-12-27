@@ -10,6 +10,14 @@
 /*___End RoboRIO DIO Pin Declarations___*/
 
 /*_____RoboRIO CAN Bus ID Declarations_____*/
+const int R_frontRightDriveMotorCANID  = 1;
+const int R_frontRightSwerveMotorCANID = 2;
+const int R_frontLeftSwerveMotorCANID  = 3;
+const int R_frontLeftDriveMotorCANID   = 4;
+const int R_rearLeftDriveMotorCANID    = 5;
+const int R_rearLeftSwerveMotorCANID   = 6;
+const int R_rearRightSwerveMotorCANID  = 7;
+const int R_rearRightDriveMotorCANID   = 8;
 /*___End RoboRIO CAN Bus ID Declarations___*/
 
 /*_____PCM Pin Declarations_____*/
