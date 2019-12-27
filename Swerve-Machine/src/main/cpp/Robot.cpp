@@ -5,7 +5,7 @@
 #include "Robot.h"
 #include "RobotMap.h"
 
-frc::XboxController* playerOne;
+frc::XboxController *playerOne;
 
 void Robot::RobotInit() {
 
