@@ -28,9 +28,9 @@ class SwerveModule {
         SwerveModule(const int &canDriveID, const int &canSwerveID) {
 
             m_driveMotor = new rev::CANSparkMax(canDriveID, rev::CANSparkMax::MotorType::kBrushless);
-            *m_driveMotorEncoder = m_driveMotor->GetEncoder();
+            m_driveMotorEncoder = new rev::CANEncoder(m_driveMotor->GetEncoder());
             m_swerveMotor = new rev::CANSparkMax(canSwerveID, rev::CANSparkMax::MotorType::kBrushless);
-            *m_swerveMotorEncoder = m_swerveMotor->GetEncoder();
+            m_swerveMotorEncoder = new rev::CANEncoder(m_swerveMotor->GetEncoder());
         }
 
         void setDriveSpeed(const double &speedToSet) {
