@@ -23,7 +23,7 @@ Public Methods
 
 #pragma once
 
-#include <SmartDashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "rev/CANSparkMax.h"
 
