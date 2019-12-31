@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <frc/XboxController.h>
+#include <cameraserver/CameraServer.h>
 
 #include "Robot.h"
 #include "SwerveModule.h"
@@ -18,6 +19,8 @@ frc::XboxController *playerOne;
 void Robot::RobotInit() {
 
     playerOne = new frc::XboxController(R_playerOneControllerPort);
+
+    frc::CameraServer::GetInstance()->StartAutomaticCapture();
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {}
