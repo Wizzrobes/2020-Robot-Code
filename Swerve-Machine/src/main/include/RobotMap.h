@@ -1,5 +1,5 @@
-// RobotMap: A collection of constant variables for declarations and settings.
-// Significantly reduces the amount of time spent looking for and configuring.
+//RobotMap: A collection of constant variables for declarations and settings.
+//Significantly reduces the amount of time spent looking for and configuring.
 
 #pragma once
 
@@ -25,4 +25,10 @@ const int R_rearRightDriveMotorCANID   = 8;
 
 /*_____Global Robot Variable Settigns_____*/
 const int R_playerOneControllerPort = 0;
+
+const double R_swerveTrainAssumePositionTolerance = .0005;
+const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5;
+const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = .2;
+const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
+const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed = .02;
 /*___End Global Robot Variable Settings___*/
