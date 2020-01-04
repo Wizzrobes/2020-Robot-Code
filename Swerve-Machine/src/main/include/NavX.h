@@ -18,8 +18,6 @@ Public Methods
 
 #include <cmath>
 
-#include <SPI.h>
-
 #include "AHRS.h"
 
 class NavX {

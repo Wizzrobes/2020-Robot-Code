@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <frc/XboxController.h>
 #include <cameraserver/CameraServer.h>
 #include <frc/smartdashboard/SmartDashboard.h>
