@@ -86,28 +86,22 @@ class SwerveModule {
             return m_swerveMotorEncoder->GetVelocity();
         }
 
-        //Assuming that Zion is upside-down...
         void assumeSwervePosition(const double& positionToAssume) {
 
             const double currentPosition = m_swerveMotorEncoder->GetPosition();
+            //If the current position is close enough to where we want to go (within one tolerance value)...
+            if (-R_swerveTrainAssumePositionTolerance < positionToAssume - currentPosition && currentPosition - positionToAssume < R_swerveTrainAssumePositionTolerance) {
+
+                //Stop rotating the swerve motor and skip checking anything else...
+                m_swerveMotor->Set(0);
+            }
             //If the difference between where we want to be and where we are doesn't satisfy tolerance
-            //(is more than a tolerance value away from 0, perfection)...
-            if (positionToAssume - currentPosition > -R_swerveTrainAssumePositionTolerance) {
+            //(is more than one tolerance value away from 0, perfection)...
+            else {
 
                 //Rotate the swerve to the speed calculated by the mathematical function based on how
-                //many REV revolutions are remaining...
+                //many REV revolutions are remaining towards 0, perfection...
                 m_swerveMotor->Set(calculateAssumePositionSpeed(positionToAssume - currentPosition));
-            }
-            //And do the same thing, inverted, for counterclockwise rotation.
-            if (positionToAssume - currentPosition < R_swerveTrainAssumePositionTolerance) {
-
-                m_swerveMotor->Set(calculateAssumePositionSpeed(positionToAssume - currentPosition));
-            }
-            //Otherwise, if the position is within one tolerance value of perfection...
-            if (-R_swerveTrainAssumePositionTolerance < currentPosition && currentPosition < R_swerveTrainAssumePositionTolerance) {
-
-                //Stop rorating the swerve motor.
-                m_swerveMotor->Set(0);
             }
         }
 
@@ -119,19 +113,19 @@ class SwerveModule {
 
         double calculateAssumePositionSpeed(const double& howFarRemainingInTravel) {
 
-            //Begin initally with a double calculated with the simplex function
-            double toReturn ((1)/(1+exp((-1 * abs(howFarRemainingInTravel)) + 5)));
-            //If we satisfy conditions for the first linear piecewise, take that speed instead
+            //Begin initally with a double calculated with the simplex function...
+            double toReturn = ((1) / (1 + exp((-1 * abs(howFarRemainingInTravel)) + 5)));
+            //If we satisfy conditions for the first linear piecewise, take that speed instead...
             if (abs(howFarRemainingInTravel) < R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt) {
 
                 toReturn = R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed;
             }
-            //Do the same for the second
+            //Do the same for the second...
             if (abs(howFarRemainingInTravel) < R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt) {
 
                 toReturn = R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed;
             }
-            //And if we needed to travel negatively to get where we need to be, make the speed negative
+            //And if we needed to travel negatively to get where we need to be, make the final speed negative...
             if (howFarRemainingInTravel < 0) {
 
                 toReturn = -toReturn;
