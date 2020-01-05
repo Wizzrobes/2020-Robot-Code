@@ -26,10 +26,12 @@ Public Methods
 #pragma once
 
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/XboxController.h>
 
 #include "rev/CANSparkMax.h"
 
 #include "SwerveModule.h"
+#include "VectorDouble.h"
 
 class SwerveTrain {
 
@@ -91,6 +93,7 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("RL Swrv Pos", m_rearLeft->getSwervePosition());
             frc::SmartDashboard::PutNumber("RR Swrv Pos", m_rearRight->getSwervePosition());
         }
+        void driveController(frc::XboxController &controller);
 
     private:
         SwerveModule *m_frontRight;
@@ -102,4 +105,35 @@ class SwerveTrain {
         double m_frontLeftSwerveZeroPosition;
         double m_rearLeftSwerveZeroPosition;
         double m_rearRightSwerveZeroPosition;
+
+        double getControllerRotationsFromCenter(const int &x, const int &yInverted) {
+
+            //Y seems to be inverted by default, so un-invert it...
+            double y = -yInverted;
+
+            //Create vectors for the line x = 0 and the line formed by the joystick coordinates...
+            VectorDouble center(0, 1);
+            VectorDouble current(x, y);
+            //Get the dot produt of the vectors for use in calculation...
+            double dotProduct = center * current;
+            //Multiply each vector's magnitude together for use in calculation...
+            double magnitudeProduct = center.magnitude() * current.magnitude();
+            //The cosine of the angle we want in rad is the dot product over the magnitude product...
+            double cosineAngle = dotProduct / magnitudeProduct;
+            //The angle we want is the arccosine of its cosine...
+            double angleRad = acos(cosineAngle);
+            //The decimal total of the whole circle is the radians over 2pi...
+            double decimalTotalCircle = angleRad / 2 * M_PI;
+            //And the amount of REV rotations we want to rotate is the decimal total by Nic's Constant.
+            return decimalTotalCircle * R_nicsConstant;
+        }
+        double getAbsoluteControllerMagnitude(const int &x, const int &y) {
+
+            //Get the absolute values of the joystick coordinates
+            double absX = abs(x);
+            double absY = abs(y);
+
+            //Return the sum of the coordinates as a knock-off magnitude
+            return absX + absY;
+        }
 };
