@@ -8,7 +8,7 @@ Constructors
 Public Methods
 
     double getYaw(): Returns the yaw value.
-    double getRate(): Returns the rate value as degrees.
+    double getRateDegrees(): Returns the rate value as degrees.
     double getAngle(): Returns the angle value.
     double getAbsoluteAngle(): Returns the absolute value of the angle value.
     void resetYaw(): Sets the yaw value to zero.
@@ -16,7 +16,7 @@ Public Methods
 
 #pragma once
 
-#include <cmath>
+#include <math.h>
 
 #include "AHRS.h"
 
@@ -25,11 +25,11 @@ class NavX {
     public:
         NavX(const int &connectionType) {
 
-            if (connectionType == 0) {
+            if (connectionType == kUSB) {
 
                 navX = new AHRS(SPI::kOnboardCS0);
             }
-            else if (connectionType == 4) {
+            else if (connectionType == kMXP) {
 
                 navX = new AHRS(SPI::kMXP);
             }
@@ -43,10 +43,9 @@ class NavX {
 
             return navX->GetYaw();
         }
-        double getRate() {
+        double getRateDegrees() {
 
-            //Convert the rate to degrees and return it
-            return (navX->GetRate()) * (180/M_PI);
+            return (navX->GetRate()) * (180 / M_PI);
         }
         double getAngle() {
 
@@ -54,14 +53,7 @@ class NavX {
         }
         double getAbsoluteAngle() {
 
-            if (navX->GetAngle() < 0) {
-
-                return ((navX->GetAngle()) - (2 * (navX->GetAngle())));
-            }
-            else {
-
-                return navX->GetAngle();
-            }
+            return abs(navX->GetAngle());
         }
         void resetYaw() {
 
