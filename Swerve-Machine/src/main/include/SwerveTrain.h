@@ -9,6 +9,8 @@ Constructors
 
 Public Methods
 
+    void setDriveSpeed(const double&): Sets a speed to all driving motors on the train.
+    void setSwerveSpeed(const double&): Sets a speed to all swerve motors on the train.
     void setSwerveZeroPosition(const bool&): Gets the current encoder values of the swerve
         motors and stores them as privates of the class. These are the values
         the swerve motors return to when invoking assumeSwerveZeroPosition().
@@ -43,6 +45,21 @@ class SwerveTrain {
             m_frontLeftSwerveZeroPosition = 0;
             m_rearLeftSwerveZeroPosition = 0;
             m_rearRightSwerveZeroPosition = 0;
+        }
+
+        void setDriveSpeed(const double& driveSpeed) {
+
+            m_frontRight->setDriveSpeed(driveSpeed);
+            m_frontLeft->setDriveSpeed(driveSpeed);
+            m_rearLeft->setDriveSpeed(driveSpeed);
+            m_rearRight->setDriveSpeed(driveSpeed);
+        }
+        void setSwerveSpeed(const double& swerveSpeed) {
+
+            m_frontRight->setSwerveSpeed(swerveSpeed);
+            m_frontLeft->setSwerveSpeed(swerveSpeed);
+            m_rearLeft->setSwerveSpeed(swerveSpeed);
+            m_rearRight->setSwerveSpeed(swerveSpeed);
         }
 
         void setSwerveZeroPosition(const bool &verbose = false) {
