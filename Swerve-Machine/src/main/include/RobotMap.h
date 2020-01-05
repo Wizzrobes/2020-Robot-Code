@@ -32,5 +32,6 @@ const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = 
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed = .02;
 
-const double R_oneSwerveRotationREVRotation = 17.9761447906494;
+//The amount of REV rotations it takes for a swerve assembly to make a full rotation.
+const double R_nicsConstant = 17.9761447906494;
 /*___End Global Robot Variable Settings___*/
