@@ -8,7 +8,8 @@ Constructors:
 
 Public Methods:
 
-    double operator* const(VectorDouble&): Returns the dot product of two VectorDoubles.
+    double operator* const(VectorDouble&): Returns the dot product of two
+        VectorDoubles.
     double magnitude(): Returns the magnitude of a VectorDouble.
 */
 

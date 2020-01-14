@@ -11,16 +11,19 @@ Public Methods
 
     void setDriveSpeed(const double&): Sets the driving speed to a double.
     void setSwerveSpeed(const double&): Sets the swerve speed to a double.
-    double getDrivePosition(): Returns the total REV revolutions of the drive encoder.
-    double getSwervePosition(): Returns the total REV revolutions of the swerve encoder.
+    double getDrivePosition(): Returns the total REV revolutions of the drive
+        encoder.
+    double getSwervePosition(): Returns the total REV revolutions of the swerve
+        encoder.
     double getDriveSpeed(): Returns the speed of the drive encoder in RPM.
     double getSwerveSpeed(): Returns the speed of the swerve encoder in RPM.
-    void assumeSwervePosition(const double& positionToAssume): Uses a mathematical function
-        to assign a speed to the swerve motor to move quickly and accurately, within
-        a tolerance, to any REV rotation value, clockwise or opposite.
+    void assumeSwervePosition(const double& positionToAssume): Uses a
+        mathematical function to assign a speed to the swerve motor to move
+        quickly and accurately, within a tolerance, to any REV rotation value,
+        clockwise or opposite.
 
     Note that the values returned by the get functions persist across disables, but
-        not across power cycles.
+        not across power cycles, and are set at power-on.
 
 Private Methods
 
@@ -32,10 +35,10 @@ Private Methods
             where
                 s = speed at which the motor rotates to assume a position
                 z = remaining REV revolutions of the position assumption
-        to assign a speed with which to proceed towards the final position. It was developed,
-        regressed, and tuned to move to the final position as fast as possible initially, slowing
-        down as it approaches and becoming linear as it settles into tolerance at a high accuracy.
-
+        to assign a speed with which to proceed towards the final position. It
+        was developed, regressed, and tuned to move to the final position as
+        fast as possible initially, slowing down as it approaches and becoming
+        linear as it settles into tolerance at a high accuracy.
 */
 
 #pragma once

@@ -9,18 +9,23 @@ Constructors
 
 Public Methods
 
-    void setDriveSpeed(const double&): Sets a speed to all driving motors on the train.
-    void setSwerveSpeed(const double&): Sets a speed to all swerve motors on the train.
-    void setSwerveZeroPosition(const bool&): Gets the current encoder values of the swerve
-        motors and stores them as privates of the class. These are the values
-        the swerve motors return to when invoking assumeSwerveZeroPosition().
-        If the passed bool is true, publishes the stored data to the SmartDashboard.
-        This is currently used for returning to and maintaining "straight".
+    void setDriveSpeed(const double&): Sets a speed to all driving motors on
+        the train.
+    void setSwerveSpeed(const double&): Sets a speed to all swerve motors on
+        the train.
+    void setSwerveZeroPosition(const bool&): Gets the current encoder values
+        of the swerve motors and stores them as privates of the class. These
+        are the values the swerve motors return to when invoking
+        assumeSwerveZeroPosition().
+        If the passed bool is true, publishes the stored data to the
+        SmartDashboard. This is currently used for returning to and maintaining
+        "straight".
     void assumeSwerveZeroPosition(): Drives the swerves to return to their
         zero position.
     void publishSwervePositions(): Puts the current swerve encoder positions
         to the SmartDashboard.
-    void driveController(): Fully drives the swerve train on the supplied controller.
+    void driveController(): Fully drives the swerve train on the supplied
+        controller.
 
 Private Methods
 
@@ -30,7 +35,6 @@ Private Methods
         See https://en.wikipedia.org/wiki/Dot_product#Geometric_definition
     double getAbsoluteControllerMagnitude(frc::XboxController&): Gets the
         unsigned velocity of the control stick using only absolute value.
-
 */
 
 #pragma once
