@@ -20,6 +20,16 @@ Public Methods
         zero position.
     void publishSwervePositions(): Puts the current swerve encoder positions
         to the SmartDashboard.
+    void driveController(): Fully drives the swerve train on the supplied controller.
+
+Private Methods
+
+    double getControllerREVRotationsFromCenter(const double&, const double&):
+        Discernes how many clockwise REV rotations from center the current
+        location of the joystick is using vector trigonometry and properties.
+        See https://en.wikipedia.org/wiki/Dot_product#Geometric_definition
+    double getAbsoluteControllerMagnitude(frc::XboxController&): Gets the
+        unsigned velocity of the control stick using only absolute value.
 
 */
 
@@ -106,28 +116,42 @@ class SwerveTrain {
         double m_rearLeftSwerveZeroPosition;
         double m_rearRightSwerveZeroPosition;
 
-        double getControllerRotationsFromCenter(const int &x, const int &yInverted) {
+        double getControllerREVRotationsFromCenter(const double &x, const double &yInverted) {
 
             //Y seems to be inverted by default, so un-invert it...
-            double y = -yInverted;
+            const double y = -yInverted;
 
             //Create vectors for the line x = 0 and the line formed by the joystick coordinates...
             VectorDouble center(0, 1);
             VectorDouble current(x, y);
             //Get the dot produt of the vectors for use in calculation...
-            double dotProduct = center * current;
+            const double dotProduct = center * current;
             //Multiply each vector's magnitude together for use in calculation...
-            double magnitudeProduct = center.magnitude() * current.magnitude();
+            const double magnitudeProduct = center.magnitude() * current.magnitude();
             //The cosine of the angle we want in rad is the dot product over the magnitude product...
-            double cosineAngle = dotProduct / magnitudeProduct;
+            const double cosineAngle = dotProduct / magnitudeProduct;
             //The angle we want is the arccosine of its cosine...
             double angleRad = acos(cosineAngle);
+            //To go from a full 0pi to 2pi and overcome the limitation of arccos, jump to 2pi and subtract the gradually decreasing angle...
+            if (x < 0) {
+
+                angleRad = (2 * M_PI) - angleRad;
+            }
             //The decimal total of the whole circle is the radians over 2pi...
-            double decimalTotalCircle = angleRad / 2 * M_PI;
+            double decimalTotalCircle = ((angleRad) / (2 * M_PI));
             //And the amount of REV rotations we want to rotate is the decimal total by Nic's Constant.
-            return decimalTotalCircle * R_nicsConstant;
+            double returnVal = decimalTotalCircle * R_nicsConstant;
+            //If x is positive, invert it to rotate clockwise
+            if (x > 0) {
+
+                return -returnVal;
+            }
+            else {
+
+                return returnVal;
+            }
         }
-        double getAbsoluteControllerMagnitude(const int &x, const int &y) {
+        double getAbsoluteControllerMagnitude(const double &x, const double &y) {
 
             //Get the absolute values of the joystick coordinates
             double absX = abs(x);

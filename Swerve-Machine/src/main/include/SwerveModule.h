@@ -17,7 +17,7 @@ Public Methods
     double getSwerveSpeed(): Returns the speed of the swerve encoder in RPM.
     void assumeSwervePosition(const double& positionToAssume): Uses a mathematical function
         to assign a speed to the swerve motor to move quickly and accurately, within
-        a tolerance, to any REV rotation value.
+        a tolerance, to any REV rotation value, clockwise or opposite.
 
     Note that the values returned by the get functions persist across disables, but
         not across power cycles.
@@ -89,8 +89,8 @@ class SwerveModule {
         void assumeSwervePosition(const double& positionToAssume) {
 
             const double currentPosition = m_swerveMotorEncoder->GetPosition();
-            //If the current position is close enough to where we want to go (within one tolerance value)...
-            if (-R_swerveTrainAssumePositionTolerance < positionToAssume - currentPosition && currentPosition - positionToAssume < R_swerveTrainAssumePositionTolerance) {
+            //If the current position both CW and CCW is close enough to where we want to go (within one tolerance value)...
+            if (positionToAssume - currentPosition < R_swerveTrainAssumePositionTolerance && currentPosition - positionToAssume < R_swerveTrainAssumePositionTolerance) {
 
                 //Stop rotating the swerve motor and skip checking anything else...
                 m_swerveMotor->Set(0);

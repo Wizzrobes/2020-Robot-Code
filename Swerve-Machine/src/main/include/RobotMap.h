@@ -25,8 +25,9 @@ const int R_rearRightDriveMotorCANID   = 8;
 
 /*_____Global Robot Variable Settigns_____*/
 const int R_playerOneControllerPort = 0;
+const int R_playerOneControllerDeadzone = .05;
 
-const double R_swerveTrainAssumePositionTolerance = .0005;
+const double R_swerveTrainAssumePositionTolerance = .1;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = .2;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
