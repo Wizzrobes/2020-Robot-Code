@@ -107,7 +107,7 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("RL Swrv Pos", m_rearLeft->getSwervePosition());
             frc::SmartDashboard::PutNumber("RR Swrv Pos", m_rearRight->getSwervePosition());
         }
-        void driveController(frc::XboxController &controller);
+        void driveController(frc::XboxController *controller);
 
     private:
         SwerveModule *m_frontRight;
