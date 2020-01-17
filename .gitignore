@@ -1,6 +1,5 @@
 # Ignore built files in the projects
-2020-Robot-Code/build/*
-Swerve-Machine/build/*
+2020-Robot/build/*
 
 # All that follows is the recommended .gitignore for FRC projects.
 # Created by https://www.gitignore.io/api/c++,java,linux,macos,gradle,windows,visualstudiocode
