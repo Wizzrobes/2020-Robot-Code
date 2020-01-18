@@ -1,6 +1,5 @@
 #include <frc/XboxController.h>
 #include <cameraserver/CameraServer.h>
-#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "Robot.h"
 #include "SwerveModule.h"
@@ -27,12 +26,16 @@ void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
 
-    if(playerOne->GetAButton()) {
+    if (playerOne->GetAButton()) {
+
         zion.setSwerveZeroPosition();
-    } if(playerOne->GetXButton()) {
+    }
+    if (playerOne->GetXButton()) {
 
         zion.driveController(playerOne);
-    } else {
+    }
+    else {
+
         zion.setDriveSpeed(0);
         zion.setSwerveSpeed(0);
     }

@@ -39,9 +39,10 @@ Private Methods
 
 #pragma once
 
+#include <math.h>
+
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/XboxController.h>
-#include "math.h"
 
 #include "rev/CANSparkMax.h"
 
@@ -71,7 +72,6 @@ class SwerveTrain {
             m_rearLeft->setDriveSpeed(driveSpeed);
             m_rearRight->setDriveSpeed(driveSpeed);
         }
-
         void setSwerveSpeed(const double& swerveSpeed) {
 
             m_frontRight->setSwerveSpeed(swerveSpeed);
@@ -95,43 +95,10 @@ class SwerveTrain {
                 frc::SmartDashboard::PutNumber("RR Swrv Pos0", m_rearRightSwerveZeroPosition);
             }
         }
+        void assignFrontRightSwerveZeroPostion(const double &angle) {
 
-        void setSwerveZeroPostion(const double &angle) {
             m_frontRightSwerveZeroPosition = angle; 
         }
-
-        double getRelativeSwervePosition() {
-            double position = m_frontRight->getSwervePosition() - m_frontRightSwerveZeroPosition;
-            if(position > R_nicsConstant) {
-                position = fmod(position, R_nicsConstant);
-            } else {
-                return position;
-            }
-        }
-
-        double getNearestZeroPosition() {
-            if(R_nicsConstant - getRelativeSwervePosition() < (R_nicsConstant/2.0)) {
-                return R_nicsConstant;
-            } else {
-                return 0.0; 
-            }
-        }
-
-        void assumeNearestSwerveZeroPosition() {
-            double nearestPosition = getNearestZeroPosition(); 
-            m_frontRight->assumeSwervePosition(nearestPosition);
-            m_frontLeft->assumeSwervePosition(nearestPosition);
-            m_rearLeft->assumeSwervePosition(nearestPosition);
-            m_rearRight->assumeSwervePosition(nearestPosition);
-        }
-
-        void invertDriveMotors() {
-            m_frontRight->invertDriveMotor(); 
-            m_frontLeft->invertDriveMotor(); 
-            m_rearLeft->invertDriveMotor(); 
-            m_rearRight->invertDriveMotor();  
-        }
-
         void assumeSwerveZeroPosition() {
 
             m_frontRight->assumeSwervePosition(m_frontRightSwerveZeroPosition);
@@ -139,6 +106,15 @@ class SwerveTrain {
             m_rearLeft->assumeSwervePosition(m_rearLeftSwerveZeroPosition);
             m_rearRight->assumeSwervePosition(m_rearRightSwerveZeroPosition);
         }
+        void assumeSwerveNearestZeroPosition() {
+
+            const double nearestPosition = getNearestZeroPosition(); 
+            m_frontRight->assumeSwervePosition(nearestPosition);
+            m_frontLeft->assumeSwervePosition(nearestPosition);
+            m_rearLeft->assumeSwervePosition(nearestPosition);
+            m_rearRight->assumeSwervePosition(nearestPosition);
+        }
+
         void publishSwervePositions() {
 
             frc::SmartDashboard::PutNumber("FR Swrv Pos", m_frontRight->getSwervePosition());
@@ -146,6 +122,7 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("RL Swrv Pos", m_rearLeft->getSwervePosition());
             frc::SmartDashboard::PutNumber("RR Swrv Pos", m_rearRight->getSwervePosition());
         }
+
         void driveController(frc::XboxController *controller);
 
     private:
@@ -159,10 +136,11 @@ class SwerveTrain {
         double m_rearLeftSwerveZeroPosition;
         double m_rearRightSwerveZeroPosition;
 
-        double getControllerREVRotationsFromCenter(const double &x, const double &yInverted) {
+        double getControllerREVRotationsFromCenter(frc::XboxController *controller) {
 
+            const double x = controller->GetX(frc::GenericHID::kLeftHand);
             //Y seems to be inverted by default, so un-invert it...
-            const double y = -yInverted;
+            const double y = -controller->GetY(frc::GenericHID::kLeftHand);
 
             //Create vectors for the line x = 0 and the line formed by the joystick coordinates...
             VectorDouble center(0, 1);
@@ -183,38 +161,59 @@ class SwerveTrain {
             //The decimal total of the whole circle is the radians over 2pi...
             double decimalTotalCircle = ((angleRad) / (2 * M_PI));
             //And the amount of REV rotations we want to rotate is the decimal total by Nic's Constant.
-            double returnVal = decimalTotalCircle * R_nicsConstant;
-            //If x is positive, invert it to rotate clockwise
-
-                return returnVal;
+            return decimalTotalCircle * R_nicsConstant;
         }
-        double getAbsoluteControllerMagnitude(const double &x, const double &y) {
+        double getControllerAngleFromCenter(frc::XboxController *controller) {
+
+            const double x = controller->GetX(frc::GenericHID::kLeftHand);
+            const double y = -controller->GetY(frc::GenericHID::kLeftHand);
+
+            VectorDouble center(0, 1);
+            VectorDouble current(x, y);
+            const double dotProduct = center * current;
+            const double magnitudeProduct = center.magnitude() * current.magnitude();
+            const double cosineAngle = dotProduct / magnitudeProduct;
+            return acos(cosineAngle);
+        }
+        double getControllerAbsoluteMagnitude(frc::XboxController *controller) {
 
             //Get the absolute values of the joystick coordinates
-            double absX = abs(x);
-            double absY = abs(y);
+            double absX = abs(controller->GetX(frc::GenericHID::kLeftHand));
+            double absY = abs(controller->GetY(frc::GenericHID::kLeftHand));
 
             //Return the sum of the coordinates as a knock-off magnitude
             return absX + absY;
         }
 
-        double getRadianAngleFromCenter(const double &x, const double &yInverted) {
+        //TODO: fix -Wreturn-type
+        double getRelativeSwervePosition() {
 
-            //Y seems to be inverted by default, so un-invert it...
-            const double y = -yInverted;
+            double position = m_frontRight->getSwervePosition() - m_frontRightSwerveZeroPosition;
+            if (position > R_nicsConstant) {
 
-            //Create vectors for the line x = 0 and the line formed by the joystick coordinates...
-            VectorDouble center(0, 1);
-            VectorDouble current(x, y);
-            //Get the dot produt of the vectors for use in calculation...
-            const double dotProduct = center * current;
-            //Multiply each vector's magnitude together for use in calculation...
-            const double magnitudeProduct = center.magnitude() * current.magnitude();
-            //The cosine of the angle we want in rad is the dot product over the magnitude product...
-            const double cosineAngle = dotProduct / magnitudeProduct;
-            //The angle we want is the arccosine of its cosine...
-            double angleRad = acos(cosineAngle);
+                position = fmod(position, R_nicsConstant);
+            }
+            else {
 
-            return angleRad;
+                return position;
+            }
+        }
+        double getNearestZeroPosition() {
+
+            if (R_nicsConstant - getRelativeSwervePosition() < (R_nicsConstant / 2)) {
+
+                return R_nicsConstant;
+            }
+            else {
+
+                return 0; 
+            }
+        }
+        void invertDriveMotors() {
+
+            m_frontRight->invertDriveMotor(); 
+            m_frontLeft->invertDriveMotor(); 
+            m_rearLeft->invertDriveMotor(); 
+            m_rearRight->invertDriveMotor();  
         }
 };
