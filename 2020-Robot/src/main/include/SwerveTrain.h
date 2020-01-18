@@ -41,6 +41,7 @@ Private Methods
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/XboxController.h>
+#include "math.h"
 
 #include "rev/CANSparkMax.h"
 
@@ -70,6 +71,7 @@ class SwerveTrain {
             m_rearLeft->setDriveSpeed(driveSpeed);
             m_rearRight->setDriveSpeed(driveSpeed);
         }
+
         void setSwerveSpeed(const double& swerveSpeed) {
 
             m_frontRight->setSwerveSpeed(swerveSpeed);
@@ -93,6 +95,43 @@ class SwerveTrain {
                 frc::SmartDashboard::PutNumber("RR Swrv Pos0", m_rearRightSwerveZeroPosition);
             }
         }
+
+        void setSwerveZeroPostion(const double &angle) {
+            m_frontRightSwerveZeroPosition = angle; 
+        }
+
+        double getRelativeSwervePosition() {
+            double position = m_frontRight->getSwervePosition() - m_frontRightSwerveZeroPosition;
+            if(position > R_nicsConstant) {
+                position = fmod(position, R_nicsConstant);
+            } else {
+                return position;
+            }
+        }
+
+        double getNearestZeroPosition() {
+            if(R_nicsConstant - getRelativeSwervePosition() < (R_nicsConstant/2.0)) {
+                return R_nicsConstant;
+            } else {
+                return 0.0; 
+            }
+        }
+
+        void assumeNearestSwerveZeroPosition() {
+            double nearestPosition = getNearestZeroPosition(); 
+            m_frontRight->assumeSwervePosition(nearestPosition);
+            m_frontLeft->assumeSwervePosition(nearestPosition);
+            m_rearLeft->assumeSwervePosition(nearestPosition);
+            m_rearRight->assumeSwervePosition(nearestPosition);
+        }
+
+        void invertDriveMotors() {
+            m_frontRight->invertDriveMotor(); 
+            m_frontLeft->invertDriveMotor(); 
+            m_rearLeft->invertDriveMotor(); 
+            m_rearRight->invertDriveMotor();  
+        }
+
         void assumeSwerveZeroPosition() {
 
             m_frontRight->assumeSwervePosition(m_frontRightSwerveZeroPosition);
@@ -107,7 +146,7 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("RL Swrv Pos", m_rearLeft->getSwervePosition());
             frc::SmartDashboard::PutNumber("RR Swrv Pos", m_rearRight->getSwervePosition());
         }
-        void driveController(frc::XboxController &controller);
+        void driveController(frc::XboxController *controller);
 
     private:
         SwerveModule *m_frontRight;
@@ -146,14 +185,8 @@ class SwerveTrain {
             //And the amount of REV rotations we want to rotate is the decimal total by Nic's Constant.
             double returnVal = decimalTotalCircle * R_nicsConstant;
             //If x is positive, invert it to rotate clockwise
-            if (x > 0) {
-
-                return -returnVal;
-            }
-            else {
 
                 return returnVal;
-            }
         }
         double getAbsoluteControllerMagnitude(const double &x, const double &y) {
 
@@ -163,5 +196,25 @@ class SwerveTrain {
 
             //Return the sum of the coordinates as a knock-off magnitude
             return absX + absY;
+        }
+
+        double getRadianAngleFromCenter(const double &x, const double &yInverted) {
+
+            //Y seems to be inverted by default, so un-invert it...
+            const double y = -yInverted;
+
+            //Create vectors for the line x = 0 and the line formed by the joystick coordinates...
+            VectorDouble center(0, 1);
+            VectorDouble current(x, y);
+            //Get the dot produt of the vectors for use in calculation...
+            const double dotProduct = center * current;
+            //Multiply each vector's magnitude together for use in calculation...
+            const double magnitudeProduct = center.magnitude() * current.magnitude();
+            //The cosine of the angle we want in rad is the dot product over the magnitude product...
+            const double cosineAngle = dotProduct / magnitudeProduct;
+            //The angle we want is the arccosine of its cosine...
+            double angleRad = acos(cosineAngle);
+
+            return angleRad;
         }
 };

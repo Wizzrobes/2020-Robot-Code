@@ -25,7 +25,18 @@ void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
-void Robot::TeleopPeriodic() {}
+void Robot::TeleopPeriodic() {
+
+    if(playerOne->GetAButton()) {
+        zion.setSwerveZeroPosition();
+    } if(playerOne->GetXButton()) {
+
+        zion.driveController(playerOne);
+    } else {
+        zion.setDriveSpeed(0);
+        zion.setSwerveSpeed(0);
+    }
+}
 
 void Robot::TestPeriodic() {}
 

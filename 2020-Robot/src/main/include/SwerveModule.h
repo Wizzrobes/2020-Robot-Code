@@ -72,14 +72,27 @@ class SwerveModule {
 
             m_swerveMotor->Set(speedToSet);
         }
+
+        void invertDriveMotor() {
+            m_driveMotor->SetInverted(true); 
+        }
+
         double getDrivePosition() {
 
             return m_driveMotorEncoder->GetPosition();
         }
-        double getSwervePosition() {
-
-            return m_swerveMotorEncoder->GetPosition();
+        double getSwervePositionAdjusted() {
+            if(m_swerveMotorEncoder->GetPosition() >= R_nicsConstant) {
+                return fmod(m_swerveMotorEncoder->GetPosition(), R_nicsConstant);
+            } else {
+                return m_swerveMotorEncoder->GetPosition(); 
+            }
         }
+
+        double getSwervePosition() {
+            return m_swerveMotorEncoder->GetPosition(); 
+        }
+
         double getDriveSpeed() {
 
             return m_driveMotorEncoder->GetVelocity();
@@ -91,17 +104,22 @@ class SwerveModule {
 
         void assumeSwervePosition(const double& positionToAssume) {
 
-            const double currentPosition = m_swerveMotorEncoder->GetPosition();
+            double currentPosition = getSwervePositionAdjusted();
             //If the current position both CW and CCW is close enough to where we want to go (within one tolerance value)...
-            if (positionToAssume - currentPosition < R_swerveTrainAssumePositionTolerance && currentPosition - positionToAssume < R_swerveTrainAssumePositionTolerance) {
-
+          
+            if (abs(positionToAssume - currentPosition) < R_swerveTrainAssumePositionTolerance) {
                 //Stop rotating the swerve motor and skip checking anything else...
                 m_swerveMotor->Set(0);
             }
+           
+           else if(abs(positionToAssume - currentPosition) > R_nicsConstant/2.0) {
+
+             m_swerveMotor->Set(calculateAssumePositionSpeed(-R_nicsConstant - (positionToAssume - currentPosition)));
+           }
+
             //If the difference between where we want to be and where we are doesn't satisfy tolerance
             //(is more than one tolerance value away from 0, perfection)...
             else {
-
                 //Rotate the swerve to the speed calculated by the mathematical function based on how
                 //many REV revolutions are remaining towards 0, perfection...
                 m_swerveMotor->Set(calculateAssumePositionSpeed(positionToAssume - currentPosition));
