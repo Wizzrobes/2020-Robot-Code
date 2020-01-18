@@ -120,10 +120,11 @@ class SwerveTrain {
         double m_rearLeftSwerveZeroPosition;
         double m_rearRightSwerveZeroPosition;
 
-        double getControllerREVRotationsFromCenter(const double &x, const double &yInverted) {
+        double getControllerREVRotationsFromCenter(frc::XboxController *controller) {
 
+            const double x = controller->GetX(frc::GenericHID::kLeftHand);
             //Y seems to be inverted by default, so un-invert it...
-            const double y = -yInverted;
+            const double y = -controller->GetY(frc::GenericHID::kLeftHand);
 
             //Create vectors for the line x = 0 and the line formed by the joystick coordinates...
             VectorDouble center(0, 1);
@@ -150,11 +151,11 @@ class SwerveTrain {
                 return returnVal;
             }
         }
-        double getAbsoluteControllerMagnitude(const double &x, const double &y) {
+        double getControllerAbsoluteMagnitude(frc::XboxController *controller) {
 
             //Get the absolute values of the joystick coordinates
-            double absX = abs(x);
-            double absY = abs(y);
+            double absX = abs(controller->GetX(frc::GenericHID::kLeftHand));
+            double absY = abs(controller->GetY(frc::GenericHID::kLeftHand));
 
             //Return the sum of the coordinates as a knock-off magnitude
             return absX + absY;

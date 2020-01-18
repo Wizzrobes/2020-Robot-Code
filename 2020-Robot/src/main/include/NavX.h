@@ -45,7 +45,7 @@ class NavX {
         }
         double getRateDegrees() {
 
-            return (navX->GetRate()) * (180 / M_PI);
+            return (navX->GetRate() * (180 / M_PI));
         }
         double getAngle() {
 

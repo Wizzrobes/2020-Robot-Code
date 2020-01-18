@@ -89,7 +89,7 @@ class SwerveModule {
             return m_swerveMotorEncoder->GetVelocity();
         }
 
-        void assumeSwervePosition(const double& positionToAssume) {
+        void assumeSwervePosition(const double &positionToAssume) {
 
             const double currentPosition = m_swerveMotorEncoder->GetPosition();
             //If the current position both CW and CCW is close enough to where we want to go (within one tolerance value)...
@@ -114,7 +114,7 @@ class SwerveModule {
         rev::CANSparkMax *m_swerveMotor;
         rev::CANEncoder *m_swerveMotorEncoder;
 
-        double calculateAssumePositionSpeed(const double& howFarRemainingInTravel) {
+        double calculateAssumePositionSpeed(const double &howFarRemainingInTravel) {
 
             //Begin initally with a double calculated with the simplex function...
             double toReturn = ((1) / (1 + exp((-1 * abs(howFarRemainingInTravel)) + 5)));
