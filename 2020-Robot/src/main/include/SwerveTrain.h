@@ -185,13 +185,13 @@ class SwerveTrain {
             return absX + absY;
         }
 
-        //TODO: fix -Wreturn-type
         double getRelativeSwervePosition() {
 
             double position = m_frontRight->getSwervePosition() - m_frontRightSwerveZeroPosition;
             if (position > R_nicsConstant) {
 
                 position = fmod(position, R_nicsConstant);
+                return position;
             }
             else {
 
