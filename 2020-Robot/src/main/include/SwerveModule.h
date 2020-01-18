@@ -113,9 +113,13 @@ class SwerveModule {
             }
            
            else if(abs(positionToAssume - currentPosition) > R_nicsConstant/2.0) {
-
-             m_swerveMotor->Set(calculateAssumePositionSpeed(-R_nicsConstant - (positionToAssume - currentPosition)));
+                if(positionToAssume < currentPosition) {
+                    m_swerveMotor->Set(calculateAssumePositionSpeed(R_nicsConstant - (currentPosition - positionToAssume)));
+                } else if(positionToAssume > currentPosition) {
+                    m_swerveMotor->Set(calculateAssumePositionSpeed(-R_nicsConstant + (positionToAssume - currentPosition)));
+                }
            }
+
 
             //If the difference between where we want to be and where we are doesn't satisfy tolerance
             //(is more than one tolerance value away from 0, perfection)...
