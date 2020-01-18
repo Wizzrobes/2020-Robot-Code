@@ -11,19 +11,37 @@ Public Methods
 
     void setDriveSpeed(const double&): Sets the driving speed to a double.
     void setSwerveSpeed(const double&): Sets the swerve speed to a double.
+    void setZeroPosition(): Sets the zero position to the current position.
     double getDrivePosition(): Returns the total REV revolutions of the drive
         encoder.
     double getSwervePosition(): Returns the total REV revolutions of the swerve
         encoder.
+    double getSwerveZeroPosition(): Returns the zero position of the swerve
+        encoder (whatever the value of its variable is).
+    double getSwervePositionSingleRotation(): Returns the REV revolution
+        position of the swerve motor as an equivalent value inside of one
+        rotation (only from 0 to Nic's Constant). For example, a position
+        value equivalent to 1.5 Nic's Constants will return a half of
+        Nic's Constant.
+    double getSwerveNearestZeroPosition(): Uses
+        getSwervePositionSingleRotation() to determine if 0 or one
+        Nic's Constant is the most efficient zero for pathfinding.
     double getDriveSpeed(): Returns the speed of the drive encoder in RPM.
     double getSwerveSpeed(): Returns the speed of the swerve encoder in RPM.
     void assumeSwervePosition(const double& positionToAssume): Uses a
         mathematical function to assign a speed to the swerve motor to move
         quickly and accurately, within a tolerance, to any REV rotation value,
-        clockwise or opposite.
+        clockwise or counterclockwise, with an optimal path. See the function
+        itself for further detail.
+    void assumeSwerveZeroPosition(): Drives the swerve to the current value
+        of the swerve's zero position variable (the last set zero position).
+    void assumeSwerveNearestZeroPosition(): Drives the swerve to its nearest
+        zero position (the closest multiple of Nic's Constant to the zero
+        value) either clockwise or counterclockwise.
+
 
     Note that the values returned by the get functions persist across disables, but
-        not across power cycles, and are set at power-on.
+        not across power cycles, and are set to 0 at power-on.
 
 Private Methods
 
@@ -59,6 +77,9 @@ class SwerveModule {
             m_swerveMotor = new rev::CANSparkMax(canSwerveID, rev::CANSparkMax::MotorType::kBrushless);
             m_swerveMotorEncoder = new rev::CANEncoder(m_swerveMotor->GetEncoder());
 
+            //Default the swerve's zero position to its power-on position
+            m_swerveZeroPosition = m_swerveMotorEncoder->GetPosition();
+
             //Allow the drive motor to coast, but brake the swerve motor for accuracy.
             m_driveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
             m_swerveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
@@ -72,6 +93,10 @@ class SwerveModule {
 
             m_swerveMotor->Set(speedToSet);
         }
+        void setZeroPosition() {
+
+            m_swerveZeroPosition = m_swerveMotorEncoder->GetPosition();
+        }
         double getDrivePosition() {
 
             return m_driveMotorEncoder->GetPosition();
@@ -80,15 +105,38 @@ class SwerveModule {
 
             return m_swerveMotorEncoder->GetPosition(); 
         }
-        double getSwervePositionAdjusted() {
+        double getSwerveZeroPosition() {
 
-            if (m_swerveMotorEncoder->GetPosition() >= R_nicsConstant) {
+            return m_swerveZeroPosition;
+        }
+        double getSwervePositionSingleRotation() {
 
-                return fmod(m_swerveMotorEncoder->GetPosition(), R_nicsConstant);
+            double clockwiseNicsFromZero = m_swerveMotorEncoder->GetPosition() - m_swerveZeroPosition;
+            //If more than a full rotation from zero...
+            if (clockwiseNicsFromZero >= R_nicsConstant) {
+
+                //Return the most local equivalent position...
+                return fmod(clockwiseNicsFromZero, R_nicsConstant);
             }
             else {
 
-                return m_swerveMotorEncoder->GetPosition(); 
+                //Otherwise, return only the position.
+                return clockwiseNicsFromZero;
+            }
+        }
+        double getSwerveNearestZeroPosition() {
+
+            //If a full rotation minus the curent position is less than half of Nic's Constant,
+            //the position is within the second or third quadrant, so a rotation to
+            //Nic's Constant is the fastest path...
+            if (R_nicsConstant - getSwervePositionSingleRotation() < (R_nicsConstant / 2)) {
+
+                return R_nicsConstant;
+            }
+            //Otherwise, going to 0 from the first or second quadrant is going to be faster.
+            else {
+
+                return 0; 
             }
         }
         double getDriveSpeed() {
@@ -99,14 +147,10 @@ class SwerveModule {
 
             return m_swerveMotorEncoder->GetVelocity();
         }
-        void invertDriveMotor() {
-
-            m_driveMotor->SetInverted(true); 
-        }
 
         void assumeSwervePosition(const double &positionToAssume) {
 
-            double currentPosition = getSwervePositionAdjusted();
+            double currentPosition = getSwervePositionSingleRotation();
 
             //If the current position is close enough to where we want to go (within one tolerance value)...
             if (abs(positionToAssume - currentPosition) < R_swerveTrainAssumePositionTolerance) {
@@ -114,21 +158,35 @@ class SwerveModule {
                 //Stop rotating the swerve motor and skip checking anything else...
                 m_swerveMotor->Set(0);
             }
+            //If the position to assume is greater than half a revolution in the clockwise direction...
             else if (abs(positionToAssume - currentPosition) > R_nicsConstant / 2) {
 
+                //If such a rotation needs to be clockwise...
                 if (positionToAssume < currentPosition) {
 
+                    //Set the speed of the motor using the Nic's Constant distance between the two points...
                     m_swerveMotor->Set(calculateAssumePositionSpeed(R_nicsConstant - (currentPosition - positionToAssume)));
                 }
+                //If such a rotation needs to be counterclockwise...
                 else if (positionToAssume > currentPosition) {
 
+                    //Set the speed similarly, but negatively...
                     m_swerveMotor->Set(calculateAssumePositionSpeed(-R_nicsConstant + (positionToAssume - currentPosition)));
                 }
             }
             else {
 
+                //Otherwise, perform a normal between two points rotation with a Nic's Constant value.
                 m_swerveMotor->Set(calculateAssumePositionSpeed(positionToAssume - currentPosition));
             }
+        }
+        void assumeSwerveZeroPosition() {
+
+            assumeSwervePosition(m_swerveZeroPosition);
+        }
+        void assumeSwerveNearestZeroPosition() {
+
+            assumeSwervePosition(getSwerveNearestZeroPosition());
         }
 
     private:
@@ -136,6 +194,8 @@ class SwerveModule {
         rev::CANEncoder *m_driveMotorEncoder;
         rev::CANSparkMax *m_swerveMotor;
         rev::CANEncoder *m_swerveMotorEncoder;
+
+        double m_swerveZeroPosition;
 
         double calculateAssumePositionSpeed(const double& howFarRemainingInTravel) {
 

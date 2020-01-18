@@ -22,6 +22,8 @@ Public Methods
         "straight".
     void assumeSwerveZeroPosition(): Drives the swerves to return to their
         zero position.
+    void assumeSwerveNearestZeroPosition(): Drives the swerve to the
+        nearest Nic's Constant multiple of its zero value, CW or CCW
     void publishSwervePositions(): Puts the current swerve encoder positions
         to the SmartDashboard.
     void driveController(): Fully drives the swerve train on the supplied
@@ -58,11 +60,6 @@ class SwerveTrain {
             m_frontLeft = &frontLeftModule;
             m_rearLeft = &rearLeftModule;
             m_rearRight = &rearRightModule;
-
-            m_frontRightSwerveZeroPosition = 0;
-            m_frontLeftSwerveZeroPosition = 0;
-            m_rearLeftSwerveZeroPosition = 0;
-            m_rearRightSwerveZeroPosition = 0;
         }
 
         void setDriveSpeed(const double& driveSpeed) {
@@ -82,37 +79,32 @@ class SwerveTrain {
 
         void setSwerveZeroPosition(const bool &verbose = false) {
 
-            m_frontRightSwerveZeroPosition = m_frontRight->getSwervePosition();
-            m_frontLeftSwerveZeroPosition = m_frontLeft->getSwervePosition();
-            m_rearLeftSwerveZeroPosition = m_rearLeft->getSwervePosition();
-            m_rearRightSwerveZeroPosition = m_rearRight->getSwervePosition();
+            m_frontRight->setZeroPosition();
+            m_frontLeft->setZeroPosition();
+            m_rearLeft->setZeroPosition();
+            m_rearRight->setZeroPosition();
 
             if (verbose) {
 
-                frc::SmartDashboard::PutNumber("FR Swrv Pos0", m_frontRightSwerveZeroPosition);
-                frc::SmartDashboard::PutNumber("FL Swrv Pos0", m_frontLeftSwerveZeroPosition);
-                frc::SmartDashboard::PutNumber("RL Swrv Pos0", m_rearLeftSwerveZeroPosition);
-                frc::SmartDashboard::PutNumber("RR Swrv Pos0", m_rearRightSwerveZeroPosition);
+                frc::SmartDashboard::PutNumber("FR Swrv Pos0", m_frontRight->getSwerveZeroPosition());
+                frc::SmartDashboard::PutNumber("FL Swrv Pos0", m_frontLeft->getSwerveZeroPosition());
+                frc::SmartDashboard::PutNumber("RL Swrv Pos0", m_rearLeft->getSwerveZeroPosition());
+                frc::SmartDashboard::PutNumber("RR Swrv Pos0", m_rearRight->getSwerveZeroPosition());
             }
         }
-        void assignFrontRightSwerveZeroPostion(const double &angle) {
+        void assumeZeroPosition() {
 
-            m_frontRightSwerveZeroPosition = angle; 
+            m_frontRight->assumeSwerveZeroPosition();
+            m_frontLeft->assumeSwerveZeroPosition();
+            m_rearLeft->assumeSwerveZeroPosition();
+            m_rearRight->assumeSwerveZeroPosition();
         }
-        void assumeSwerveZeroPosition() {
+        void assumeNearestZeroPosition() {
 
-            m_frontRight->assumeSwervePosition(m_frontRightSwerveZeroPosition);
-            m_frontLeft->assumeSwervePosition(m_frontLeftSwerveZeroPosition);
-            m_rearLeft->assumeSwervePosition(m_rearLeftSwerveZeroPosition);
-            m_rearRight->assumeSwervePosition(m_rearRightSwerveZeroPosition);
-        }
-        void assumeSwerveNearestZeroPosition() {
-
-            const double nearestPosition = getNearestZeroPosition(); 
-            m_frontRight->assumeSwervePosition(nearestPosition);
-            m_frontLeft->assumeSwervePosition(nearestPosition);
-            m_rearLeft->assumeSwervePosition(nearestPosition);
-            m_rearRight->assumeSwervePosition(nearestPosition);
+            m_frontRight->assumeSwerveNearestZeroPosition();
+            m_frontLeft->assumeSwerveNearestZeroPosition();
+            m_rearLeft->assumeSwerveNearestZeroPosition();
+            m_rearRight->assumeSwerveNearestZeroPosition();
         }
 
         void publishSwervePositions() {
@@ -130,11 +122,6 @@ class SwerveTrain {
         SwerveModule *m_frontLeft;
         SwerveModule *m_rearLeft;
         SwerveModule *m_rearRight;
-
-        double m_frontRightSwerveZeroPosition;
-        double m_frontLeftSwerveZeroPosition;
-        double m_rearLeftSwerveZeroPosition;
-        double m_rearRightSwerveZeroPosition;
 
         double getControllerREVRotationsFromCenter(frc::XboxController *controller) {
 
@@ -183,37 +170,5 @@ class SwerveTrain {
 
             //Return the sum of the coordinates as a knock-off magnitude
             return absX + absY;
-        }
-
-        double getRelativeSwervePosition() {
-
-            double position = m_frontRight->getSwervePosition() - m_frontRightSwerveZeroPosition;
-            if (position > R_nicsConstant) {
-
-                position = fmod(position, R_nicsConstant);
-                return position;
-            }
-            else {
-
-                return position;
-            }
-        }
-        double getNearestZeroPosition() {
-
-            if (R_nicsConstant - getRelativeSwervePosition() < (R_nicsConstant / 2)) {
-
-                return R_nicsConstant;
-            }
-            else {
-
-                return 0; 
-            }
-        }
-        void invertDriveMotors() {
-
-            m_frontRight->invertDriveMotor(); 
-            m_frontLeft->invertDriveMotor(); 
-            m_rearLeft->invertDriveMotor(); 
-            m_rearRight->invertDriveMotor();  
         }
 };

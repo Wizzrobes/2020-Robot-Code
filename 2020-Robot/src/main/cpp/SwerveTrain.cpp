@@ -5,15 +5,20 @@
 void SwerveTrain::driveController(frc::XboxController *controller) {
 
     const double controllerREVRotationsFromCenter = getControllerREVRotationsFromCenter(controller);
-    //const double controllerMagnitude = getControllerAbsoluteMagnitude(controller);
+    const double controllerMagnitude = getControllerAbsoluteMagnitude(controller);
 
     //If the control stick is within deadzone, return to the zero position
     if (abs(controller->GetX(frc::GenericHID::kLeftHand)) < R_playerOneControllerDeadzone && abs(controller->GetY(frc::GenericHID::kLeftHand)) < R_playerOneControllerDeadzone) {
         
-        assumeSwerveNearestZeroPosition();
+        assumeNearestZeroPosition();
+        setDriveSpeed(0);
     }
     else {
         
-        m_frontRight->assumeSwervePosition(controllerREVRotationsFromCenter);  
+        m_frontRight->assumeSwervePosition(controllerREVRotationsFromCenter);
+        m_frontLeft->assumeSwervePosition(controllerREVRotationsFromCenter);
+        m_rearLeft->assumeSwervePosition(controllerREVRotationsFromCenter);
+        m_rearRight->assumeSwervePosition(controllerREVRotationsFromCenter);
+        setDriveSpeed(controllerMagnitude);
     }
 }
