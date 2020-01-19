@@ -22,8 +22,15 @@ Public Methods
         "straight".
     void assumeSwerveZeroPosition(): Drives the swerves to return to their
         zero position.
-    void assumeSwerveNearestZeroPosition(): Drives the swerve to the
-        nearest Nic's Constant multiple of its zero value, CW or CCW
+    void assumeSwerveNearestZeroPosition(): Drives the swerves to the
+        nearest Nic's Constant multiple of its zero value, CW or CCW.
+        In doing so, really only drives the swerve to either 0 or
+        the value of one Nic's Constant. Since the pathfinding function
+        thinks clockwise, this ends up driving it to zero the fastest
+        way possible, making use of getSwervePositionSingleRotation() as
+        the driver function to make this possible. assumeSwerveZeroPosition()
+        cannot make this optimization, and simply goes to whatever the zero
+        value is. Useful for low-level things.
     void publishSwervePositions(): Puts the current swerve encoder positions
         to the SmartDashboard.
     void driveController(): Fully drives the swerve train on the supplied
@@ -31,10 +38,13 @@ Public Methods
 
 Private Methods
 
-    double getControllerREVRotationsFromCenter(const double&, const double&):
+    double getControllerREVRotationsFromCenter(frc::XboxController*):
         Discernes how many clockwise REV rotations from center the current
         location of the joystick is using vector trigonometry and properties.
         See https://en.wikipedia.org/wiki/Dot_product#Geometric_definition
+    double getControllerAngleFromCenter(frc::XboxController*): Same
+        as above, but simply returns the radian angle (no conversion
+        back to a REV Rotation value).
     double getAbsoluteControllerMagnitude(frc::XboxController&): Gets the
         unsigned velocity of the control stick using only absolute value.
 */

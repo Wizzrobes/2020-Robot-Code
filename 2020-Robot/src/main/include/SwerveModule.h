@@ -16,16 +16,18 @@ Public Methods
         encoder.
     double getSwervePosition(): Returns the total REV revolutions of the swerve
         encoder.
-    double getSwerveZeroPosition(): Returns the zero position of the swerve
-        encoder (whatever the value of its variable is).
     double getSwervePositionSingleRotation(): Returns the REV revolution
         position of the swerve motor as an equivalent value inside of one
         rotation (only from 0 to Nic's Constant). For example, a position
         value equivalent to 1.5 Nic's Constants will return a half of
         Nic's Constant.
+    double getSwerveZeroPosition(): Returns the zero position of the swerve
+        encoder (whatever the value of its variable is).
     double getSwerveNearestZeroPosition(): Uses
         getSwervePositionSingleRotation() to determine if 0 or one
         Nic's Constant is the most efficient zero for pathfinding.
+        See SwerveTrain.h for a more thorough explanation of why
+        this works.
     double getDriveSpeed(): Returns the speed of the drive encoder in RPM.
     double getSwerveSpeed(): Returns the speed of the swerve encoder in RPM.
     void assumeSwervePosition(const double& positionToAssume): Uses a
@@ -77,7 +79,7 @@ class SwerveModule {
             m_swerveMotor = new rev::CANSparkMax(canSwerveID, rev::CANSparkMax::MotorType::kBrushless);
             m_swerveMotorEncoder = new rev::CANEncoder(m_swerveMotor->GetEncoder());
 
-            //Default the swerve's zero position to its power-on position
+            //Default the swerve's zero position to its power-on position.
             m_swerveZeroPosition = m_swerveMotorEncoder->GetPosition();
 
             //Allow the drive motor to coast, but brake the swerve motor for accuracy.
@@ -105,10 +107,6 @@ class SwerveModule {
 
             return m_swerveMotorEncoder->GetPosition(); 
         }
-        double getSwerveZeroPosition() {
-
-            return m_swerveZeroPosition;
-        }
         double getSwervePositionSingleRotation() {
 
             double clockwiseNicsFromZero = m_swerveMotorEncoder->GetPosition() - m_swerveZeroPosition;
@@ -123,6 +121,10 @@ class SwerveModule {
                 //Otherwise, return only the position.
                 return clockwiseNicsFromZero;
             }
+        }
+        double getSwerveZeroPosition() {
+
+            return m_swerveZeroPosition;
         }
         double getSwerveNearestZeroPosition() {
 
