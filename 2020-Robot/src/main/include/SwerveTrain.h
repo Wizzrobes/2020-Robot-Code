@@ -150,6 +150,11 @@ class SwerveTrain {
             const double cosineAngle = dotProduct / magnitudeProduct;
             //The angle we want is the arccosine of its cosine...
             double angleRad = acos(cosineAngle);
+            //To go from a full 0pi to 2pi and overcome the limitation of arccos, jump to 2pi and subtract the gradually decreasing angle...
+            if (x < 0) {
+
+                angleRad = (2 * M_PI) - angleRad;
+            }
             //The decimal total of the whole circle is the radians over 2pi...
             double decimalTotalCircle = ((angleRad) / (2 * M_PI));
             //And the amount of REV rotations we want to rotate is the decimal total by Nic's Constant.
