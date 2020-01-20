@@ -181,4 +181,15 @@ class SwerveTrain {
             //Return the sum of the coordinates as a knock-off magnitude
             return absX + absY;
         }
+
+        bool controllerIsWithinDeadzone(frc::XboxController *controller) {
+            if (abs(controller->GetX(frc::GenericHID::kLeftHand)) < R_playerOneControllerDeadzone && abs(controller->GetY(frc::GenericHID::kLeftHand)) < R_playerOneControllerDeadzone &&
+                abs(controller->GetX(frc::GenericHID::kRightHand)) < R_playerOneControllerDeadzone && abs(controller->GetY(frc::GenericHID::kRightHand)) < R_playerOneControllerDeadzone){
+                    return true; 
+            }
+            else {
+                return false;
+            }
+        }
+
 };
