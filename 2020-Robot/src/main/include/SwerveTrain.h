@@ -57,7 +57,7 @@ Private Methods
 #include <math.h>
 
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/XboxController.h>
+#include <frc/Joystick.h>
 
 #include "rev/CANSparkMax.h"
 
@@ -128,7 +128,7 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("RR Swrv Pos", m_rearRight->getSwervePosition());
         }
 
-        void driveController(frc::XboxController *controller);
+        void driveController(frc::Joystick *controller);
 
     private:
         SwerveModule *m_frontRight;
@@ -136,12 +136,13 @@ class SwerveTrain {
         SwerveModule *m_rearLeft;
         SwerveModule *m_rearRight;
 
-        double getControllerREVRotationsFromCenter(frc::XboxController *controller) {
+        double getControllerREVRotationsFromCenter(frc::Joystick *controller) {
 
             //TODO: Why is there a negative here?
-            const double x = -controller->GetX(frc::GenericHID::kLeftHand);
+            //took out negative to test with joystick
+            const double x = -controller->GetX(frc::GenericHID::kRightHand);
             //Y seems to be inverted by default, so un-invert it...
-            const double y = -controller->GetY(frc::GenericHID::kLeftHand);
+            const double y = -controller->GetY(frc::GenericHID::kRightHand);
 
             //Create vectors for the line x = 0 and the line formed by the joystick coordinates...
             VectorDouble center(0, 1);
@@ -164,10 +165,10 @@ class SwerveTrain {
             //And the amount of REV rotations we want to rotate is the decimal total by Nic's Constant.
             return decimalTotalCircle * R_nicsConstant;
         }
-        double getControllerAngleFromCenter(frc::XboxController *controller) {
+        double getControllerAngleFromCenter(frc::Joystick *controller) {
 
-            const double x = controller->GetX(frc::GenericHID::kLeftHand);
-            const double y = -controller->GetY(frc::GenericHID::kLeftHand);
+            const double x = -controller->GetX(frc::GenericHID::kRightHand);
+            const double y = -controller->GetY(frc::GenericHID::kRightHand);
 
             VectorDouble center(0, 1);
             VectorDouble current(x, y);
@@ -176,24 +177,23 @@ class SwerveTrain {
             const double cosineAngle = dotProduct / magnitudeProduct;
             return acos(cosineAngle);
         }
-        double getControllerAbsoluteMagnitude(frc::XboxController *controller) {
+        double getControllerAbsoluteMagnitude(frc::Joystick *controller) {
 
             //Get the absolute values of the joystick coordinates
-            double absX = abs(controller->GetX(frc::GenericHID::kLeftHand));
-            double absY = abs(controller->GetY(frc::GenericHID::kLeftHand));
+            double absX = abs(controller->GetX(frc::GenericHID::kRightHand));
+            double absY = abs(controller->GetY(frc::GenericHID::kRightHand));
 
             //Return the sum of the coordinates as a knock-off magnitude
             return absX + absY;
         }
-        bool getControllerAllInDeadzone(frc::XboxController *controller) {
+        bool getControllerAllInDeadzone(frc::Joystick *controller) {
 
-            const double absLeftX = abs(controller->GetX(frc::GenericHID::kLeftHand));
-            const double absLeftY = abs(controller->GetY(frc::GenericHID::kLeftHand));
-            const double absRightX = abs(controller->GetX(frc::GenericHID::kRightHand));
-            const double absRightY = abs(controller->GetY(frc::GenericHID::kRightHand));
+            const double absLeftX = abs(controller->GetX(frc::GenericHID::kRightHand));
+            const double absLeftY = abs(controller->GetY(frc::GenericHID::kRightHand));
+            const double absZ = abs(controller->GetZ());
             const double zone = R_controllerDeadzone;
 
-            if (absLeftX < zone && absLeftY < zone && absRightX < zone && absRightY < zone) {
+            if (absLeftX < zone && absLeftY < zone && absZ < R_twistDeadzone) {
 
                 return true;
             }
