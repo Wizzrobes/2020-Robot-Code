@@ -135,7 +135,7 @@ class SwerveTrain {
 
         double getControllerREVRotationsFromCenter(frc::XboxController *controller) {
 
-            const double x = controller->GetX(frc::GenericHID::kLeftHand);
+            const double x = -controller->GetX(frc::GenericHID::kLeftHand);
             //Y seems to be inverted by default, so un-invert it...
             const double y = -controller->GetY(frc::GenericHID::kLeftHand);
 

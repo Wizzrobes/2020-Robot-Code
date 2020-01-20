@@ -5,7 +5,7 @@
 void SwerveTrain::driveController(frc::XboxController *controller) {
 
     const double controllerREVRotationsFromCenter = getControllerREVRotationsFromCenter(controller);
-    const double controllerTurningMagnitude = controller->GetX(frc::GenericHID::kRightHand); 
+    const double controllerTurningMagnitude = -controller->GetX(frc::GenericHID::kRightHand); 
 
     const double controllerMagnitude = getControllerAbsoluteMagnitude(controller);
 
@@ -14,7 +14,7 @@ void SwerveTrain::driveController(frc::XboxController *controller) {
         
         assumeNearestZeroPosition();
         setDriveSpeed(0);
-    } 
+    }
     else if(abs(controllerTurningMagnitude) > R_playerOneControllerDeadzone) {
 
         m_frontRight->assumeSwervePosition((1.0/8.0)*R_nicsConstant);
@@ -30,6 +30,6 @@ void SwerveTrain::driveController(frc::XboxController *controller) {
         m_frontLeft->assumeSwervePosition(controllerREVRotationsFromCenter);
         m_rearLeft->assumeSwervePosition(controllerREVRotationsFromCenter);
         m_rearRight->assumeSwervePosition(controllerREVRotationsFromCenter);
-        setDriveSpeed(controllerMagnitude);
+        setDriveSpeed(controllerMagnitude / 4.0);
     }
 }
