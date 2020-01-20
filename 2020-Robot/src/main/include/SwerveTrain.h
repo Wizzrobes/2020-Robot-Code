@@ -47,6 +47,9 @@ Private Methods
         back to a REV Rotation value).
     double getAbsoluteControllerMagnitude(frc::XboxController&): Gets the
         unsigned velocity of the control stick using only absolute value.
+    bool getControllerAllInDeadzone(frc::XboxController*): Returns
+        true if each stick is within the deadzone specified in RobotMap,
+        false otherwise.
 */
 
 #pragma once
@@ -135,6 +138,7 @@ class SwerveTrain {
 
         double getControllerREVRotationsFromCenter(frc::XboxController *controller) {
 
+            //TODO: Why is there a negative here?
             const double x = -controller->GetX(frc::GenericHID::kLeftHand);
             //Y seems to be inverted by default, so un-invert it...
             const double y = -controller->GetY(frc::GenericHID::kLeftHand);
@@ -181,15 +185,18 @@ class SwerveTrain {
             //Return the sum of the coordinates as a knock-off magnitude
             return absX + absY;
         }
+        bool getControllerAllInDeadzone(frc::XboxController *controller) {
 
-        bool controllerIsWithinDeadzone(frc::XboxController *controller) {
-            if (abs(controller->GetX(frc::GenericHID::kLeftHand)) < R_playerOneControllerDeadzone && abs(controller->GetY(frc::GenericHID::kLeftHand)) < R_playerOneControllerDeadzone &&
-                abs(controller->GetX(frc::GenericHID::kRightHand)) < R_playerOneControllerDeadzone && abs(controller->GetY(frc::GenericHID::kRightHand)) < R_playerOneControllerDeadzone){
-                    return true; 
+            const double absLeftX = abs(controller->GetX(frc::GenericHID::kLeftHand));
+            const double absLeftY = abs(controller->GetY(frc::GenericHID::kLeftHand));
+            const double absRightX = abs(controller->GetX(frc::GenericHID::kRightHand));
+            const double absRightY = abs(controller->GetY(frc::GenericHID::kRightHand));
+            const double zone = R_controllerDeadzone;
+
+            if (absLeftX < zone && absLeftY < zone && absRightX < zone && absRightY < zone) {
+
+                return true;
             }
-            else {
-                return false;
-            }
+            return false;
         }
-
 };
