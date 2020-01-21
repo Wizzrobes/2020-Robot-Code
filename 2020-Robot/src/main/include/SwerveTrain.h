@@ -199,4 +199,18 @@ class SwerveTrain {
             }
             return false;
         }
+
+     bool getNonTwistInDeadzone(frc::Joystick *controller) {
+
+            const double absLeftX = abs(controller->GetX(frc::GenericHID::kRightHand));
+            const double absLeftY = abs(controller->GetY(frc::GenericHID::kRightHand));
+            const double zone = R_controllerDeadzone * 2.0;
+ 
+            if (absLeftX < zone && absLeftY < zone) {
+
+                return true;
+            }
+            return false;
+        }
+
 };
