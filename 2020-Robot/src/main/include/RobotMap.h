@@ -27,6 +27,8 @@ const int R_rearRightDriveMotorCANID   = 8;
 const int R_playerOneControllerPort = 0;
 const double R_controllerDeadzone = .05;
 
+const double R_driveTrainExecutionCap = .25;
+
 const double R_swerveTrainAssumePositionTolerance = .1;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = .2;
