@@ -30,7 +30,7 @@ void SwerveTrain::driveController(frc::XboxController *controller) {
         m_frontLeft->assumeSwervePosition((3.0 / 8.0) * R_nicsConstant);
         m_rearLeft->assumeSwervePosition((5.0 / 8.0) * R_nicsConstant);
         m_rearRight->assumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
-        setDriveSpeed(controllerTurningMagnitude * .25);
+        setDriveSpeed(controllerTurningMagnitude * R_driveTrainExecutionCap);
     }
     //Otherwise, simply drive normally.
     else {
@@ -39,7 +39,7 @@ void SwerveTrain::driveController(frc::XboxController *controller) {
         m_frontLeft->assumeSwervePosition(controllerREVRotationsFromCenter);
         m_rearLeft->assumeSwervePosition(controllerREVRotationsFromCenter);
         m_rearRight->assumeSwervePosition(controllerREVRotationsFromCenter);
-        setDriveSpeed(controllerMagnitude * .25);
+        setDriveSpeed(controllerMagnitude * R_driveTrainExecutionCap);
     }
 }
 

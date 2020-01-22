@@ -27,6 +27,7 @@ const int R_rearRightDriveMotorCANID   = 8;
 const int R_playerOneControllerPort = 0;
 const double R_controllerDeadzone = .05;
 
+//This is the highest percentage of full speed that Zion can actually go.
 const double R_driveTrainExecutionCap = .25;
 
 const double R_swerveTrainAssumePositionTolerance = .1;
