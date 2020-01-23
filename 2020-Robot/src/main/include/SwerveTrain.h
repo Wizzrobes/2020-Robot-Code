@@ -140,9 +140,9 @@ class SwerveTrain {
 
             //TODO: Why is there a negative here?
             //took out negative to test with joystick
-            const double x = -controller->GetX(frc::GenericHID::kRightHand);
+            const double x = -controller->GetX();
             //Y seems to be inverted by default, so un-invert it...
-            const double y = -controller->GetY(frc::GenericHID::kRightHand);
+            const double y = -controller->GetY();
 
             //Create vectors for the line x = 0 and the line formed by the joystick coordinates...
             VectorDouble center(0, 1);
@@ -167,8 +167,8 @@ class SwerveTrain {
         }
         double getControllerAngleFromCenter(frc::Joystick *controller) {
 
-            const double x = -controller->GetX(frc::GenericHID::kRightHand);
-            const double y = -controller->GetY(frc::GenericHID::kRightHand);
+            const double x = -controller->GetX();
+            const double y = -controller->GetY();
 
             VectorDouble center(0, 1);
             VectorDouble current(x, y);
@@ -180,31 +180,31 @@ class SwerveTrain {
         double getControllerAbsoluteMagnitude(frc::Joystick *controller) {
 
             //Get the absolute values of the joystick coordinates
-            double absX = abs(controller->GetX(frc::GenericHID::kRightHand));
-            double absY = abs(controller->GetY(frc::GenericHID::kRightHand));
+            double absX = abs(controller->GetX());
+            double absY = abs(controller->GetY());
 
             //Return the sum of the coordinates as a knock-off magnitude
             return absX + absY;
         }
-        bool getControllerAllInDeadzone(frc::Joystick *controller) {
+        bool getControllerXYZInDeadzone(frc::Joystick *controller) {
 
-            const double absLeftX = abs(controller->GetX(frc::GenericHID::kRightHand));
-            const double absLeftY = abs(controller->GetY(frc::GenericHID::kRightHand));
+            const double absLeftX = abs(controller->GetX());
+            const double absLeftY = abs(controller->GetY());
             const double absZ = abs(controller->GetZ());
-            const double zone = R_controllerDeadzone;
+            const double xyZone = R_controllerXYDeadzone;
+            const double zZone = R_controllerZRotationDeadzone;
 
-            if (absLeftX < zone && absLeftY < zone && absZ < R_twistDeadzone) {
+            if (absLeftX < xyZone && absLeftY < xyZone && absZ < zZone) {
 
                 return true;
             }
             return false;
         }
+        bool getControllerXYInLargerDeadzone(frc::Joystick *controller) {
 
-     bool getNonTwistInDeadzone(frc::Joystick *controller) {
-
-            const double absLeftX = abs(controller->GetX(frc::GenericHID::kRightHand));
-            const double absLeftY = abs(controller->GetY(frc::GenericHID::kRightHand));
-            const double zone = R_controllerDeadzone * 2.0;
+            const double absLeftX = abs(controller->GetX());
+            const double absLeftY = abs(controller->GetY());
+            const double zone = R_controllerZRotationDeadzone;
  
             if (absLeftX < zone && absLeftY < zone) {
 
@@ -212,5 +212,4 @@ class SwerveTrain {
             }
             return false;
         }
-
 };

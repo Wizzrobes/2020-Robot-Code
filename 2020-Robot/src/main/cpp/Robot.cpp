@@ -12,13 +12,11 @@ SwerveModule rearLeftModule(R_rearLeftDriveMotorCANID, R_rearLeftSwerveMotorCANI
 SwerveModule rearRightModule(R_rearRightDriveMotorCANID, R_rearRightSwerveMotorCANID);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule);
 
-//frc::XboxController *playerOne;
-frc::Joystick *joystickPlayer; 
+frc::Joystick *playerOne; 
 
 void Robot::RobotInit() {
 
-    //playerOne = new frc::XboxController(R_playerOneControllerPort);
-    joystickPlayer = new frc::Joystick(R_playerOneControllerPort); 
+    playerOne = new frc::Joystick(R_playerOneControllerPort); 
 
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
 }
@@ -28,22 +26,14 @@ void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
 
-  /*  if (playerOne->GetAButton()) {
+    if (playerOne->GetRawButton(3)) {
 
-        zion.setSwerveZeroPosition();
+        zion.setSwerveZeroPosition(); 
+    } 
+    else if (playerOne->GetRawButton(11)) {
+
+       zion.driveController(playerOne);
     }
-    if (playerOne->GetXButton()) {
-
-        zion.driveController(playerOne);
-    }
-    */ 
-   if(joystickPlayer->GetRawButton(3)) {
-       zion.setSwerveZeroPosition(); 
-   } 
-   if(joystickPlayer->GetRawButton(11)) {
-       zion.driveController(joystickPlayer);
-   }
-
     else {
 
         zion.setDriveSpeed(0);

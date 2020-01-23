@@ -11,12 +11,12 @@
     //TODO: Why is there a negative here?
     const double controllerTurningMagnitude = -controller->GetZ();
 
-    if (getControllerAllInDeadzone(controller)) {
+    if (getControllerXYZInDeadzone(controller)) {
           
         assumeNearestZeroPosition();
         setDriveSpeed(0);
     }
-    else if (abs(controllerTurningMagnitude) > R_twistDeadzone && getNonTwistInDeadzone(controller)) {
+    else if (!getControllerZInDeadzone(controller) && getControllerXYZInDeadzone(controller)) {
 
         m_frontRight->assumeSwervePosition((1.0 / 8.0) * R_nicsConstant);
         m_frontLeft->assumeSwervePosition((3.0 / 8.0) * R_nicsConstant);
