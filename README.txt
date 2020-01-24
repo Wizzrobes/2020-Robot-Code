@@ -3,7 +3,7 @@ FRC Team 4624's 2020-Robot-Code
   Recharge.
 
  2020-Robot
- The primary project for 2020: commanding Zion to play this year's game.
+  The primary project for 2020: commanding Zion to play this year's game.
   Description
    4624's 2020 robot resides on a swerve drivetrain based on Team 2910's
     Swerve Drive Specialties MKII swerve modules. Controlling this is
@@ -25,3 +25,21 @@ FRC Team 4624's 2020-Robot-Code
     vendor libraries installed, the project can be imported
     and built automatically through GradleRIO. Otherwise, the
     code can be browsed on GitHub or locally.
+
+ 2020-Robot-Arduino
+  The software running on the RoboRIO's coprocessor, an Arduino Uno R3.
+  Description
+   There are many sensors in use this year which require operation too
+    quick and low-level to be effectively managed by the RIO or its
+    libraries, which thus find themselves much more at home on the low-
+    overhead and quick loop time of a microprocessor. These sensors
+    are pinged by the Arduino, and then their results and tramsitted
+    back to the RIO over USB over serial.
+  Documentation
+   The code in this project is also fully documented, with a complete
+    write-up in the Arduino header file in 2020-Robot. Documentation
+    follows the template laid out in 2020-Robot.
+  Compiling-Usage
+   This project is written and maintained in the Arduino IDE version
+    1.8.4 - any version higher than 1.0 (and possibly older) should
+    be able to both compile it and upload it to a board just fine.
