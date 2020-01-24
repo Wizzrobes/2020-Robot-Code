@@ -199,7 +199,7 @@ class SwerveModule {
 
         double m_swerveZeroPosition;
 
-        double calculateAssumePositionSpeed(const double& howFarRemainingInTravel) {
+        double calculateAssumePositionSpeed(const double &howFarRemainingInTravel) {
 
             //Begin initally with a double calculated with the simplex function...
             double toReturn = ((1) / (1 + exp((-1 * abs(howFarRemainingInTravel)) + 5)));

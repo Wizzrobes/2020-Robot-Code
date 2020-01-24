@@ -1,6 +1,9 @@
 /*
 class SwerveModule
 
+    Allows higher-level control of four SwerveModules as a drivetrain, and
+        provides many private controller functions for manipulating it.
+
 Constructors
 
     SwerveTrain(SwerveModule*, SwerveModule*, SwerveModule*, SwerveModule*):
@@ -38,11 +41,11 @@ Public Methods
 
 Private Methods
 
-    double getControllerREVRotationsFromCenter(frc::XboxController*):
+    double getControllerREVRotationsFromCenter(frc::Joystick*):
         Discernes how many clockwise REV rotations from center the current
         location of the joystick is using vector trigonometry and properties.
         See https://en.wikipedia.org/wiki/Dot_product#Geometric_definition
-    double getControllerAngleFromCenter(frc::XboxController*): Same
+    double getControllerAngleFromCenter(frc::Joystick*): Same
         as above, but simply returns the radian angle (no conversion
         back to a REV Rotation value).
     double getAbsoluteControllerMagnitude(frc::XboxController&): Gets the
@@ -50,6 +53,9 @@ Private Methods
     bool getControllerAllInDeadzone(frc::XboxController*): Returns
         true if each stick is within the deadzone specified in RobotMap,
         false otherwise.
+    bool getControllerInDeadzone(frc::Joystick*): If all axis of the
+        controller are within the RobotMap deadzone variable for
+        playerOne's controller, returns true; otherwise, returns false.
 */
 
 #pragma once
@@ -186,27 +192,14 @@ class SwerveTrain {
             //Return the sum of the coordinates as a knock-off magnitude
             return absX + absY;
         }
-        bool getControllerXYZInDeadzone(frc::Joystick *controller) {
+        bool getControllerInDeadzone(frc::Joystick *controller) {
 
-            const double absLeftX = abs(controller->GetX());
-            const double absLeftY = abs(controller->GetY());
+            const double absX = abs(controller->GetX());
+            const double absY = abs(controller->GetY());
             const double absZ = abs(controller->GetZ());
-            const double xyZone = R_controllerXYDeadzone;
-            const double zZone = R_controllerZRotationDeadzone;
+            const double zone = R_controllerDeadzone;
 
-            if (absLeftX < xyZone && absLeftY < xyZone && absZ < zZone) {
-
-                return true;
-            }
-            return false;
-        }
-        bool getControllerXYInLargerDeadzone(frc::Joystick *controller) {
-
-            const double absLeftX = abs(controller->GetX());
-            const double absLeftY = abs(controller->GetY());
-            const double zone = R_controllerZRotationDeadzone;
- 
-            if (absLeftX < zone && absLeftY < zone) {
+            if (absX < zone && absY < zone && absZ < zone) {
 
                 return true;
             }

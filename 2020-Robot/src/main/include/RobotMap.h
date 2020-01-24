@@ -25,8 +25,11 @@ const int R_rearRightDriveMotorCANID   = 8;
 
 /*_____Global Robot Variable Settigns_____*/
 const int R_playerOneControllerPort = 0;
-const double R_controllerXYDeadzone = .075;
-const double R_controllerXYTurningDeadzone = .6; 
+//This deadzone is used to determine when the controller is completely motionless...
+const double R_controllerDeadzone = .075;
+//And this one is to determine when rotation is being induced, as simply operation
+//of the controller often results in errant rotation.
+const double R_controllerZDeadzone = .6;
 
 const double R_swerveTrainAssumePositionTolerance = .1;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5;
@@ -35,5 +38,7 @@ const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed = .02;
 
 //The amount of REV rotations it takes for a swerve assembly to make a full rotation.
+//Often, a REV Rotation is referred to as a Nic, although they mean different things.
+//Truly, a Nic is ~17.976 REV Rotation values.
 const double R_nicsConstant = 17.9761447906494;
 /*___End Global Robot Variable Settings___*/

@@ -26,13 +26,13 @@ void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
 
-    if (playerOne->GetRawButton(3)) {
+    if (playerOne->GetRawButtonPressed(3)) {
 
         zion.setSwerveZeroPosition(); 
     } 
     else if (playerOne->GetRawButton(11)) {
 
-       zion.driveController(playerOne);
+        zion.driveController(playerOne);
     }
     else {
 

@@ -1,22 +1,20 @@
-
 #include <frc/Joystick.h>
 
 #include "SwerveTrain.h"
 
-    void SwerveTrain::driveController(frc::Joystick *controller) {
+void SwerveTrain::driveController(frc::Joystick *controller) {
 
     const double controllerREVRotationsFromCenter = getControllerREVRotationsFromCenter(controller);
     const double controllerMagnitude = getControllerAbsoluteMagnitude(controller);
-
     //TODO: Why is there a negative here?
     const double controllerTurningMagnitude = -controller->GetZ();
 
-    if (getControllerXYZInDeadzone(controller)) {
+    if (getControllerInDeadzone(controller)) {
           
         assumeNearestZeroPosition();
         setDriveSpeed(0);
     }
-    else if (!getControllerZInDeadzone(controller) && getControllerXYZInDeadzone(controller)) {
+    else if (controllerTurningMagnitude > R_controllerZDeadzone) {
 
         m_frontRight->assumeSwervePosition((1.0 / 8.0) * R_nicsConstant);
         m_frontLeft->assumeSwervePosition((3.0 / 8.0) * R_nicsConstant);
@@ -24,7 +22,6 @@
         m_rearRight->assumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
         setDriveSpeed(controllerTurningMagnitude / 4.0);
     }
-
     else {
         
         m_frontRight->assumeSwervePosition(controllerREVRotationsFromCenter);
