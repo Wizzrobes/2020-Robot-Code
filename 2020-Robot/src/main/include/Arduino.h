@@ -15,7 +15,7 @@ This class allows interfacing with an Arduino microcontroller as an auxiliary
     registry, which fulfills both transmission and reception of alphanumeric
     data. Below is a diagram of the 32-character registry, which contains
     12 registers each delimited with |:
-
+cd
     |x|xxx|xxx|xxx|xxx|xxx|xxx|xxx|xxx|xxx|xxx|x|
     A B   C   D   E   F   G   H   I   J   K   L
 
@@ -39,3 +39,19 @@ This class allows interfacing with an Arduino microcontroller as an auxiliary
         interface with the FRC Serial functions. It is usually referenced by a
         temporary string to be operated on, and then used as-is.
 */
+
+#pragma once
+
+#include <frc/SerialPort.h>
+
+class Arduino {
+
+    public:
+        Arduino(const frc::SerialPort::Port &port = frc::SerialPort::Port::kUSB1, const int &baudRate = 9600) {
+
+            arduino = new frc::SerialPort(baudRate, port);
+        }
+
+    private:
+        frc::SerialPort *arduino;
+};
