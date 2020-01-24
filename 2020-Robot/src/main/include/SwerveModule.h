@@ -105,7 +105,7 @@ class SwerveModule {
         }
         double getSwervePosition() {
 
-            return m_swerveMotorEncoder->GetPosition(); 
+            return m_swerveMotorEncoder->GetPosition();
         }
         double getSwervePositionSingleRotation() {
 
@@ -138,7 +138,7 @@ class SwerveModule {
             //Otherwise, going to 0 from the first or second quadrant is going to be faster.
             else {
 
-                return 0; 
+                return 0;
             }
         }
         double getDriveSpeed() {
@@ -168,5 +168,5 @@ class SwerveModule {
 
         double m_swerveZeroPosition;
 
-        double calculateAssumePositionSpeed(const double& howFarRemainingInTravel);
+        double calculateAssumePositionSpeed(const double &howFarRemainingInTravel);
 };

@@ -25,7 +25,7 @@ class Limelight {
 
             table = NetworkTable::GetTable("limelight");
         }
-        
+
         double getHorizontalOffset() {
 
             return table->GetNumber("tx", 0);
@@ -38,7 +38,7 @@ class Limelight {
 
             return table->GetNumber("tv", 0);
         }
-    
+
     private:
         std::shared_ptr<NetworkTable> table;
 };

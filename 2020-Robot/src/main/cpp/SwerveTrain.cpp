@@ -13,7 +13,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     const double controllerTurningMagnitude = -controller->GetZ();
 
     if (getControllerInDeadzone(controller)) {
-          
+
         assumeNearestZeroPosition();
         setDriveSpeed(0);
     }
@@ -33,7 +33,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     }
     //Otherwise, simply drive normally.
     else {
-        
+
         m_frontRight->assumeSwervePosition(controllerREVRotationsFromCenter);
         m_frontLeft->assumeSwervePosition(controllerREVRotationsFromCenter);
         m_rearLeft->assumeSwervePosition(controllerREVRotationsFromCenter);
