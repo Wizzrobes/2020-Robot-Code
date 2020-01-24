@@ -1,5 +1,8 @@
 /*
-class SwerveModule
+class SwerveTrain
+
+    Allows higher-level control of four SwerveModules as a drivetrain, and
+        provides many private controller functions for manipulating it.
 
 Constructors
 
@@ -38,11 +41,11 @@ Public Methods
 
 Private Methods
 
-    double getControllerREVRotationsFromCenter(frc::XboxController*):
+    double getControllerREVRotationsFromCenter(frc::Joystick*):
         Discernes how many clockwise REV rotations from center the current
         location of the joystick is using vector trigonometry and properties.
         See https://en.wikipedia.org/wiki/Dot_product#Geometric_definition
-    double getControllerAngleFromCenter(frc::XboxController*): Same
+    double getControllerAngleFromCenter(frc::Joystick*): Same
         as above, but simply returns the radian angle (no conversion
         back to a REV Rotation value).
     double getAbsoluteControllerMagnitude(frc::XboxController&): Gets the
@@ -50,6 +53,9 @@ Private Methods
     bool getControllerAllInDeadzone(frc::XboxController*): Returns
         true if each stick is within the deadzone specified in RobotMap,
         false otherwise.
+    bool getControllerInDeadzone(frc::Joystick*): If all axis of the
+        controller are within the RobotMap deadzone variable for
+        playerOne's controller, returns true; otherwise, returns false.
 */
 
 #pragma once
@@ -57,7 +63,7 @@ Private Methods
 #include <math.h>
 
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/XboxController.h>
+#include <frc/Joystick.h>
 
 #include "rev/CANSparkMax.h"
 
@@ -75,14 +81,14 @@ class SwerveTrain {
             m_rearRight = &rearRightModule;
         }
 
-        void setDriveSpeed(const double& driveSpeed) {
+        void setDriveSpeed(const double &driveSpeed) {
 
             m_frontRight->setDriveSpeed(driveSpeed);
             m_frontLeft->setDriveSpeed(driveSpeed);
             m_rearLeft->setDriveSpeed(driveSpeed);
             m_rearRight->setDriveSpeed(driveSpeed);
         }
-        void setSwerveSpeed(const double& swerveSpeed) {
+        void setSwerveSpeed(const double &swerveSpeed) {
 
             m_frontRight->setSwerveSpeed(swerveSpeed);
             m_frontLeft->setSwerveSpeed(swerveSpeed);
@@ -128,7 +134,7 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("RR Swrv Pos", m_rearRight->getSwervePosition());
         }
 
-        void driveController(frc::XboxController *controller);
+        void driveController(frc::Joystick *controller);
 
     private:
         SwerveModule *m_frontRight;
@@ -136,37 +142,25 @@ class SwerveTrain {
         SwerveModule *m_rearLeft;
         SwerveModule *m_rearRight;
 
-        double getControllerClockwiseREVRotationsFromCenter(frc::XboxController *controller);
-        double getControllerAngleFromCenter(frc::XboxController *controller) {
-
-            const double x = controller->GetX(frc::GenericHID::kLeftHand);
-            const double y = -controller->GetY(frc::GenericHID::kLeftHand);
-
-            VectorDouble center(0, 1);
-            VectorDouble current(x, y);
-            const double dotProduct = center * current;
-            const double magnitudeProduct = center.magnitude() * current.magnitude();
-            const double cosineAngle = dotProduct / magnitudeProduct;
-            return acos(cosineAngle);
-        }
-        double getControllerAbsoluteMagnitude(frc::XboxController *controller) {
+        double getControllerClockwiseREVRotationsFromCenter(frc::Joystick *controller);
+        double getControllerAngleFromCenter(frc::Joystick *controller);
+        double getControllerAbsoluteMagnitude(frc::Joystick *controller) {
 
             //Get the absolute values of the joystick coordinates
-            double absX = abs(controller->GetX(frc::GenericHID::kLeftHand));
-            double absY = abs(controller->GetY(frc::GenericHID::kLeftHand));
+            double absX = abs(controller->GetX());
+            double absY = abs(controller->GetY());
 
             //Return the sum of the coordinates as a knock-off magnitude
             return absX + absY;
         }
-        bool getControllerAllInDeadzone(frc::XboxController *controller) {
+        bool getControllerInDeadzone(frc::Joystick *controller) {
 
-            const double absLeftX = abs(controller->GetX(frc::GenericHID::kLeftHand));
-            const double absLeftY = abs(controller->GetY(frc::GenericHID::kLeftHand));
-            const double absRightX = abs(controller->GetX(frc::GenericHID::kRightHand));
-            const double absRightY = abs(controller->GetY(frc::GenericHID::kRightHand));
+            const double absX = abs(controller->GetX());
+            const double absY = abs(controller->GetY());
+            const double absZ = abs(controller->GetZ());
             const double zone = R_controllerDeadzone;
 
-            if (absLeftX < zone && absLeftY < zone && absRightX < zone && absRightY < zone) {
+            if (absX < zone && absY < zone && absZ < zone) {
 
                 return true;
             }

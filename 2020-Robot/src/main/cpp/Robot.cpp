@@ -1,4 +1,4 @@
-#include <frc/XboxController.h>
+#include <frc/Joystick.h>
 #include <cameraserver/CameraServer.h>
 
 #include "Robot.h"
@@ -12,11 +12,11 @@ SwerveModule rearLeftModule(R_rearLeftDriveMotorCANID, R_rearLeftSwerveMotorCANI
 SwerveModule rearRightModule(R_rearRightDriveMotorCANID, R_rearRightSwerveMotorCANID);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule);
 
-frc::XboxController *playerOne;
+frc::Joystick *playerOne; 
 
 void Robot::RobotInit() {
 
-    playerOne = new frc::XboxController(R_playerOneControllerPort);
+    playerOne = new frc::Joystick(R_playerOneControllerPort); 
 
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
 }
@@ -26,11 +26,11 @@ void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
 
-    if (playerOne->GetAButton()) {
+    if (playerOne->GetRawButtonPressed(3)) {
 
-        zion.setSwerveZeroPosition();
-    }
-    if (playerOne->GetXButton()) {
+        zion.setSwerveZeroPosition(); 
+    } 
+    else if (playerOne->GetRawButton(11)) {
 
         zion.driveController(playerOne);
     }

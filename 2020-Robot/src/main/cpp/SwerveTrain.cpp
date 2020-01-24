@@ -1,25 +1,24 @@
 #include <math.h>
 
-#include <frc/XboxController.h>
+#include <frc/Joystick.h>
 
 #include "SwerveTrain.h"
 #include "VectorDouble.h"
 
-void SwerveTrain::driveController(frc::XboxController *controller) {
+void SwerveTrain::driveController(frc::Joystick *controller) {
 
     const double controllerREVRotationsFromCenter = getControllerClockwiseREVRotationsFromCenter(controller);
     const double controllerMagnitude = getControllerAbsoluteMagnitude(controller);
-
     //TODO: Why is there a negative here?
-    const double controllerTurningMagnitude = -controller->GetX(frc::GenericHID::kRightHand);
+    const double controllerTurningMagnitude = -controller->GetZ();
 
-    if (getControllerAllInDeadzone(controller)) {
-        
+    if (getControllerInDeadzone(controller)) {
+          
         assumeNearestZeroPosition();
         setDriveSpeed(0);
     }
-    //If the we're out of deadzone and turning is out of deadzone, override driving and begin turning...
-    else if (abs(controllerTurningMagnitude) > R_controllerDeadzone) {
+    //If we're out of deadzone and turning is also out of its deadzone, override driving and begin turning...
+    else if (abs(controllerTurningMagnitude) > R_controllerZDeadzone) {
 
         //To avoid inverting the drive motor direction in turning, rotate each swerve away from center
         //by a successively increasing amount: the first moves a total of 45*, the second a total of 135*,
@@ -30,7 +29,7 @@ void SwerveTrain::driveController(frc::XboxController *controller) {
         m_frontLeft->assumeSwervePosition((3.0 / 8.0) * R_nicsConstant);
         m_rearLeft->assumeSwervePosition((5.0 / 8.0) * R_nicsConstant);
         m_rearRight->assumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
-        setDriveSpeed(controllerTurningMagnitude * R_driveTrainExecutionCap);
+        setDriveSpeed(controllerTurningMagnitude * R_zionExecutionCap);
     }
     //Otherwise, simply drive normally.
     else {
@@ -39,11 +38,11 @@ void SwerveTrain::driveController(frc::XboxController *controller) {
         m_frontLeft->assumeSwervePosition(controllerREVRotationsFromCenter);
         m_rearLeft->assumeSwervePosition(controllerREVRotationsFromCenter);
         m_rearRight->assumeSwervePosition(controllerREVRotationsFromCenter);
-        setDriveSpeed(controllerMagnitude * R_driveTrainExecutionCap);
+        setDriveSpeed(controllerMagnitude * R_zionExecutionCap);
     }
 }
 
-double SwerveTrain::getControllerClockwiseREVRotationsFromCenter(frc::XboxController *controller) {
+double SwerveTrain::getControllerClockwiseREVRotationsFromCenter(frc::Joystick *controller) {
 
     //TODO: Why is there a negative here?
     const double x = -controller->GetX(frc::GenericHID::kLeftHand);
@@ -70,4 +69,16 @@ double SwerveTrain::getControllerClockwiseREVRotationsFromCenter(frc::XboxContro
     double decimalTotalCircle = ((angleRad) / (2 * M_PI));
     //And the amount of REV rotations we want to rotate is the decimal total by Nic's Constant.
     return decimalTotalCircle * R_nicsConstant;
+}
+double SwerveTrain::getControllerAngleFromCenter(frc::Joystick *controller) {
+
+    const double x = -controller->GetX();
+    const double y = -controller->GetY();
+
+    VectorDouble center(0, 1);
+    VectorDouble current(x, y);
+    const double dotProduct = center * current;
+    const double magnitudeProduct = center.magnitude() * current.magnitude();
+    const double cosineAngle = dotProduct / magnitudeProduct;
+    return acos(cosineAngle);
 }
