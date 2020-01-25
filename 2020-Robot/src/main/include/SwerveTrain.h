@@ -56,6 +56,9 @@ Private Methods
     bool getControllerInDeadzone(frc::Joystick*): If all axis of the
         controller are within the RobotMap deadzone variable for
         playerOne's controller, returns true; otherwise, returns false.
+    void forceControllerXYZToDeadzone(const int&, const int&, const int&):
+        If any of the passed X, Y, or Z values fall outside of the global
+        deadzone, they will be set to 0. Otherwise, they are untouched.
 */
 
 #pragma once
@@ -166,23 +169,16 @@ class SwerveTrain {
             }
             return false;
         }
+        void forceZeroControllerXYZToDeadzone(double &x, double &y, double &z) {
 
-        void checkControllerDeadzones(double &x, double &y, double &z) {
-            double absLeftX = abs(x);
-            double absLeftY = abs(y);
-            double absz = abs(z);
+            double absX = abs(x);
+            double absY = abs(y);
+            double absZ = abs(z);
 
-            if(absLeftX < R_controllerDeadzone) {
-                x = 0;
-            }
-
-            if(absLeftY < R_controllerDeadzone) {
-               y  = 0;
-            }
-
-            if(absz < R_controllerZDeadzone) {
-                z = 0;
-            }
+            if (absX < R_controllerDeadzone) {x = 0;}
+            if (absY < R_controllerDeadzone) {y = 0;}
+            //TODO: Deadzone or Z Deadzone?
+            if (absZ < R_controllerZDeadzone) {z = 0;}
         }
 
 };
