@@ -147,6 +147,8 @@ class SwerveTrain {
 
         double getControllerClockwiseREVRotationsFromCenter(frc::Joystick *controller);
         double getControllerAngleFromCenter(frc::Joystick *controller);
+        double getVectorClockwiseREVRotationsFromCenter(VectorDouble const &vector);
+        
         double getControllerAbsoluteMagnitude(frc::Joystick *controller) {
 
             //Get the absolute values of the joystick coordinates

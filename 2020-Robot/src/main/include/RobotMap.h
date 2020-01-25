@@ -35,6 +35,8 @@ const double R_controllerZDeadzone = .6;
 //This is the highest decimal percentage of full speed that Zion can actually go.
 const double R_zionExecutionCap = .25;
 
+const double tangentialAngleFromRobotRadius = (M_PI / 4.0); 
+
 const double R_swerveTrainAssumePositionTolerance = .1;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = .2;

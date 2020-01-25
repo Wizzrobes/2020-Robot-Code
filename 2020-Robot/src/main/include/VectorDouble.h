@@ -20,6 +20,9 @@ Public Methods:
 class VectorDouble {
 
     public:
+        double i; 
+        double j; 
+
         VectorDouble(const double &iVal, const double &jVal) {
 
             i = iVal;
@@ -37,6 +40,5 @@ class VectorDouble {
         }
 
     private:
-        double i;
-        double j;
+        
 };
