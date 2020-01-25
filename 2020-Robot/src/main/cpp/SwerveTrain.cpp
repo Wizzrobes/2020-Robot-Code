@@ -17,8 +17,8 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         assumeNearestZeroPosition();
         setDriveSpeed(0);
     }
-    //If we're out of deadzone and turning is also out of its deadzone, override driving and begin turning...
-    else if (abs(controllerTurningMagnitude) > R_controllerZDeadzone) {
+    //If we're in forward deadzone and turning is out of its deadzone, begin turning...
+    else if ((abs(controllerTurningMagnitude) > R_controllerZDeadzone) and (abs(controllerMagnitude) < R_controllerDeadzone))  {
 
         //To avoid inverting the drive motor direction in turning, rotate each swerve away from center
         //by a successively increasing amount: the first moves a total of 45*, the second a total of 135*,
@@ -31,6 +31,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         m_rearRight->assumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
         setDriveSpeed(controllerTurningMagnitude * R_zionExecutionCap);
     }
+    
     //Otherwise, simply drive normally.
     else {
 
@@ -39,8 +40,8 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         m_rearLeft->assumeSwervePosition(controllerREVRotationsFromCenter);
         m_rearRight->assumeSwervePosition(controllerREVRotationsFromCenter);
         setDriveSpeed(controllerMagnitude * R_zionExecutionCap);
+        }
     }
-}
 
 double SwerveTrain::getControllerClockwiseREVRotationsFromCenter(frc::Joystick *controller) {
 
@@ -70,15 +71,41 @@ double SwerveTrain::getControllerClockwiseREVRotationsFromCenter(frc::Joystick *
     //And the amount of REV rotations we want to rotate is the decimal total by Nic's Constant.
     return decimalTotalCircle * R_nicsConstant;
 }
-double SwerveTrain::getControllerAngleFromCenter(frc::Joystick *controller) {
-
-    const double x = -controller->GetX();
-    const double y = -controller->GetY();
-
+double SwerveTrain::getDegreeAngleFromCenter(const double x, const double y) {
     VectorDouble center(0, 1);
     VectorDouble current(x, y);
     const double dotProduct = center * current;
     const double magnitudeProduct = center.magnitude() * current.magnitude();
     const double cosineAngle = dotProduct / magnitudeProduct;
-    return acos(cosineAngle);
+    double angleRad = acos(cosineAngle);
+
+     if (x < 0) {
+
+        angleRad = (2 * M_PI) - angleRad;
+    }
+
+    angleRad *= (180.0/M_PI); 
+
+    return angleRad;
+}
+
+VectorDouble SwerveTrain::getTranslationVector (const double x, const double y, double angleGyro) {
+    double joystickAngle = getDegreeAngleFromCenter(-x, -y);
+
+    double vectorAngle = 0.0; 
+
+    if(angleGyro < 0) {
+        angleGyro += 360.0;
+    }
+   
+    vectorAngle = 450.0 - joystickAngle + angleGyro;
+       
+    if (vectorAngle > 360){
+        fmod (vectorAngle, 360);
+    }
+   
+    VectorDouble translationVector(x*cos(vectorAngle), y*sin(vectorAngle));
+
+    return translationVector;  
+
 }
