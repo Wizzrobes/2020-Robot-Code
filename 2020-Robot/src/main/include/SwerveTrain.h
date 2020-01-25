@@ -135,6 +135,7 @@ class SwerveTrain {
         }
 
         void driveController(frc::Joystick *controller);
+        void maunualZero(frc::Joystick *controller);
 
     private:
         SwerveModule *m_frontRight;

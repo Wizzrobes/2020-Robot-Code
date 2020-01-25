@@ -42,6 +42,36 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     }
 }
 
+void SwerveTrain::maunualZero(frc::Joystick *controller) {
+
+    const double controllerTurningMagnitude = -controller->GetZ();
+
+    if (controller->GetRawButton(7)) {
+
+        m_frontLeft->setSwerveSpeed(controllerTurningMagnitude * .1);
+    }
+    else if (controller->GetRawButton(8)) {
+        
+        m_frontRight->setSwerveSpeed(controllerTurningMagnitude * .1);
+    }
+    else if (controller->GetRawButton(9)) {
+        
+        m_rearLeft->setSwerveSpeed(controllerTurningMagnitude * .1);
+    }
+    else if (controller->GetRawButton(10)) {
+        
+        m_rearRight->setSwerveSpeed(controllerTurningMagnitude * .1);
+    }
+    else if (controller->GetRawButton(1)) {
+
+        setSwerveZeroPosition();
+    }
+    else {
+        setSwerveSpeed(0);
+        setDriveSpeed(0);
+    }
+}
+
 double SwerveTrain::getControllerClockwiseREVRotationsFromCenter(frc::Joystick *controller) {
 
     //TODO: Why is there a negative here?

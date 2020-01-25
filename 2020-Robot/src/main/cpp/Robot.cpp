@@ -34,6 +34,10 @@ void Robot::TeleopPeriodic() {
 
         zion.driveController(playerOne);
     }
+    else if (playerOne->GetRawButton(2)) {
+
+        zion.maunualZero(playerOne);
+    }
     else {
 
         zion.setDriveSpeed(0);
