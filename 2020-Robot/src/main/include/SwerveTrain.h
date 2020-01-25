@@ -166,4 +166,23 @@ class SwerveTrain {
             }
             return false;
         }
+
+        void checkControllerDeadzones(double &x, double &y, double &z) {
+            double absLeftX = abs(x);
+            double absLeftY = abs(y);
+            double absz = abs(z);
+
+            if(absLeftX < R_controllerDeadzone) {
+                x = 0;
+            }
+
+            if(absLeftY < R_controllerDeadzone) {
+               y  = 0;
+            }
+
+            if(absz < R_controllerZDeadzone) {
+                z = 0;
+            }
+        }
+
 };
