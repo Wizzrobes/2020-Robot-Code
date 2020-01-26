@@ -73,10 +73,16 @@ Private Methods
 #include "SwerveModule.h"
 #include "VectorDouble.h"
 
+#include "NavX.h"
+
 class SwerveTrain {
 
     public:
-        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule) {
+        SwerveTrain(SwerveModule &frontRightModule,
+                    SwerveModule &frontLeftModule,
+                    SwerveModule &rearLeftModule,
+                    SwerveModule &rearRightModule,
+                    NavX &navX) {
 
             m_frontRight = &frontRightModule;
             m_frontLeft = &frontLeftModule;
@@ -137,6 +143,10 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("RR Swrv Pos", m_rearRight->getSwervePosition());
         }
 
+        void resetRotationDegreeOffset() {
+            navX->resetYaw(); 
+        }
+
         void driveController(frc::Joystick *controller);
 
     private:
@@ -144,11 +154,12 @@ class SwerveTrain {
         SwerveModule *m_frontLeft;
         SwerveModule *m_rearLeft;
         SwerveModule *m_rearRight;
+        NavX *navX; 
 
         double getControllerClockwiseREVRotationsFromCenter(frc::Joystick *controller);
         double getControllerAngleFromCenter(frc::Joystick *controller);
         double getVectorClockwiseREVRotationsFromCenter(VectorDouble const &vector);
-        
+
         double getControllerAbsoluteMagnitude(frc::Joystick *controller) {
 
             //Get the absolute values of the joystick coordinates

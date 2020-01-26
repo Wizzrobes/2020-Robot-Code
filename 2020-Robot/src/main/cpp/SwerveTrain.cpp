@@ -46,6 +46,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
 
 */
 
+
 void SwerveTrain::driveController(frc::Joystick *controller) {
     double x = -controller->GetX(frc::GenericHID::kLeftHand);
     //Y seems to be inverted by default, so un-invert it...
@@ -55,7 +56,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
 
     forceZeroControllerXYZToDeadzone(x, y, z); 
 
-    VectorDouble translationVector = getTranslationVector(x, y, gyroAngle);
+    VectorDouble translationVector = getTranslationVector(x, y, navX->getYaw());
     
     VectorDouble frontRightRotationVector(z * cos (tangentialAngleFromRobotRadius), -z * sin (tangentialAngleFromRobotRadius) ); 
     VectorDouble frontLeftRotationVector(z * cos (tangentialAngleFromRobotRadius), z * sin (tangentialAngleFromRobotRadius) ); 
