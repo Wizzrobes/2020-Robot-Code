@@ -155,11 +155,9 @@ class SwerveTrain {
 
         double getClockwiseREVRotationsFromCenter(frc::Joystick *controller);
         double getClockwiseREVRotationsFromCenter(const VectorDouble &vector);
+        double getStandardDegreeAngleFromCenter(const double &x, const double &y);
 
-        double getControllerAngleFromCenter(frc::Joystick *controller);
-
-        double getDegreeAngleFromCenter(const double &x, const double &y);
-        VectorDouble getTranslationVector (const double &x, const double &y, double &angleGyro); 
+        VectorDouble getTranslationVector(const double &x, const double &y, double angleGyro); 
 
         double getControllerAbsoluteMagnitude(frc::Joystick *controller) {
 
