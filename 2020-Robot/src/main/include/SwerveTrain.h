@@ -6,9 +6,11 @@ class SwerveTrain
 
 Constructors
 
-    SwerveTrain(SwerveModule*, SwerveModule*, SwerveModule*, SwerveModule*):
+    SwerveTrain(SwerveModule&, SwerveModule&, SwerveModule&, SwerveModule&,
+        NavX&):
         Creates a swerve train with the swerve modules on the front right,
-        front left, back left, and back right positions.
+        front left, back left, and back right positions, and takes a NavX
+        for use in calculating rotational vectors.
 
 Public Methods
 
@@ -45,6 +47,9 @@ Private Methods
         Discernes how many clockwise REV rotations from center the current
         location of the joystick is using vector trigonometry and properties.
         See https://en.wikipedia.org/wiki/Dot_product#Geometric_definition
+    double etVectorClockwiseREVRotationsFromCenter(const VectorDouble&):
+        Same as above, but accepts a vector outright instead of stripping
+        one from the supplied controller.
     double getControllerAngleFromCenter(frc::Joystick*): Same
         as above, but simply returns the radian angle (no conversion
         back to a REV Rotation value).
@@ -72,22 +77,18 @@ Private Methods
 
 #include "SwerveModule.h"
 #include "VectorDouble.h"
-
 #include "NavX.h"
 
 class SwerveTrain {
 
     public:
-        SwerveTrain(SwerveModule &frontRightModule,
-                    SwerveModule &frontLeftModule,
-                    SwerveModule &rearLeftModule,
-                    SwerveModule &rearRightModule,
-                    NavX &navX) {
+        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet) {
 
             m_frontRight = &frontRightModule;
             m_frontLeft = &frontLeftModule;
             m_rearLeft = &rearLeftModule;
             m_rearRight = &rearRightModule;
+            navX = &navXToSet;
         }
 
         void setDriveSpeed(const double &driveSpeed) {
@@ -143,10 +144,6 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("RR Swrv Pos", m_rearRight->getSwervePosition());
         }
 
-        void resetRotationDegreeOffset() {
-            navX->resetYaw(); 
-        }
-
         void driveController(frc::Joystick *controller);
 
     private:
@@ -157,9 +154,8 @@ class SwerveTrain {
         NavX *navX; 
 
         double getControllerClockwiseREVRotationsFromCenter(frc::Joystick *controller);
+        double getVectorClockwiseREVRotationsFromCenter(const VectorDouble &vector);
         double getControllerAngleFromCenter(frc::Joystick *controller);
-        double getVectorClockwiseREVRotationsFromCenter(VectorDouble const &vector);
-
         double getControllerAbsoluteMagnitude(frc::Joystick *controller) {
 
             //Get the absolute values of the joystick coordinates
@@ -182,7 +178,7 @@ class SwerveTrain {
             }
             return false;
         }
-        void forceZeroControllerXYZToDeadzone(double &x, double &y, double &z) {
+        void forceControllerXYZToZeroInDeadzone(double &x, double &y, double &z) {
 
             double absX = abs(x);
             double absY = abs(y);
@@ -190,8 +186,6 @@ class SwerveTrain {
 
             if (absX < R_controllerDeadzone) {x = 0;}
             if (absY < R_controllerDeadzone) {y = 0;}
-            //TODO: Deadzone or Z Deadzone?
             if (absZ < R_controllerZDeadzone) {z = 0;}
         }
-
 };

@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <math.h>
+
 /*_____RoboRIO PWM Pin Declarations_____*/
 /*___End RoboRIO PWM Pin Declarations___*/
 
@@ -35,7 +37,11 @@ const double R_controllerZDeadzone = .6;
 //This is the highest decimal percentage of full speed that Zion can actually go.
 const double R_zionExecutionCap = .25;
 
-const double tangentialAngleFromRobotRadius = (M_PI / 4.0); 
+//If an xy coordinate plane is centered at the middle of the drivetrain, this
+//is the radian measure between the y-axis and the front right wheel. This is
+//the basic unit of a non-moving center turn, and it is modified as the basis
+//for moving and turning at the same time.
+const double R_angleFromCenterToFrontRightWheel = (M_PI / 4.0);
 
 const double R_swerveTrainAssumePositionTolerance = .1;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5;

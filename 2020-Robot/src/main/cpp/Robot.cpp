@@ -7,12 +7,12 @@
 #include "RobotMap.h"
 #include "NavX.h"
 
-NavX *navX;
-
 SwerveModule frontRightModule(R_frontRightDriveMotorCANID, R_frontRightSwerveMotorCANID);
 SwerveModule frontLeftModule(R_frontLeftDriveMotorCANID, R_frontLeftSwerveMotorCANID);
 SwerveModule rearLeftModule(R_rearLeftDriveMotorCANID, R_rearLeftSwerveMotorCANID);
 SwerveModule rearRightModule(R_rearRightDriveMotorCANID, R_rearRightSwerveMotorCANID);
+
+NavX navX(NavX::ConnectionType::kMXP);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 
 frc::Joystick *playerOne;

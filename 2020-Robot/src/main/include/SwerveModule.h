@@ -168,7 +168,5 @@ class SwerveModule {
 
         double m_swerveZeroPosition;
 
-        
-
         double calculateAssumePositionSpeed(const double &howFarRemainingInTravel);
 };
