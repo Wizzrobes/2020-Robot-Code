@@ -63,14 +63,15 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     //speed of driving.
     else {
 
-        m_frontRight->assumeSwervePosition(getVectorClockwiseREVRotationsFromCenter(frontRightResultVector));
-        m_frontLeft->assumeSwervePosition(getVectorClockwiseREVRotationsFromCenter(frontLeftResultVector));
-        m_rearLeft->assumeSwervePosition(getVectorClockwiseREVRotationsFromCenter(rearLeftResultVector));
-        m_rearRight->assumeSwervePosition(getVectorClockwiseREVRotationsFromCenter(rearRightResultVector));
+        m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontRightResultVector));
+        m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontLeftResultVector));
+        m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearLeftResultVector));
+        m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearRightResultVector));
         setDriveSpeed(frontRightResultVector.magnitude() * R_zionExecutionCap);
     }
+}
 
-double SwerveTrain::getControllerClockwiseREVRotationsFromCenter(frc::Joystick *controller) {
+double SwerveTrain::getClockwiseREVRotationsFromCenter(frc::Joystick *controller) {
 
     //Invert both the x and y once again, as the logic is written for an
     //upside-down Zion...
@@ -98,7 +99,7 @@ double SwerveTrain::getControllerClockwiseREVRotationsFromCenter(frc::Joystick *
     //And the amount of REV rotations we want to rotate is the decimal total by Nic's Constant.
     return decimalTotalCircle * R_nicsConstant;
 }
-double SwerveTrain::getVectorClockwiseREVRotationsFromCenter(const VectorDouble &vector) {
+double SwerveTrain::getClockwiseREVRotationsFromCenter(const VectorDouble &vector) {
 
     const double x = -vector.i; 
     const double y = -vector.j;
