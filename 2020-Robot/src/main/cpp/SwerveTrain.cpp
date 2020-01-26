@@ -69,7 +69,6 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         m_rearRight->assumeSwervePosition(getVectorClockwiseREVRotationsFromCenter(rearRightResultVector));
         setDriveSpeed(frontRightResultVector.magnitude() * R_zionExecutionCap);
     }
-}
 
 double SwerveTrain::getControllerClockwiseREVRotationsFromCenter(frc::Joystick *controller) {
 
@@ -117,15 +116,41 @@ double SwerveTrain::getVectorClockwiseREVRotationsFromCenter(const VectorDouble 
     double decimalTotalCircle = ((angleRad) / (2 * M_PI));
     return decimalTotalCircle * R_nicsConstant;
 }
-double SwerveTrain::getControllerAngleFromCenter(frc::Joystick *controller) {
 
-    const double x = -controller->GetX();
-    const double y = -controller->GetY();
+double getDegreeAngleFromCenter(const double &x, const double &y) {
 
     VectorDouble center(0, 1);
     VectorDouble current(x, y);
     const double dotProduct = center * current;
     const double magnitudeProduct = center.magnitude() * current.magnitude();
     const double cosineAngle = dotProduct / magnitudeProduct;
-    return acos(cosineAngle);
+    double angleRad = acos(cosineAngle);
+
+     if (x < 0) {
+
+        angleRad = (2 * M_PI) - angleRad;
+    }
+
+    return angleRad *= (180.0/M_PI); 
+}
+
+VectorDouble getTranslationVector(const double &x, const double &y, double &angleGyro) {
+
+    double joystickAngle = getDegreeAngleFromCenter(-x, -y);
+    double vectorAngle = 0; 
+
+    if (angleGyro < 0) {
+
+        angleGyro += 360.0;
+    }
+
+    vectorAngle = 450.0 - joystickAngle + angleGyro;
+       
+    if (vectorAngle > 360) {
+
+        fmod (vectorAngle, 360);
+    }
+   
+    VectorDouble translationVector(x*cos(vectorAngle), y*sin(vectorAngle));
+    return translationVector;  
 }

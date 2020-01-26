@@ -43,9 +43,24 @@ class NavX {
 
             return navX->GetYaw();
         }
+        //TODO: What is this?
         double getRateDegrees() {
 
-            return (navX->GetRate() * (180 / M_PI));
+            return (navX->GetRate() * (180 if (angleGyro < 0) {
+            angleGyro += 360;
+        }
+        if (angleGyro >= 0 || angleGyro <= 90) {
+            angleReal = 90 - angleGyro;
+        }
+            else {
+                angleReal = 450 - angleGyro;
+            }
+
+        m_frontRight->assumeSwervePosition(...);
+        m_frontLeft->assumeSwervePosition(...);
+        m_rearLeft->assumeSwervePosition(...);
+        m_rearRight->assumeSwervePosition(...);
+        setDriveSpeed(controllerMagnitude * R_zionExecutionCap); / M_PI));
         }
         double getAngle() {
 
