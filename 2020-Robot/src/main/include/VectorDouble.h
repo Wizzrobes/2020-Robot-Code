@@ -34,6 +34,12 @@ class VectorDouble {
             return ((i * otherVector.i) + (j * otherVector.j));
         }
 
+        VectorDouble operator+ (VectorDouble const &otherVector) {
+            
+            VectorDouble resultVector (i + otherVector.i, j + otherVector.j); 
+            return resultVector;
+        }
+
         double magnitude() {
 
             return sqrt(pow(i, 2) + pow (j, 2));
