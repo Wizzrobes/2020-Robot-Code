@@ -71,7 +71,8 @@ double SwerveTrain::getControllerClockwiseREVRotationsFromCenter(frc::Joystick *
     //And the amount of REV rotations we want to rotate is the decimal total by Nic's Constant.
     return decimalTotalCircle * R_nicsConstant;
 }
-double SwerveTrain::getDegreeAngleFromCenter(const double x, const double y) {
+double getDegreeAngleFromCenter(const double &x, const double &y) {
+
     VectorDouble center(0, 1);
     VectorDouble current(x, y);
     const double dotProduct = center * current;
@@ -84,28 +85,26 @@ double SwerveTrain::getDegreeAngleFromCenter(const double x, const double y) {
         angleRad = (2 * M_PI) - angleRad;
     }
 
-    angleRad *= (180.0/M_PI); 
-
-    return angleRad;
+    return angleRad *= (180.0/M_PI); 
 }
 
-VectorDouble SwerveTrain::getTranslationVector (const double x, const double y, double angleGyro) {
+VectorDouble getTranslationVector(const double &x, const double &y, double &angleGyro) {
+
     double joystickAngle = getDegreeAngleFromCenter(-x, -y);
+    double vectorAngle = 0; 
 
-    double vectorAngle = 0.0; 
+    if (angleGyro < 0) {
 
-    if(angleGyro < 0) {
         angleGyro += 360.0;
     }
-   
+
     vectorAngle = 450.0 - joystickAngle + angleGyro;
        
-    if (vectorAngle > 360){
+    if (vectorAngle > 360) {
+
         fmod (vectorAngle, 360);
     }
    
     VectorDouble translationVector(x*cos(vectorAngle), y*sin(vectorAngle));
-
     return translationVector;  
-
 }

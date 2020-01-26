@@ -43,6 +43,7 @@ class NavX {
 
             return navX->GetYaw();
         }
+        //TODO: What is this?
         double getRateDegrees() {
 
             return (navX->GetRate() * (180 if (angleGyro < 0) {
