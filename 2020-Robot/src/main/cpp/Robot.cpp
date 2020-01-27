@@ -31,7 +31,7 @@ void Robot::TeleopPeriodic() {
 
     if (playerOne->GetRawButtonPressed(3)) {
 
-        zion.setSwerveZeroPosition();
+        zion.setZeroPosition();
     }
     else if (playerOne->GetRawButton(11)) {
 

@@ -61,7 +61,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         //Due to this, it must be reset when not in movement to allow
         //this behavior to occur...
         assumeNearestZeroPosition();
-        setSwerveZeroPosition();
+        setZeroPosition();
         navX->resetYaw();
     }
     //Otherwise, go to the result vectors and use the magnitude to set the
@@ -123,6 +123,7 @@ double SwerveTrain::getClockwiseREVRotationsFromCenter(const VectorDouble &vecto
     double decimalTotalCircle = ((angleRad) / (2 * M_PI));
     return decimalTotalCircle * R_nicsConstant;
 }
+//TODO: Inline function documentation
 double SwerveTrain::getStandardDegreeAngleFromCenter(const double &x, const double &y) {
 
     VectorDouble center(0, 1);
@@ -131,7 +132,6 @@ double SwerveTrain::getStandardDegreeAngleFromCenter(const double &x, const doub
     const double magnitudeProduct = center.magnitude() * current.magnitude();
     const double cosineAngle = dotProduct / magnitudeProduct;
     double angleRad = acos(cosineAngle);
-
     if (x < 0) {
 
         angleRad = (2 * M_PI) - angleRad;
@@ -139,19 +139,20 @@ double SwerveTrain::getStandardDegreeAngleFromCenter(const double &x, const doub
     return angleRad *= (180.0 / M_PI);
 }
 
+//TODO: Inline function documentation
 VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y, double angleGyro) {
 
     double joystickAngle = getStandardDegreeAngleFromCenter(-x, -y);
     double vectorAngle = 0;
 
-    if (angleGyro < 0) {
+    if (angleGyro < 0.) {
 
-        angleGyro += 360.0;
+        angleGyro += 360.;
     }
-    vectorAngle = 450.0 - joystickAngle + angleGyro;
-    if (vectorAngle > 360) {
+    vectorAngle = 450. - joystickAngle + angleGyro;
+    if (vectorAngle > 360.) {
 
-        fmod (vectorAngle, 360);
+        fmod (vectorAngle, 360.);
     }
 
     VectorDouble translationVector(x * cos(vectorAngle), y * sin(vectorAngle));
