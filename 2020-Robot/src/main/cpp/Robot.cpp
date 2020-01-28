@@ -25,6 +25,8 @@ void Robot::RobotInit() {
     playerTwo = new frc::XboxController(R_playerTwoControllerPort);
 
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
+
+    m_launcherIndexSpeed = 0;
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {}
@@ -47,13 +49,22 @@ void Robot::TeleopPeriodic() {
     }
 
 
-    if (playerTwo->GetXButton) {
+    if (playerTwo->GetXButton()) {
 
-        launcher.setIndexSpeed(playerTwo->GetY(frc::GenericHID::kLeftHand));
+        m_launcherIndexSpeed = playerTwo->GetY(frc::GenericHID::kLeftHand);
+        launcher.setIndexSpeed(m_launcherIndexSpeed);
     }
-    if (playerTwo->GetYButton) {
+    if (playerTwo->GetYButton()) {
 
         launcher.setLaunchSpeed(playerTwo->GetY(frc::GenericHID::kLeftHand));
+    }
+    if (playerTwo->GetAButton()) {
+
+        launcher.setIndexSpeed(m_launcherIndexSpeed);
+    }
+    else {
+
+        launcher.setIndexSpeed(0);
     }
 }
 
