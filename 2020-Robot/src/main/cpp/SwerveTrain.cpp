@@ -8,7 +8,7 @@
 void SwerveTrain::driveController(frc::Joystick *controller) {
 
     //All value are inverted as the functions' logic is written for an upside-down Zion
-    double x = -controller->GetX();
+    double x = controller->GetX();
     double y = -controller->GetY();
     double z = -controller->GetZ(); 
     //To prevent controller drift, if the values of X, Y, and Z are inside of
@@ -23,7 +23,11 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     //away from the operator, and simply driving "straight" at a 45* angle
     //would make it drive away from the operator at 45*. This is true of any
     //angle, so the gyro is needed to offset the vector described by X and Y.
-    VectorDouble translationVector = getTranslationVector(x, y, navX->getYaw());
+    //VectorDouble translationVector(0, 0);
+    VectorDouble translationVector = getTranslationVector(x, y, navX->getYaw()); 
+
+    //TODO make translation vector a 0 -> Nic angle or result back to a 0 -> vector
+
     //The rotation vectors' i-components take the cosine of the R_ angle (see
     //RobotMap) in order to discern the first component of a vector which
     //points in the direction that would be applied to the swerve if the
@@ -37,10 +41,10 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     //negative, each vector applied to the swerves would point the same
     //direction - so axis inversion is used to ensure that traversing the
     //swerves from frontRight clockwise compounds 90 to the rotation vector.
-    VectorDouble frontRightRotationVector(z * cos(R_angleFromCenterToFrontRightWheel), -z * sin(R_angleFromCenterToFrontRightWheel));
-    VectorDouble frontLeftRotationVector(z * cos(R_angleFromCenterToFrontRightWheel), z * sin(R_angleFromCenterToFrontRightWheel));
-    VectorDouble rearLeftRotationVector(-z * cos(R_angleFromCenterToFrontRightWheel), z * sin (R_angleFromCenterToFrontRightWheel));
-    VectorDouble rearRightRotationVector(-z * cos(R_angleFromCenterToFrontRightWheel), -z * sin (R_angleFromCenterToFrontRightWheel));
+    VectorDouble frontRightRotationVector(z * cos(R_angleFromCenterToFrontRightWheel), z * sin(R_angleFromCenterToFrontRightWheel));
+    VectorDouble frontLeftRotationVector(z * cos(R_angleFromCenterToFrontRightWheel), -z * sin(R_angleFromCenterToFrontRightWheel));
+    VectorDouble rearLeftRotationVector(-z * cos(R_angleFromCenterToFrontRightWheel), -z * sin (R_angleFromCenterToFrontRightWheel));
+    VectorDouble rearRightRotationVector(-z * cos(R_angleFromCenterToFrontRightWheel), z * sin (R_angleFromCenterToFrontRightWheel));
     
     //And the vector we actually want to apply to the swerves is the sum of
     //the two vectors - the vector that forms "straight" (translationVector)
@@ -49,6 +53,32 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     VectorDouble frontLeftResultVector = translationVector + frontLeftRotationVector;
     VectorDouble rearLeftResultVector = translationVector + rearLeftRotationVector;
     VectorDouble rearRightResultVector = translationVector + rearRightRotationVector;
+
+    if(frontRightResultVector.magnitude() > 1.0) {
+        frontRightResultVector.i /= frontRightResultVector.magnitude(); 
+        frontRightResultVector.j /= frontRightResultVector.magnitude(); 
+    }
+
+    if(frontLeftResultVector.magnitude() > 1.0) {
+        frontLeftResultVector.i /= frontLeftResultVector.magnitude(); 
+        frontLeftResultVector.j /= frontLeftResultVector.magnitude(); 
+    }
+
+    if(rearLeftResultVector.magnitude() > 1.0) {
+        rearLeftResultVector.i /= rearLeftResultVector.magnitude(); 
+        rearLeftResultVector.j /= rearLeftResultVector.magnitude(); 
+    }
+
+    if(rearRightResultVector.magnitude() > 1.0) {
+        rearRightResultVector.i /= rearRightResultVector.magnitude(); 
+        rearRightResultVector.j /= rearRightResultVector.magnitude(); 
+    }
+
+   
+    frc::SmartDashboard::PutNumber("Front right result vector i ", frontRightResultVector.getI()); 
+    frc::SmartDashboard::PutNumber("Front right result vector j ", frontRightResultVector.getJ()); 
+    frc::SmartDashboard::PutNumber("Gyro Angle ", navX->getYaw());  
+
 
     //If the controller is in the total deadzone (entirely still)...
     if (getControllerInDeadzone(controller)) {
@@ -61,7 +91,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         //Due to this, it must be reset when not in movement to allow
         //this behavior to occur...
         assumeNearestZeroPosition();
-        setZeroPosition();
+        setDriveSpeed(0); 
         navX->resetYaw();
     }
     //Otherwise, go to the result vectors and use the magnitude to set the
@@ -94,6 +124,10 @@ double SwerveTrain::getClockwiseREVRotationsFromCenter(frc::Joystick *controller
     const double cosineAngle = dotProduct / magnitudeProduct;
     //The angle we want is the arccosine of its cosine...
     double angleRad = acos(cosineAngle);
+
+    if(magnitudeProduct == 0) {
+       angleRad = 0; 
+    }
     //To go from a full 0pi to 2pi and overcome the limitation of arccos, jump
     //to 2pi and subtract the gradually decreasing angle...
     if (x < 0) {
@@ -107,8 +141,8 @@ double SwerveTrain::getClockwiseREVRotationsFromCenter(frc::Joystick *controller
 }
 double SwerveTrain::getClockwiseREVRotationsFromCenter(const VectorDouble &vector) {
 
-    const double x = -vector.i; 
-    const double y = -vector.j;
+    const double x = vector.i; 
+    const double y = vector.j;
 
     VectorDouble center(0, 1);
     VectorDouble current(x, y);
@@ -116,6 +150,11 @@ double SwerveTrain::getClockwiseREVRotationsFromCenter(const VectorDouble &vecto
     const double magnitudeProduct = center.magnitude() * current.magnitude();
     const double cosineAngle = dotProduct / magnitudeProduct;
     double angleRad = acos(cosineAngle);
+
+    if(magnitudeProduct == 0) { 
+        angleRad = 0;
+    }
+
     if (x < 0) {
 
         angleRad = (2 * M_PI) - angleRad;
@@ -132,17 +171,24 @@ double SwerveTrain::getStandardDegreeAngleFromCenter(const double &x, const doub
     const double magnitudeProduct = center.magnitude() * current.magnitude();
     const double cosineAngle = dotProduct / magnitudeProduct;
     double angleRad = acos(cosineAngle);
+
+    if(magnitudeProduct == 0) {
+        angleRad = 0;
+    }
+
     if (x < 0) {
 
         angleRad = (2 * M_PI) - angleRad;
     }
-    return angleRad *= (180.0 / M_PI);
+    angleRad *= (180.0 / M_PI); 
+    return angleRad;
 }
 
 //TODO: Inline function documentation
 VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y, double angleGyro) {
 
-    double joystickAngle = getStandardDegreeAngleFromCenter(-x, -y);
+    double joystickAngle = getStandardDegreeAngleFromCenter(-x, y);
+
     double vectorAngle = 0;
 
     if (angleGyro < 0.) {
@@ -150,11 +196,17 @@ VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y,
         angleGyro += 360.;
     }
     vectorAngle = 450. - joystickAngle + angleGyro;
+
     if (vectorAngle > 360.) {
 
-        fmod (vectorAngle, 360.);
+       vectorAngle = fmod (vectorAngle, 360.);
     }
 
-    VectorDouble translationVector(x * cos(vectorAngle), y * sin(vectorAngle));
+    vectorAngle *= (M_PI / 180.); //convert to radians to use trig functions
+
+
+    //abs() of x and y is included because sin and cos handles the direction
+    VectorDouble translationVector(abs(x) * cos(vectorAngle), abs(y) * sin(vectorAngle));   
+   
     return translationVector;
 }

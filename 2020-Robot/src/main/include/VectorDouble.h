@@ -45,6 +45,13 @@ class VectorDouble {
             return sqrt(pow(i, 2) + pow (j, 2));
         }
 
+        double getI() {
+            return i;
+        }
+        double getJ() {
+            return j;
+        }
+
     private:
         
 };
