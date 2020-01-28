@@ -18,6 +18,9 @@ const int R_rearLeftSwerveMotorCANID   = 5;
 const int R_rearLeftDriveMotorCANID    = 6;
 const int R_rearRightSwerveMotorCANID  = 7;
 const int R_rearRightDriveMotorCANID   = 8;
+
+const int R_launcherIndexMotorCANID = 9;
+const int R_launcherLaunchMotorCANID = 10;
 /*___End RoboRIO CAN Bus ID Declarations___*/
 
 /*_____PCM Pin Declarations_____*/
@@ -25,6 +28,7 @@ const int R_rearRightDriveMotorCANID   = 8;
 
 /*_____Global Robot Variable Settigns_____*/
 const int R_playerOneControllerPort = 0;
+const int R_playerTwoControllerPort = 1;
 
 //This deadzone is used to determine when the controller is completely motionless...
 const double R_controllerDeadzone = .075;
