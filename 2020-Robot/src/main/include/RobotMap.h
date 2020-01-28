@@ -32,6 +32,15 @@ const double R_controllerDeadzone = .075;
 //of the controller often results in errant rotation.
 const double R_controllerZDeadzone = .6;
 
+//These are the playerOne raw controller buttons that are used for manually
+//zeroing Zion one wheel at a time by holding them down.
+const int R_zeroButtonFR = 0;
+const int R_zeroButtonFL = 0;
+const int R_zeroButtonRL = 0;
+const int R_zeroButtonRR = 0;
+//And this is the execution cap for the speed at which this process can be done.
+const double R_controllerZeroExecutionCap = .1;
+
 //This is the highest decimal percentage of full speed that Zion can actually go.
 const double R_zionExecutionCap = .25;
 

@@ -38,6 +38,12 @@ Public Methods
         to the SmartDashboard.
     void driveController(): Fully drives the swerve train on the supplied
         controller.
+    void zeroController(): Allows use of a controller through
+        a mapped button which is held down in correspondence to a motor
+        to slowly override its zero from that controller's joystick
+        value. This allows manual adjustment from an enabled state in case of
+        either drift or error. CURRENTLY WRITTEN FOR A JOYSTICK, WILL LIKELY
+        NEED TO CHANGE.
 
 Private Methods
 
@@ -135,7 +141,7 @@ class SwerveTrain {
         }
 
         void driveController(frc::Joystick *controller);
-        void maunualZero(frc::Joystick *controller);
+        void zeroController(frc::Joystick *controller);
 
     private:
         SwerveModule *m_frontRight;

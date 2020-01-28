@@ -41,34 +41,30 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         setDriveSpeed(controllerMagnitude * R_zionExecutionCap);
     }
 }
+void SwerveTrain::zeroController(frc::Joystick *controller) {
 
-void SwerveTrain::maunualZero(frc::Joystick *controller) {
-
+    //This one is also built for being upside down, so invert it.
     const double controllerTurningMagnitude = -controller->GetZ();
 
-    if (controller->GetRawButton(7)) {
+    if (controller->GetRawButton(R_zeroButtonFR)) {
 
-        m_frontLeft->setSwerveSpeed(controllerTurningMagnitude * .1);
+        m_frontRight->setSwerveSpeed(controllerTurningMagnitude * R_controllerZeroExecutionCap);
     }
-    else if (controller->GetRawButton(8)) {
-        
-        m_frontRight->setSwerveSpeed(controllerTurningMagnitude * .1);
-    }
-    else if (controller->GetRawButton(9)) {
-        
-        m_rearLeft->setSwerveSpeed(controllerTurningMagnitude * .1);
-    }
-    else if (controller->GetRawButton(10)) {
-        
-        m_rearRight->setSwerveSpeed(controllerTurningMagnitude * .1);
-    }
-    else if (controller->GetRawButton(1)) {
+    else if (controller->GetRawButton(R_zeroButtonFL)) {
 
-        setSwerveZeroPosition();
+        m_frontLeft->setSwerveSpeed(controllerTurningMagnitude * R_controllerZeroExecutionCap);
+    }
+    else if (controller->GetRawButton(R_zeroButtonRL)) {
+
+        m_rearLeft->setSwerveSpeed(controllerTurningMagnitude * R_controllerZeroExecutionCap);
+    }
+    else if (controller->GetRawButton(R_zeroButtonRR)) {
+
+        m_rearRight->setSwerveSpeed(controllerTurningMagnitude * R_controllerZeroExecutionCap);
     }
     else {
-        setSwerveSpeed(0);
-        setDriveSpeed(0);
+
+        setSwerveZeroPosition();
     }
 }
 
