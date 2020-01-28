@@ -51,8 +51,7 @@ void Robot::TeleopPeriodic() {
 
     if (playerTwo->GetXButton()) {
 
-        m_launcherIndexSpeed = playerTwo->GetY(frc::GenericHID::kLeftHand);
-        launcher.setIndexSpeed(m_launcherIndexSpeed);
+        m_launcherIndexSpeed = playerTwo->GetY(frc::GenericHID::kLeftHand) * .1;
     }
     if (playerTwo->GetYButton()) {
 
