@@ -10,6 +10,8 @@ Public Methods:
 
     double operator* const(VectorDouble&): Returns the dot product of two
         VectorDoubles.
+    VectorDouble operator+ const(VectorDouble&): Returns the resultant vector
+        of the addition of two VectorDoubles.
     double magnitude(): Returns the magnitude of a VectorDouble.
 */
 
@@ -17,11 +19,7 @@ Public Methods:
 
 #include <math.h>
 
-class VectorDouble {
-
-    public:
-        double i; 
-        double j; 
+struct VectorDouble {
 
         VectorDouble(const double &iVal, const double &jVal) {
 
@@ -33,10 +31,9 @@ class VectorDouble {
 
             return ((i * otherVector.i) + (j * otherVector.j));
         }
-
         VectorDouble operator+ (VectorDouble const &otherVector) {
-            
-            VectorDouble resultVector (i + otherVector.i, j + otherVector.j); 
+
+            VectorDouble resultVector (i + otherVector.i, j + otherVector.j);
             return resultVector;
         }
 
@@ -45,13 +42,6 @@ class VectorDouble {
             return sqrt(pow(i, 2) + pow (j, 2));
         }
 
-        double getI() {
-            return i;
-        }
-        double getJ() {
-            return j;
-        }
-
-    private:
-        
+        double i;
+        double j;
 };
