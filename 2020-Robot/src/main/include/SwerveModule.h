@@ -40,8 +40,6 @@ Public Methods
     void assumeSwerveNearestZeroPosition(): Drives the swerve to its nearest
         zero position (the closest multiple of Nic's Constant to the zero
         value) either clockwise or counterclockwise.
-
-
     Note that the values returned by the get functions persist across disables, but
         not across power cycles, and are set to 0 at power-on.
 
