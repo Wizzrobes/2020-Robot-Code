@@ -56,6 +56,10 @@ class NavX {
             navX->ZeroYaw();
         }
 
+        void reset() {
+            navX->Reset(); 
+        }
+
         enum ConnectionType {
 
             kUSB,

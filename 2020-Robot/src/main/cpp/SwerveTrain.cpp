@@ -27,7 +27,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     angle, so the gyro is needed to offset the vector described by X and Y.
     VectorDouble translationVector(0, 0);
     */
-    VectorDouble translationVector = getTranslationVector(x, y, navX->getYaw()); 
+    VectorDouble translationVector = getTranslationVector(x, y, 0.0); 
 
     /*
     The rotation vectors' i-components take the cosine of the R_ angle (see
@@ -66,6 +66,17 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     calculations ensure that the magnitude of a vector will always evaluate
     to exactly one in the event that it was over one.
     */
+
+   frc::SmartDashboard::PutNumber("Front right result i", frontRightResultVector.i);
+    frc::SmartDashboard::PutNumber("Front right result j", frontRightResultVector.j);
+     frc::SmartDashboard::PutNumber("Front left result i", frontLeftResultVector.i); 
+      frc::SmartDashboard::PutNumber("Front left result j", frontLeftResultVector.j);
+       frc::SmartDashboard::PutNumber("Rear left result i", rearLeftResultVector.i);
+        frc::SmartDashboard::PutNumber("Rear left result j", rearLeftResultVector.j);
+         frc::SmartDashboard::PutNumber("Rear right result i", rearRightResultVector.i);
+          frc::SmartDashboard::PutNumber("Rear right result j", rearRightResultVector.j);
+          
+
     if (frontRightResultVector.magnitude() > 1.) {
 
         frontRightResultVector.i /= frontRightResultVector.magnitude(); 
@@ -87,6 +98,9 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         rearRightResultVector.j /= rearRightResultVector.magnitude(); 
     }
 
+
+
+
     //If the controller is in the total deadzone (entirely still)...
     if (getControllerInDeadzone(controller)) {
 
@@ -99,7 +113,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         //this behavior to occur...
         assumeNearestZeroPosition();
         setDriveSpeed(0); 
-        navX->resetYaw();
+        navX->reset();
     }
     //Otherwise, go to the result vectors and use the magnitude to set the
     //speed of driving.
@@ -109,7 +123,11 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontLeftResultVector));
         m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearLeftResultVector));
         m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearRightResultVector));
-        setDriveSpeed(frontRightResultVector.magnitude() * R_zionExecutionCap);
+       
+        m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * R_zionExecutionCap);
+        m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * R_zionExecutionCap);
+        m_rearLeft->setDriveSpeed(rearLeftResultVector.magnitude() * R_zionExecutionCap);
+        m_rearRight->setDriveSpeed(rearRightResultVector.magnitude() * R_zionExecutionCap);
     }
 }
 
