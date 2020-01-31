@@ -29,6 +29,8 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     */
     VectorDouble translationVector = getTranslationVector(x, y, 0.0); 
 
+    frc::SmartDashboard::PutNumber("GYRO", navX->getYaw()); 
+
     /*
     The rotation vectors' i-components take the cosine of the R_ angle (see
     RobotMap) in order to discern the first component of a vector which
@@ -67,39 +69,22 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     to exactly one in the event that it was over one.
     */
 
-   frc::SmartDashboard::PutNumber("Front right result i", frontRightResultVector.i);
-    frc::SmartDashboard::PutNumber("Front right result j", frontRightResultVector.j);
-     frc::SmartDashboard::PutNumber("Front left result i", frontLeftResultVector.i); 
-      frc::SmartDashboard::PutNumber("Front left result j", frontLeftResultVector.j);
-       frc::SmartDashboard::PutNumber("Rear left result i", rearLeftResultVector.i);
-        frc::SmartDashboard::PutNumber("Rear left result j", rearLeftResultVector.j);
-         frc::SmartDashboard::PutNumber("Rear right result i", rearRightResultVector.i);
-          frc::SmartDashboard::PutNumber("Rear right result j", rearRightResultVector.j);
-          
+    double largestMagnitude = getLargestMagnitude(frontRightResultVector.magnitude(), frontLeftResultVector.magnitude(), rearLeftResultVector.magnitude(), rearRightResultVector.magnitude()); 
 
-    if (frontRightResultVector.magnitude() > 1.) {
+    if(largestMagnitude > 1) {
+        frontRightResultVector.i /= largestMagnitude; 
+        frontRightResultVector.j /= largestMagnitude; 
 
-        frontRightResultVector.i /= frontRightResultVector.magnitude(); 
-        frontRightResultVector.j /= frontRightResultVector.magnitude(); 
+        frontLeftResultVector.i /= largestMagnitude; 
+        frontLeftResultVector.j /= largestMagnitude;
+
+        rearLeftResultVector.i /= largestMagnitude; 
+        rearLeftResultVector.j /= largestMagnitude; 
+
+        rearRightResultVector.i /= largestMagnitude; 
+        rearRightResultVector.j /= largestMagnitude; 
     }
-    if (frontLeftResultVector.magnitude() > 1.) {
-
-        frontLeftResultVector.i /= frontLeftResultVector.magnitude(); 
-        frontLeftResultVector.j /= frontLeftResultVector.magnitude(); 
-    }
-    if (rearLeftResultVector.magnitude() > 1.) {
-
-        rearLeftResultVector.i /= rearLeftResultVector.magnitude(); 
-        rearLeftResultVector.j /= rearLeftResultVector.magnitude(); 
-    }
-    if (rearRightResultVector.magnitude() > 1.) {
-
-        rearRightResultVector.i /= rearRightResultVector.magnitude(); 
-        rearRightResultVector.j /= rearRightResultVector.magnitude(); 
-    }
-
-
-
+    
 
     //If the controller is in the total deadzone (entirely still)...
     if (getControllerInDeadzone(controller)) {
@@ -235,4 +220,10 @@ VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y,
     //for signage - allowing X and Y signage causes double negative rrors.
     VectorDouble translationVector(abs(x) * cos(vectorAngle), abs(y) * sin(vectorAngle));   
     return translationVector;
+    
+}
+
+double SwerveTrain::getLargestMagnitude(const double &fr, const double &fl, const double &rl, const double &rr) {
+     
+    return std::max(std::max(fr, fl), std::max(rr, rl));
 }

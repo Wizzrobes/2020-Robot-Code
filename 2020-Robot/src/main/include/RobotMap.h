@@ -31,7 +31,7 @@ const int R_playerOneControllerPort = 0;
 const double R_controllerDeadzone = .075;
 //And this one is to determine when rotation is being induced, as simply operation
 //of the controller often results in errant rotation.
-const double R_controllerZDeadzone = .6;
+const double R_controllerZDeadzone = .3;
 
 //The amount of REV rotations it takes for a swerve assembly to make a full rotation.
 //Often, a REV Rotation is referred to as a Nic, although they mean different things.
@@ -49,5 +49,5 @@ const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = 
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed = .02;
 //This is the highest decimal percentage of full speed that Zion can actually go.
-const double R_zionExecutionCap = .4;
+const double R_zionExecutionCap = .25;
 /*___End Global Robot Variable Settings___*/

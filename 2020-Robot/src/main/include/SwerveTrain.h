@@ -158,6 +158,7 @@ class SwerveTrain {
         double getStandardDegreeAngleFromCenter(const double &x, const double &y);
 
         VectorDouble getTranslationVector(const double &x, const double &y, double angleGyro); 
+        double getLargestMagnitude(const double &fr, const double &fl, const double &rl, const double &rr);
 
         double getControllerAbsoluteMagnitude(frc::Joystick *controller) {
 
@@ -190,6 +191,6 @@ class SwerveTrain {
             if (absX < R_controllerDeadzone) {x = 0;}
             if (absY < R_controllerDeadzone) {y = 0;}
             if (absZ < R_controllerZDeadzone) {z = 0;}
-            
+
         }
 };
