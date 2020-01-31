@@ -1,6 +1,7 @@
 #include <frc/Joystick.h>
 #include <frc/XboxController.h>
 #include <cameraserver/CameraServer.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "Robot.h"
 #include "SwerveModule.h"
@@ -8,11 +9,11 @@
 #include "Launcher.h"
 #include "RobotMap.h"
 
-SwerveModule frontRightModule(R_frontRightDriveMotorCANID, R_frontRightSwerveMotorCANID);
-SwerveModule frontLeftModule(R_frontLeftDriveMotorCANID, R_frontLeftSwerveMotorCANID);
-SwerveModule rearLeftModule(R_rearLeftDriveMotorCANID, R_rearLeftSwerveMotorCANID);
-SwerveModule rearRightModule(R_rearRightDriveMotorCANID, R_rearRightSwerveMotorCANID);
-SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule);
+//SwerveModule frontRightModule(R_frontRightDriveMotorCANID, R_frontRightSwerveMotorCANID);
+//SwerveModule frontLeftModule(R_frontLeftDriveMotorCANID, R_frontLeftSwerveMotorCANID);
+//SwerveModule rearLeftModule(R_rearLeftDriveMotorCANID, R_rearLeftSwerveMotorCANID);
+//SwerveModule rearRightModule(R_rearRightDriveMotorCANID, R_rearRightSwerveMotorCANID);
+//SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule);
 
 Launcher launcher(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
 
@@ -25,15 +26,13 @@ void Robot::RobotInit() {
     playerTwo = new frc::XboxController(R_playerTwoControllerPort);
 
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
-
-    m_launcherIndexSpeed = 0;
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
-
+/*
     if (playerOne->GetRawButtonPressed(3)) {
 
         zion.setSwerveZeroPosition();
@@ -46,20 +45,28 @@ void Robot::TeleopPeriodic() {
 
         zion.setDriveSpeed(0);
         zion.setSwerveSpeed(0);
-    }
+    }*/
 
 
-    if (playerTwo->GetXButton()) {
-
-        launcher.setLaunchSpeed(playerTwo->GetY(frc::GenericHID::kLeftHand));
-    }
     if (playerTwo->GetYButton()) {
 
-        m_launcherIndexSpeed = playerTwo->GetY(frc::GenericHID::kLeftHand);
+        frc::SmartDashboard::PutNumber("Launcher::Launch-Speed:", playerTwo->GetY(frc::GenericHID::kLeftHand));
+    }
+    if (playerTwo->GetXButton()) {
+
+        frc::SmartDashboard::PutNumber("Launcher::Index-Speed:", playerTwo->GetY(frc::GenericHID::kLeftHand));
+    }
+    if (!playerTwo->GetBButton()) {
+
+        launcher.setLaunchSpeed(frc::SmartDashboard::GetNumber("Launcher::Launch-Speed:", 0));
+    }
+    else {
+
+        launcher.setLaunchSpeed(0);
     }
     if (playerTwo->GetAButton()) {
 
-        launcher.setIndexSpeed(m_launcherIndexSpeed);
+        launcher.setIndexSpeed(frc::SmartDashboard::GetNumber("Launcher::Index-Speed:", 0));
     }
     else {
 
