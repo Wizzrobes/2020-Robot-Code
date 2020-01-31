@@ -8,14 +8,16 @@
 #include "SwerveTrain.h"
 #include "Launcher.h"
 #include "RobotMap.h"
+#include "Climber.h"
 
-//SwerveModule frontRightModule(R_frontRightDriveMotorCANID, R_frontRightSwerveMotorCANID);
-//SwerveModule frontLeftModule(R_frontLeftDriveMotorCANID, R_frontLeftSwerveMotorCANID);
-//SwerveModule rearLeftModule(R_rearLeftDriveMotorCANID, R_rearLeftSwerveMotorCANID);
-//SwerveModule rearRightModule(R_rearRightDriveMotorCANID, R_rearRightSwerveMotorCANID);
-//SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule);
+SwerveModule frontRightModule(R_frontRightDriveMotorCANID, R_frontRightSwerveMotorCANID);
+SwerveModule frontLeftModule(R_frontLeftDriveMotorCANID, R_frontLeftSwerveMotorCANID);
+SwerveModule rearLeftModule(R_rearLeftDriveMotorCANID, R_rearLeftSwerveMotorCANID);
+SwerveModule rearRightModule(R_rearRightDriveMotorCANID, R_rearRightSwerveMotorCANID);
+SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule);
 
 Launcher launcher(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
+Climber climber(R_launcherIndexMotorCANID);
 
 frc::Joystick *playerOne;
 frc::XboxController *playerTwo;
@@ -32,7 +34,7 @@ void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
-/*
+
     if (playerOne->GetRawButtonPressed(3)) {
 
         zion.setSwerveZeroPosition();
@@ -45,7 +47,7 @@ void Robot::TeleopPeriodic() {
 
         zion.setDriveSpeed(0);
         zion.setSwerveSpeed(0);
-    }*/
+    }
 
 
     if (playerTwo->GetYButton()) {
@@ -71,6 +73,16 @@ void Robot::TeleopPeriodic() {
     else {
 
         launcher.setIndexSpeed(0);
+    }
+
+    if (playerTwo->GetBackButton()) {
+
+        double climberSpeed = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
+        climber.setSpeed(climberSpeed);
+    }
+    else {
+
+        climber.setSpeed(0);
     }
 }
 

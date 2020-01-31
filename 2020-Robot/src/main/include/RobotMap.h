@@ -10,14 +10,14 @@
 /*___End RoboRIO DIO Pin Declarations___*/
 
 /*_____RoboRIO CAN Bus ID Declarations_____*/
-//const int R_frontRightSwerveMotorCANID = 1;
-//const int R_frontRightDriveMotorCANID  = 2;
-//const int R_frontLeftSwerveMotorCANID  = 3;
-//const int R_frontLeftDriveMotorCANID   = 4;
-//const int R_rearLeftSwerveMotorCANID   = 5;
-//const int R_rearLeftDriveMotorCANID    = 6;
-//const int R_rearRightSwerveMotorCANID  = 7;
-//const int R_rearRightDriveMotorCANID   = 8;
+const int R_frontRightSwerveMotorCANID = 1;
+const int R_frontRightDriveMotorCANID  = 2;
+const int R_frontLeftSwerveMotorCANID  = 3;
+const int R_frontLeftDriveMotorCANID   = 4;
+const int R_rearLeftSwerveMotorCANID   = 5;
+const int R_rearLeftDriveMotorCANID    = 6;
+const int R_rearRightSwerveMotorCANID  = 7;
+const int R_rearRightDriveMotorCANID   = 8;
 
 const int R_launcherIndexMotorCANID = 9;
 const int R_launcherLaunchMotorCANID = 10;
