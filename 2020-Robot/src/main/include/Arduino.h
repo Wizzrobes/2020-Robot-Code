@@ -14,28 +14,89 @@ This class allows interfacing with an Arduino microcontroller as an auxiliary
     responds with the registry in-turn. Data can be added or extracted from the
     registry, which fulfills both transmission and reception of alphanumeric
     data. Below is a diagram of the 32-character registry, which contains
-    12 registers each delimited with |:
+    8 registers each delimited with |:
 
-    |x|xxx|xxx|xxx|xxx|xxx|xxx|xxx|xxx|xxx|xxx|x|
-    A B   C   D   E   F   G   H   I   J   K   L
+    |x|xxxxx|xxxxx|xxxxx|xxxxx|xxxxx|xxxxx|x|
+    A B     C     D     E     F     G     H
 
     A. Sanity Register: This value should read 0 when the Rio transmits the
         registry, and will read 1 after the Arduino respomds with the registry.
         Any other value at any other time is in error. This is used to ensure
         success over many serial transactions occurring at many times.
-    B. Option Register 0: This register is modified by the RoboRIO and then
+    B. Tx Register 0: This register is modified by the RoboRIO and then
         transmitted to the Arduino. It can be used to transmit any alphanumeric
         data, but it is logically used in modifying the behavior of whatevever
-        device is returning data on Data Register 0.
-    C-F. Option Register 1-Option Register 4
-    G. Data Register 0: This register is modified by the Arduino and then
+        device is returning data on Rx Register 0.
+    C-D. Tx Register 1-Tx Register 4
+    E. Rx Register 0: This register is modified by the Arduino and then
         transmitted to the RoboRIO. It can also be used to receive any
         alphanumeric data from the Arduino, but it is logically used
-        to receive data from whatever sensor is transmitting on Register 0
-    H-K. Data Register 1-Data Register 4
-    L. Extra Register: Unused. 32 is a nice number.
+        to receive data from whatever sensor is transmitting on Register 0.
+    F-G. Rx Register 1-Rx Register 2
+    H. Extra Register: Unused. 32 is a nice number.
 
     On the RIO, the registry is a WPI::StringRef object, allowing it to
         interface with the FRC Serial functions. It is usually referenced by a
         temporary string to be operated on, and then used as-is.
+
+
+class Arduino
+
+Constructors
+
+    Arduino(const frc::SerialPort::Port&, const int&): Creates a serial
+        interface called Arduino on the specified port at the specified
+        baud rate. These default to frc::SerialPort::Port::kUSB1 and
+        9600, respectively.
+
+Public Methods
+
+    std::string getRegister(const Register&): Takes a register as defined in
+        enum Register and returns a string of the value found there.
+    bool setRegister(const Register&, const std::string&): Takes a register
+        as defined in enum Register and sets its full contents to the most
+        usable data of the passed string starting at the beginning. Returns
+        true if that operation was possible, false if it was not. In case of
+        failure, no data is updated!
+    Note that these get/setters allow getting and setting of things that
+        shouldn't necessarily be get or set - setting a received register
+        is such an example, as is getting one to be transmitted.
 */
+
+#pragma once
+
+#include <frc/SerialPort.h>
+#include <wpi/StringRef.h>
+
+class Arduino {
+
+    public:
+        Arduino(const frc::SerialPort::Port &port = frc::SerialPort::Port::kUSB1, const int &baudRate = 9600) {
+
+            arduino = new frc::SerialPort(baudRate, port);
+            //Initialize the registry to 32 0 chars
+            m_registry = std::string(32, '0');
+        }
+
+        std::string getRegister(const int &regToGet);
+        bool setRegister(const int &regToSet, const std::string &stringToSet);
+
+        //These values are used to pass registry locations to functions. kSanity and kRegistry are
+        //arbitrary, whereas the rest of the register names indicate their own start positions
+        //in the registry.
+        enum Register {
+
+            kSanity,
+            kRegisterTx0, kRegisterTx1 = 5, kRegisterTx2 = 7, kRegisterTx3 = 10, kRegisterTx4 = 13,
+            kRegisterRx0 = 16, kRegisterRx1 = 21, kRegisterRx2 = 26,
+            kRegisterExtra = 31,
+            kRegistry
+        };
+
+    private:
+        frc::SerialPort *arduino;
+
+        //Setup a string to operate on the registry, and refer a StringRef to it for seial use
+        std::string m_registry;
+        wpi::StringRef m_registryRef = m_registry;
+};
