@@ -10,10 +10,9 @@
 #include "SwerveModule.h"
 #include "SwerveTrain.h"
 
-Climber climber(R_launcherIndexMotorCANID);
+Climber climber(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
 Launcher launcher(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
 NavX navX(NavX::ConnectionType::kMXP);
-
 SwerveModule frontRightModule(R_frontRightDriveMotorCANID, R_frontRightSwerveMotorCANID);
 SwerveModule frontLeftModule(R_frontLeftDriveMotorCANID, R_frontLeftSwerveMotorCANID);
 SwerveModule rearLeftModule(R_rearLeftDriveMotorCANID, R_rearLeftSwerveMotorCANID);
@@ -79,11 +78,13 @@ void Robot::TeleopPeriodic() {
     if (playerTwo->GetBackButton()) {
 
         double climberSpeed = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
-        climber.setSpeed(climberSpeed);
+        climber.setSpeed(Climber::LiftMotor::kPrimary, climberSpeed);
+        //climber.setSpeed(Climber::LiftMotor::kSecondary, -climberSpeed);
     }
     else {
 
-        climber.setSpeed(0);
+        climber.setSpeed(Climber::LiftMotor::kPrimary);
+        //climber.setSpeed(Climber::LiftMotor::kSecondary);
     }
 }
 
