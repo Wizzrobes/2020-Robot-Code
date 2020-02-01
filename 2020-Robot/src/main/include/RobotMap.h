@@ -28,27 +28,30 @@ const int R_launcherLaunchMotorCANID = 10;
 /*_____PCM Pin Declarations_____*/
 /*___End PCM Pin Declarations___*/
 
-/*_____Global Robot Variable Settigns_____*/
+/*_____Controller Settings_____*/
 const int R_playerOneControllerPort = 0;
 const int R_playerTwoControllerPort = 1;
 
-//This deadzone is used to determine when the controller is completely motionless...
+//This deadzone is used to determine when the controller is completely motionless
 const double R_controllerDeadzone = .075;
 //And this one is to determine when rotation is being induced, as simply operation
-//of the controller often results in errant rotation.
+//of the controller often results in errant rotation. Due to how easy it is to
+//drift, it is significantly higher.
 const double R_controllerZDeadzone = .3;
 
-//These are the playerOne raw controller buttons that are used for manually
+//These are the playerTwo raw controller buttons that are used for manually
 //zeroing Zion one wheel at a time by holding them down.
 const int R_zeroButtonFR = 0;
 const int R_zeroButtonFL = 0;
 const int R_zeroButtonRL = 0;
 const int R_zeroButtonRR = 0;
-//And this is the execution cap for the speed at which this process can be done.
-const double R_controllerZeroExecutionCap = .1;
+/*___End Controller Settings___*/
 
+/*_____Global Robot Variable Settigns_____*/
 //This is the highest decimal percentage of full speed that Zion can actually go.
 const double R_zionExecutionCap = .25;
+//And this is the execution cap for how fast manual zeroing can occur.
+const double R_controllerZeroExecutionCap = .1;
 
 //The amount of REV rotations it takes for a swerve assembly to make a full rotation.
 //Often, a REV Rotation is referred to as a Nic, although they mean different things.
@@ -60,6 +63,8 @@ const double R_nicsConstant = 17.9761447906494;
 //for moving and turning at the same time.
 const double R_angleFromCenterToFrontRightWheel = (M_PI / 4.0);
 
+//These contants are used for the functions which provide assuming a position.
+//See those functions for further detail.
 const double R_swerveTrainAssumePositionTolerance = .1;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = .2;
