@@ -18,6 +18,7 @@ SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightMod
 
 Launcher launcher(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
 Climber climber(R_launcherIndexMotorCANID);
+Climber secondClimber(R_launcherLaunchMotorCANID);
 
 frc::Joystick *playerOne;
 frc::XboxController *playerTwo;
@@ -79,10 +80,13 @@ void Robot::TeleopPeriodic() {
 
         double climberSpeed = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
         climber.setSpeed(climberSpeed);
+        //Give the motor the opposite speed becuase it is flipped under the first one
+        secondClimber.setSpeed(-climberSpeed);
     }
     else {
 
         climber.setSpeed(0);
+        secondClimber.setSpeed(0);
     }
 }
 
