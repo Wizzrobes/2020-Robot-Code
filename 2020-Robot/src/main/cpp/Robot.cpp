@@ -2,6 +2,7 @@
 #include <frc/Joystick.h>
 #include <frc/XboxController.h>
 
+#include "Climber.h"
 #include "Launcher.h"
 #include "NavX.h"
 #include "Robot.h"
@@ -9,6 +10,7 @@
 #include "SwerveModule.h"
 #include "SwerveTrain.h"
 
+Climber climber(R_launcherIndexMotorCANID);
 Launcher launcher(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
 NavX navX(NavX::ConnectionType::kMXP);
 
@@ -49,21 +51,39 @@ void Robot::TeleopPeriodic() {
     }
 
 
-    if (playerTwo->GetXButton()) {
-
-        launcher.setLaunchSpeed(playerTwo->GetY(frc::GenericHID::kLeftHand));
-    }
     if (playerTwo->GetYButton()) {
 
-        m_launcherIndexSpeed = playerTwo->GetY(frc::GenericHID::kLeftHand);
+        frc::SmartDashboard::PutNumber("Launcher::Launch-Speed:", playerTwo->GetY(frc::GenericHID::kLeftHand));
+    }
+    if (playerTwo->GetXButton()) {
+
+        frc::SmartDashboard::PutNumber("Launcher::Index-Speed:", playerTwo->GetY(frc::GenericHID::kLeftHand));
+    }
+    if (!playerTwo->GetBButton()) {
+
+        launcher.setLaunchSpeed(frc::SmartDashboard::GetNumber("Launcher::Launch-Speed:", 0));
+    }
+    else {
+
+        launcher.setLaunchSpeed(0);
     }
     if (playerTwo->GetAButton()) {
 
-        launcher.setIndexSpeed(m_launcherIndexSpeed);
+        launcher.setIndexSpeed(frc::SmartDashboard::GetNumber("Launcher::Index-Speed:", 0));
     }
     else {
 
         launcher.setIndexSpeed(0);
+    }
+
+    if (playerTwo->GetBackButton()) {
+
+        double climberSpeed = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
+        climber.setSpeed(climberSpeed);
+    }
+    else {
+
+        climber.setSpeed(0);
     }
 }
 

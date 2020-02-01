@@ -139,7 +139,7 @@ void SwerveTrain::zeroController(frc::Joystick *controller) {
     }
     else {
 
-        setSwerveZeroPosition();
+        setZeroPosition();
     }
 }
 

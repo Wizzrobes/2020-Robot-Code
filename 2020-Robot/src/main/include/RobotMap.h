@@ -65,6 +65,4 @@ const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = .2;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed = .02;
-//This is the highest decimal percentage of full speed that Zion can actually go.
-const double R_zionExecutionCap = .25;
 /*___End Global Robot Variable Settings___*/
