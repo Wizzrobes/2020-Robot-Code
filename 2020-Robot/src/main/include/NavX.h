@@ -8,10 +8,10 @@ Constructors
 Public Methods
 
     double getYaw(): Returns the yaw value.
-    double getRateDegrees(): Returns the rate value as degrees.
     double getAngle(): Returns the angle value.
     double getAbsoluteAngle(): Returns the absolute value of the angle value.
     void resetYaw(): Sets the yaw value to zero.
+    void resetAll(): Resets all NavX return values.
 */
 
 #pragma once
@@ -51,13 +51,14 @@ class NavX {
 
             return abs(navX->GetAngle());
         }
+
         void resetYaw() {
 
             navX->ZeroYaw();
         }
+        void resetAll() {
 
-        void reset() {
-            navX->Reset(); 
+            navX->Reset();
         }
 
         enum ConnectionType {
@@ -69,24 +70,3 @@ class NavX {
     private:
         AHRS *navX;
 };
-/*
-//TODO: What is this?
-double getRateDegrees() {
-
-    return (navX->GetRate() * (180 if (angleGyro < 0) {
-        angleGyro += 360;
-    }
-    if (angleGyro >= 0 || angleGyro <= 90) {
-        angleReal = 90 - angleGyro;
-    }
-    else {
-        angleReal = 450 - angleGyro;
-    }
-
-    m_frontRight->assumeSwervePosition(...);
-    m_frontLeft->assumeSwervePosition(...);
-    m_rearLeft->assumeSwervePosition(...);
-    m_rearRight->assumeSwervePosition(...);
-    setDriveSpeed(controllerMagnitude * R_zionExecutionCap); / M_PI));
-}
-*/

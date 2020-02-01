@@ -11,10 +11,10 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     //TODO: Why does uninverting X solve our issues?
     double x = controller->GetX();
     double y = -controller->GetY();
-    double z = -controller->GetZ(); 
+    double z = -controller->GetZ();
     //To prevent controller drift, if the values of X, Y, and Z are inside of
     //deadzone, set them to 0
-    forceControllerXYZToZeroInDeadzone(x, y, z); 
+    forceControllerXYZToZeroInDeadzone(x, y, z);
 
     /*
     The translation vector is the "standard" vector - that is, if no rotation
@@ -27,9 +27,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     angle, so the gyro is needed to offset the vector described by X and Y.
     VectorDouble translationVector(0, 0);
     */
-    VectorDouble translationVector = getTranslationVector(x, y, 0.0); 
-
-    frc::SmartDashboard::PutNumber("GYRO", navX->getYaw()); 
+    VectorDouble translationVector = getTranslationVector(x, y, 0.0);
 
     /*
     The rotation vectors' i-components take the cosine of the R_ angle (see
@@ -56,7 +54,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     the two vectors - the vector that forms "straight" (translationVector)
     and the vector that forms strictly the rotation (rotationVector).
     */
-    VectorDouble frontRightResultVector = translationVector + frontRightRotationVector; 
+    VectorDouble frontRightResultVector = translationVector + frontRightRotationVector;
     VectorDouble frontLeftResultVector = translationVector + frontLeftRotationVector;
     VectorDouble rearLeftResultVector = translationVector + rearLeftRotationVector;
     VectorDouble rearRightResultVector = translationVector + rearRightRotationVector;
@@ -66,39 +64,42 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     possible for a vector's magnitude to evaluate to a value of greater
     than 1. As this is in error to send to a speed controller, the following
     calculations ensure that the magnitude of a vector will always evaluate
-    to exactly one in the event that it was over one.
+    to exactly one in the event that it was over one. The rest of the motor
+    values then scale proportionally to this value, using the second block
+    of code, which prevents non-standard turning from occurring through
+    changing motor ratios not by a standard value.
     */
+    double largestMagnitude = getLargestMagnitudeValue(frontRightResultVector.magnitude(), frontLeftResultVector.magnitude(), rearLeftResultVector.magnitude(), rearRightResultVector.magnitude());
+    if (largestMagnitude > 1) {
 
-    double largestMagnitude = getLargestMagnitude(frontRightResultVector.magnitude(), frontLeftResultVector.magnitude(), rearLeftResultVector.magnitude(), rearRightResultVector.magnitude()); 
+        frontRightResultVector.i /= largestMagnitude;
+        frontRightResultVector.j /= largestMagnitude;
 
-    if(largestMagnitude > 1) {
-        frontRightResultVector.i /= largestMagnitude; 
-        frontRightResultVector.j /= largestMagnitude; 
-
-        frontLeftResultVector.i /= largestMagnitude; 
+        frontLeftResultVector.i /= largestMagnitude;
         frontLeftResultVector.j /= largestMagnitude;
 
-        rearLeftResultVector.i /= largestMagnitude; 
-        rearLeftResultVector.j /= largestMagnitude; 
+        rearLeftResultVector.i /= largestMagnitude;
+        rearLeftResultVector.j /= largestMagnitude;
 
-        rearRightResultVector.i /= largestMagnitude; 
-        rearRightResultVector.j /= largestMagnitude; 
+        rearRightResultVector.i /= largestMagnitude;
+        rearRightResultVector.j /= largestMagnitude;
     }
-    
 
     //If the controller is in the total deadzone (entirely still)...
     if (getControllerInDeadzone(controller)) {
 
-        //Go to the nearest zero position, take it as the new zero, and
-        //reset the angle coming off of the gyroscope to zero to allow
-        //setting of the next translation vector, as the translation
-        //vector is always refereced from "center" (the beginning of the
-        //turn) and updated based on how much that gyro angle changes.
-        //Due to this, it must be reset when not in movement to allow
-        //this behavior to occur...
+        /*
+        Go to the nearest zero position, take it as the new zero, and
+        reset the angle coming off of the gyroscope to zero to allow
+        setting of the next translation vector, as the translation
+        vector is always refereced from "center" (the beginning of the
+        turn) and updated based on how much that gyro angle changes.
+        Due to this, it must be reset when not in movement to allow
+        this behavior to occur...
+        */
         assumeNearestZeroPosition();
-        setDriveSpeed(0); 
-        navX->reset();
+        setDriveSpeed(0);
+        navX->resetAll();
     }
     //Otherwise, go to the result vectors and use the magnitude to set the
     //speed of driving.
@@ -108,7 +109,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontLeftResultVector));
         m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearLeftResultVector));
         m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearRightResultVector));
-       
+
         m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * R_zionExecutionCap);
         m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * R_zionExecutionCap);
         m_rearLeft->setDriveSpeed(rearLeftResultVector.magnitude() * R_zionExecutionCap);
@@ -137,7 +138,7 @@ double SwerveTrain::getClockwiseREVRotationsFromCenter(frc::Joystick *controller
     //If an imaginary situation is presented, set the angle equal to 0...
     if (magnitudeProduct == 0) {
 
-       angleRad = 0; 
+       angleRad = 0;
     }
 
     //To go from a full 0pi to 2pi and overcome the limitation of arccos, jump
@@ -153,7 +154,7 @@ double SwerveTrain::getClockwiseREVRotationsFromCenter(frc::Joystick *controller
 }
 double SwerveTrain::getClockwiseREVRotationsFromCenter(const VectorDouble &vector) {
 
-    const double x = vector.i; 
+    const double x = vector.i;
     const double y = vector.j;
     VectorDouble center(0, 1);
     VectorDouble current(x, y);
@@ -193,10 +194,9 @@ double SwerveTrain::getStandardDegreeAngleFromCenter(const double &x, const doub
 
         angleRad = (2 * M_PI) - angleRad;
     }
-    angleRad *= (180.0 / M_PI); 
+    angleRad *= (180. / M_PI);
     return angleRad;
 }
-
 //TODO: Inline function documentation
 VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y, double angleGyro) {
 
@@ -213,17 +213,11 @@ VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y,
 
        vectorAngle = fmod (vectorAngle, 360.);
     }
-    //Make the conversion to radians to falicltate trigonometric usage
+    //Make the conversion to radians to faciliate trigonometric usage
     vectorAngle *= (M_PI / 180.);
 
     //The absolute value of X and Y is taken because cosine and sine account
-    //for signage - allowing X and Y signage causes double negative rrors.
-    VectorDouble translationVector(abs(x) * cos(vectorAngle), abs(y) * sin(vectorAngle));   
+    //for signage - allowing X and Y signage causes double negative errors.
+    VectorDouble translationVector(abs(x) * cos(vectorAngle), abs(y) * sin(vectorAngle));
     return translationVector;
-    
-}
-
-double SwerveTrain::getLargestMagnitude(const double &fr, const double &fl, const double &rl, const double &rr) {
-     
-    return std::max(std::max(fr, fl), std::max(rr, rl));
 }

@@ -53,6 +53,8 @@ Private Methods
     double getStandardDegreeAngleFromCenter(const double&, const double&): Same
         as above, but returns the result as a degree measure in standard
         position.
+    double getLargestMagnitudeValue(const double&, const double&, const double&, const double&):
+        Returns the largest of the four values passed to the function.
     VectorDouble getTranslationVector(const double&, const double&, double):
         Calculates the translation vector to be used in total swerve movement
         calculation by the control function. See the function itself for more.
@@ -61,7 +63,7 @@ Private Methods
     bool getControllerInDeadzone(frc::Joystick*): If all axis of the
         controller are within their RobotMap deadzone variables for
         playerOne's controller, returns true; otherwise, returns false.
-    void forceControllerXYZToDeadzone(const int&, const int&, const int&):
+    void forceControllerXYZToZeroInDeadzone(const int&, const int&, const int&):
         If any of the passed X, Y, or Z values fall outside of their global
         deadzone, they will be set to 0. Otherwise, they are untouched.
 */
@@ -70,14 +72,14 @@ Private Methods
 
 #include <math.h>
 
-#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/Joystick.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "rev/CANSparkMax.h"
 
+#include "NavX.h"
 #include "SwerveModule.h"
 #include "VectorDouble.h"
-#include "NavX.h"
 
 class SwerveTrain {
 
@@ -151,14 +153,16 @@ class SwerveTrain {
         SwerveModule *m_frontLeft;
         SwerveModule *m_rearLeft;
         SwerveModule *m_rearRight;
-        NavX *navX; 
+        NavX *navX;
 
         double getClockwiseREVRotationsFromCenter(frc::Joystick *controller);
         double getClockwiseREVRotationsFromCenter(const VectorDouble &vector);
         double getStandardDegreeAngleFromCenter(const double &x, const double &y);
+        double getLargestMagnitudeValue(const double &frVal, const double &flVal, const double &rlVal, const double &rrVal) {
 
-        VectorDouble getTranslationVector(const double &x, const double &y, double angleGyro); 
-        double getLargestMagnitude(const double &fr, const double &fl, const double &rl, const double &rr);
+            return std::max(std::max(frVal, flVal), std::max(rrVal, rlVal));
+        }
+        VectorDouble getTranslationVector(const double &x, const double &y, double angleGyro);
 
         double getControllerAbsoluteMagnitude(frc::Joystick *controller) {
 

@@ -3,7 +3,7 @@ class VectorDouble
 
 Constructors:
 
-    VectorDouble(const double& const double&): Creates a 2D vector with its
+    VectorDouble(const double&, const double&): Creates a 2D vector with its
         components i and j, such that A<i,j>.
 
 Public Methods:
@@ -39,7 +39,7 @@ struct VectorDouble {
 
         double magnitude() {
 
-            return sqrt(pow(i, 2) + pow (j, 2));
+            return sqrt(pow(i, 2) + pow(j, 2));
         }
 
         double i;
