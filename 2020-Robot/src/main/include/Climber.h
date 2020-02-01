@@ -1,4 +1,4 @@
-#pragma once;
+#pragma once
 
 #include "frc/smartdashboard/SmartDashboard.h"
 
@@ -21,18 +21,14 @@ class Climber {
 
         void setSpeed(const int &motor, const double &speedToSet = 0) {
 
-            if (motor == LiftMotor::kPrimary) {
+            switch(motor) {
 
-                m_primaryMotor->Set(speedToSet);
-            }
-            if (motor == LiftMotor::kSecondary) {
-
-                m_primaryMotor->Set(speedToSet);
-            }
-            if (motor == LiftMotor::kBoth) {
-
-                m_primaryMotor->Set(speedToSet);
-                m_secondaryMotor->Set(speedToSet);
+                case LiftMotor::kPrimary: m_primaryMotor->Set(speedToSet); break;
+                case LiftMotor::kSecondary: m_secondaryMotor->Set(speedToSet); break;
+                case LiftMotor::kBoth:
+                    m_primaryMotor->Set(speedToSet);
+                    m_secondaryMotor->Set(speedToSet);
+                    break;
             }
         }
 

@@ -79,14 +79,11 @@ void Robot::TeleopPeriodic() {
     if (playerTwo->GetBackButton()) {
 
         double climberSpeed = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
-        climber.setSpeed(climberSpeed);
-        //Give the motor the opposite speed becuase it is flipped under the first one
-        secondClimber.setSpeed(-climberSpeed);
+        climber.setSpeed(Climber::LiftMotor::kPrimary, climberSpeed);
     }
     else {
 
-        climber.setSpeed(0);
-        secondClimber.setSpeed(0);
+        climber.setSpeed(Climber::LiftMotor::kPrimary);
     }
 }
 
