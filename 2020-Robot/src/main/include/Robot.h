@@ -13,7 +13,4 @@ class Robot : public frc::TimedRobot {
         void TeleopPeriodic() override;
 
         void TestPeriodic() override;
-
-    private:
-        double m_launcherIndexSpeed;
 };

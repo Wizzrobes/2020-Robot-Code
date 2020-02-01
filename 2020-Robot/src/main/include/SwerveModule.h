@@ -30,6 +30,8 @@ Public Methods
         this works.
     double getDriveSpeed(): Returns the speed of the drive encoder in RPM.
     double getSwerveSpeed(): Returns the speed of the swerve encoder in RPM.
+    Note that the values returned by the get functions persist across disables, but
+        not across power cycles.
     void assumeSwervePosition(const double& positionToAssume): Uses a
         mathematical function to assign a speed to the swerve motor to move
         quickly and accurately, within a tolerance, to any REV rotation value,
@@ -40,10 +42,6 @@ Public Methods
     void assumeSwerveNearestZeroPosition(): Drives the swerve to its nearest
         zero position (the closest multiple of Nic's Constant to the zero
         value) either clockwise or counterclockwise.
-
-
-    Note that the values returned by the get functions persist across disables, but
-        not across power cycles, and are set to 0 at power-on.
 
 Private Methods
 

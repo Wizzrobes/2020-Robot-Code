@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <math.h>
+
 /*_____RoboRIO PWM Pin Declarations_____*/
 /*___End RoboRIO PWM Pin Declarations___*/
 
@@ -34,7 +36,7 @@ const int R_playerTwoControllerPort = 1;
 const double R_controllerDeadzone = .075;
 //And this one is to determine when rotation is being induced, as simply operation
 //of the controller often results in errant rotation.
-const double R_controllerZDeadzone = .6;
+const double R_controllerZDeadzone = .3;
 
 //These are the playerOne raw controller buttons that are used for manually
 //zeroing Zion one wheel at a time by holding them down.
@@ -48,14 +50,21 @@ const double R_controllerZeroExecutionCap = .1;
 //This is the highest decimal percentage of full speed that Zion can actually go.
 const double R_zionExecutionCap = .25;
 
+//The amount of REV rotations it takes for a swerve assembly to make a full rotation.
+//Often, a REV Rotation is referred to as a Nic, although they mean different things.
+//Truly, a Nic is ~17.976 REV Rotation values.
+const double R_nicsConstant = 17.9761447906494;
+//If an xy coordinate plane is centered at the middle of the drivetrain, this
+//is the radian measure between the y-axis and the front right wheel. This is
+//the basic unit of a non-moving center turn, and it is modified as the basis
+//for moving and turning at the same time.
+const double R_angleFromCenterToFrontRightWheel = (M_PI / 4.0);
+
 const double R_swerveTrainAssumePositionTolerance = .1;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt = 3.5;
 const double R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed = .2;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed = .02;
-
-//The amount of REV rotations it takes for a swerve assembly to make a full rotation.
-//Often, a REV Rotation is referred to as a Nic, although they mean different things.
-//Truly, a Nic is ~17.976 REV Rotation values.
-const double R_nicsConstant = 17.9761447906494;
+//This is the highest decimal percentage of full speed that Zion can actually go.
+const double R_zionExecutionCap = .25;
 /*___End Global Robot Variable Settings___*/

@@ -1,20 +1,22 @@
+#include <cameraserver/CameraServer.h>
 #include <frc/Joystick.h>
 #include <frc/XboxController.h>
-#include <cameraserver/CameraServer.h>
 
+#include "Launcher.h"
+#include "NavX.h"
 #include "Robot.h"
+#include "RobotMap.h"
 #include "SwerveModule.h"
 #include "SwerveTrain.h"
-#include "Launcher.h"
-#include "RobotMap.h"
+
+Launcher launcher(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
+NavX navX(NavX::ConnectionType::kMXP);
 
 SwerveModule frontRightModule(R_frontRightDriveMotorCANID, R_frontRightSwerveMotorCANID);
 SwerveModule frontLeftModule(R_frontLeftDriveMotorCANID, R_frontLeftSwerveMotorCANID);
 SwerveModule rearLeftModule(R_rearLeftDriveMotorCANID, R_rearLeftSwerveMotorCANID);
 SwerveModule rearRightModule(R_rearRightDriveMotorCANID, R_rearRightSwerveMotorCANID);
-SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule);
-
-Launcher launcher(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
+SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 
 frc::Joystick *playerOne;
 frc::XboxController *playerTwo;
@@ -25,8 +27,6 @@ void Robot::RobotInit() {
     playerTwo = new frc::XboxController(R_playerTwoControllerPort);
 
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
-
-    m_launcherIndexSpeed = 0;
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {}
@@ -36,7 +36,7 @@ void Robot::TeleopPeriodic() {
 
     if (playerOne->GetRawButtonPressed(3)) {
 
-        zion.setSwerveZeroPosition();
+        zion.setZeroPosition();
     }
     else if (playerOne->GetRawButton(11)) {
 

@@ -7,38 +7,113 @@
 
 void SwerveTrain::driveController(frc::Joystick *controller) {
 
-    const double controllerREVRotationsFromCenter = getControllerClockwiseREVRotationsFromCenter(controller);
-    const double controllerMagnitude = getControllerAbsoluteMagnitude(controller);
-    //TODO: Why is there a negative here?
-    const double controllerTurningMagnitude = -controller->GetZ();
+    //All value are inverted as the functions' logic is written for an upside-down Zion
+    //TODO: Why does uninverting X solve our issues?
+    double x = controller->GetX();
+    double y = -controller->GetY();
+    double z = -controller->GetZ();
+    //To prevent controller drift, if the values of X, Y, and Z are inside of
+    //deadzone, set them to 0
+    forceControllerXYZToZeroInDeadzone(x, y, z);
 
+    /*
+    The translation vector is the "standard" vector - that is, if no rotation
+    were applied, the robot would simply travel in the direction of this
+    vector. In order to obtain this, we need the X and Y from the controller
+    in addition to input from a gyroscope. This is due to the fact that
+    pushing straight on the controller should always make it drive directly
+    away from the operator, and simply driving "straight" at a 45* angle
+    would make it drive away from the operator at 45*. This is true of any
+    angle, so the gyro is needed to offset the vector described by X and Y.
+    VectorDouble translationVector(0, 0);
+    */
+    VectorDouble translationVector = getTranslationVector(x, y, 0.0);
+
+    /*
+    The rotation vectors' i-components take the cosine of the R_ angle (see
+    RobotMap) in order to discern the first component of a vector which
+    points in the direction that would be applied to the swerve if the
+    rotation were only around center. This is multipled by the magnitude of Z
+    in order to make it a proportionally smaller component to
+    result in a less drastic turn, as a Z-value of 1 would imply the most
+    drastic turn possible. The j-component does the same, but using sine to
+    find the other half of the hypotenuse's components which make up the
+    direction that will be applied in rotation, as cosine only provides the
+    x-component. Cosine for X, sine for Y. If none of the Z-values were
+    negative, each vector applied to the swerves would point the same
+    direction - so axis inversion is used to ensure that traversing the
+    swerves from frontRight clockwise compounds 90 to the rotation vector.
+    */
+    VectorDouble frontRightRotationVector(z * cos(R_angleFromCenterToFrontRightWheel), z * sin(R_angleFromCenterToFrontRightWheel));
+    VectorDouble frontLeftRotationVector(z * cos(R_angleFromCenterToFrontRightWheel), -z * sin(R_angleFromCenterToFrontRightWheel));
+    VectorDouble rearLeftRotationVector(-z * cos(R_angleFromCenterToFrontRightWheel), -z * sin(R_angleFromCenterToFrontRightWheel));
+    VectorDouble rearRightRotationVector(-z * cos(R_angleFromCenterToFrontRightWheel), z * sin(R_angleFromCenterToFrontRightWheel));
+
+    /*
+    And the vector we actually want to apply to the swerves is the sum of
+    the two vectors - the vector that forms "straight" (translationVector)
+    and the vector that forms strictly the rotation (rotationVector).
+    */
+    VectorDouble frontRightResultVector = translationVector + frontRightRotationVector;
+    VectorDouble frontLeftResultVector = translationVector + frontLeftRotationVector;
+    VectorDouble rearLeftResultVector = translationVector + rearLeftRotationVector;
+    VectorDouble rearRightResultVector = translationVector + rearRightRotationVector;
+
+    /*
+    Due to the way that the vector math is completed, it is currently
+    possible for a vector's magnitude to evaluate to a value of greater
+    than 1. As this is in error to send to a speed controller, the following
+    calculations ensure that the magnitude of a vector will always evaluate
+    to exactly one in the event that it was over one. The rest of the motor
+    values then scale proportionally to this value, using the second block
+    of code, which prevents non-standard turning from occurring through
+    changing motor ratios not by a standard value.
+    */
+    double largestMagnitude = getLargestMagnitudeValue(frontRightResultVector.magnitude(), frontLeftResultVector.magnitude(), rearLeftResultVector.magnitude(), rearRightResultVector.magnitude());
+    if (largestMagnitude > 1) {
+
+        frontRightResultVector.i /= largestMagnitude;
+        frontRightResultVector.j /= largestMagnitude;
+
+        frontLeftResultVector.i /= largestMagnitude;
+        frontLeftResultVector.j /= largestMagnitude;
+
+        rearLeftResultVector.i /= largestMagnitude;
+        rearLeftResultVector.j /= largestMagnitude;
+
+        rearRightResultVector.i /= largestMagnitude;
+        rearRightResultVector.j /= largestMagnitude;
+    }
+
+    //If the controller is in the total deadzone (entirely still)...
     if (getControllerInDeadzone(controller)) {
 
+        /*
+        Go to the nearest zero position, take it as the new zero, and
+        reset the angle coming off of the gyroscope to zero to allow
+        setting of the next translation vector, as the translation
+        vector is always refereced from "center" (the beginning of the
+        turn) and updated based on how much that gyro angle changes.
+        Due to this, it must be reset when not in movement to allow
+        this behavior to occur...
+        */
         assumeNearestZeroPosition();
         setDriveSpeed(0);
+        navX->resetAll();
     }
-    //If we're out of deadzone and turning is also out of its deadzone, override driving and begin turning...
-    else if (abs(controllerTurningMagnitude) > R_controllerZDeadzone) {
-
-        //To avoid inverting the drive motor direction in turning, rotate each swerve away from center
-        //by a successively increasing amount: the first moves a total of 45*, the second a total of 135*,
-        //the third a total of 225*, and the fourth a total of 315*. These are taken as fractional values
-        //then multiplied by Nic's Constant, as assumeSwervePosition() operates on REV Rotation Values,
-        //also called shorthand as Nics.
-        m_frontRight->assumeSwervePosition((1.0 / 8.0) * R_nicsConstant);
-        m_frontLeft->assumeSwervePosition((3.0 / 8.0) * R_nicsConstant);
-        m_rearLeft->assumeSwervePosition((5.0 / 8.0) * R_nicsConstant);
-        m_rearRight->assumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
-        setDriveSpeed(controllerTurningMagnitude * R_zionExecutionCap);
-    }
-    //Otherwise, simply drive normally.
+    //Otherwise, go to the result vectors and use the magnitude to set the
+    //speed of driving.
     else {
 
-        m_frontRight->assumeSwervePosition(controllerREVRotationsFromCenter);
-        m_frontLeft->assumeSwervePosition(controllerREVRotationsFromCenter);
-        m_rearLeft->assumeSwervePosition(controllerREVRotationsFromCenter);
-        m_rearRight->assumeSwervePosition(controllerREVRotationsFromCenter);
-        setDriveSpeed(controllerMagnitude * R_zionExecutionCap);
+        m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontRightResultVector));
+        m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontLeftResultVector));
+        m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearLeftResultVector));
+        m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearRightResultVector));
+
+        m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * R_zionExecutionCap);
+        m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * R_zionExecutionCap);
+        m_rearLeft->setDriveSpeed(rearLeftResultVector.magnitude() * R_zionExecutionCap);
+        m_rearRight->setDriveSpeed(rearRightResultVector.magnitude() * R_zionExecutionCap);
     }
 }
 void SwerveTrain::zeroController(frc::Joystick *controller) {
@@ -68,16 +143,16 @@ void SwerveTrain::zeroController(frc::Joystick *controller) {
     }
 }
 
-double SwerveTrain::getControllerClockwiseREVRotationsFromCenter(frc::Joystick *controller) {
+double SwerveTrain::getClockwiseREVRotationsFromCenter(frc::Joystick *controller) {
 
-    //TODO: Why is there a negative here?
+    //Invert both the x and y once again, as the logic is written for an
+    //upside-down Zion...
     const double x = -controller->GetX(frc::GenericHID::kLeftHand);
-    //Y seems to be inverted by default, so un-invert it...
     const double y = -controller->GetY(frc::GenericHID::kLeftHand);
-
     //Create vectors for the line x = 0 and the line formed by the joystick coordinates...
     VectorDouble center(0, 1);
     VectorDouble current(x, y);
+
     //Get the dot produt of the vectors for use in calculation...
     const double dotProduct = center * current;
     //Multiply each vector's magnitude together for use in calculation...
@@ -86,7 +161,14 @@ double SwerveTrain::getControllerClockwiseREVRotationsFromCenter(frc::Joystick *
     const double cosineAngle = dotProduct / magnitudeProduct;
     //The angle we want is the arccosine of its cosine...
     double angleRad = acos(cosineAngle);
-    //To go from a full 0pi to 2pi and overcome the limitation of arccos, jump to 2pi and subtract the gradually decreasing angle...
+    //If an imaginary situation is presented, set the angle equal to 0...
+    if (magnitudeProduct == 0) {
+
+       angleRad = 0;
+    }
+
+    //To go from a full 0pi to 2pi and overcome the limitation of arccos, jump
+    //to 2pi and subtract the gradually decreasing angle...
     if (x < 0) {
 
         angleRad = (2 * M_PI) - angleRad;
@@ -96,15 +178,72 @@ double SwerveTrain::getControllerClockwiseREVRotationsFromCenter(frc::Joystick *
     //And the amount of REV rotations we want to rotate is the decimal total by Nic's Constant.
     return decimalTotalCircle * R_nicsConstant;
 }
-double SwerveTrain::getControllerAngleFromCenter(frc::Joystick *controller) {
+double SwerveTrain::getClockwiseREVRotationsFromCenter(const VectorDouble &vector) {
 
-    const double x = -controller->GetX();
-    const double y = -controller->GetY();
-
+    const double x = vector.i;
+    const double y = vector.j;
     VectorDouble center(0, 1);
     VectorDouble current(x, y);
+
     const double dotProduct = center * current;
     const double magnitudeProduct = center.magnitude() * current.magnitude();
     const double cosineAngle = dotProduct / magnitudeProduct;
-    return acos(cosineAngle);
+    double angleRad = acos(cosineAngle);
+    if (magnitudeProduct == 0) {
+
+        angleRad = 0;
+    }
+
+    if (x < 0) {
+
+        angleRad = (2 * M_PI) - angleRad;
+    }
+    double decimalTotalCircle = ((angleRad) / (2 * M_PI));
+    return decimalTotalCircle * R_nicsConstant;
+}
+//TODO: Inline function documentation
+double SwerveTrain::getStandardDegreeAngleFromCenter(const double &x, const double &y) {
+
+    VectorDouble center(0, 1);
+    VectorDouble current(x, y);
+
+    const double dotProduct = center * current;
+    const double magnitudeProduct = center.magnitude() * current.magnitude();
+    const double cosineAngle = dotProduct / magnitudeProduct;
+    double angleRad = acos(cosineAngle);
+    if (magnitudeProduct == 0) {
+
+        angleRad = 0;
+    }
+
+    if (x < 0) {
+
+        angleRad = (2 * M_PI) - angleRad;
+    }
+    angleRad *= (180. / M_PI);
+    return angleRad;
+}
+//TODO: Inline function documentation
+VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y, double angleGyro) {
+
+    //TODO: Why does inverting this as well solve our problems?
+    double joystickAngle = getStandardDegreeAngleFromCenter(-x, y);
+
+    double vectorAngle = 0;
+    if (angleGyro < 0.) {
+
+        angleGyro += 360.;
+    }
+    vectorAngle = 450. - joystickAngle + angleGyro;
+    if (vectorAngle > 360.) {
+
+       vectorAngle = fmod (vectorAngle, 360.);
+    }
+    //Make the conversion to radians to faciliate trigonometric usage
+    vectorAngle *= (M_PI / 180.);
+
+    //The absolute value of X and Y is taken because cosine and sine account
+    //for signage - allowing X and Y signage causes double negative errors.
+    VectorDouble translationVector(abs(x) * cos(vectorAngle), abs(y) * sin(vectorAngle));
+    return translationVector;
 }

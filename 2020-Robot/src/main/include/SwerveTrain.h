@@ -6,9 +6,11 @@ class SwerveTrain
 
 Constructors
 
-    SwerveTrain(SwerveModule*, SwerveModule*, SwerveModule*, SwerveModule*):
+    SwerveTrain(SwerveModule&, SwerveModule&, SwerveModule&, SwerveModule&,
+        NavX&):
         Creates a swerve train with the swerve modules on the front right,
-        front left, back left, and back right positions.
+        front left, back left, and back right positions, and takes a NavX
+        for use in calculating rotational vectors.
 
 Public Methods
 
@@ -16,16 +18,16 @@ Public Methods
         the train.
     void setSwerveSpeed(const double&): Sets a speed to all swerve motors on
         the train.
-    void setSwerveZeroPosition(const bool&): Gets the current encoder values
+    void setZeroPosition(const bool&): Gets the current encoder values
         of the swerve motors and stores them as privates of the class. These
         are the values the swerve motors return to when invoking
         assumeSwerveZeroPosition().
         If the passed bool is true, publishes the stored data to the
         SmartDashboard. This is currently used for returning to and maintaining
         "straight".
-    void assumeSwerveZeroPosition(): Drives the swerves to return to their
+    void assumeZeroPosition(): Drives the swerves to return to their
         zero position.
-    void assumeSwerveNearestZeroPosition(): Drives the swerves to the
+    void assumeNearestZeroPosition(): Drives the swerves to the
         nearest Nic's Constant multiple of its zero value, CW or CCW.
         In doing so, really only drives the swerve to either 0 or
         the value of one Nic's Constant. Since the pathfinding function
@@ -47,44 +49,54 @@ Public Methods
 
 Private Methods
 
-    double getControllerREVRotationsFromCenter(frc::Joystick*):
+    double getClockwiseREVRotationsFromCenter(frc::Joystick*):
         Discernes how many clockwise REV rotations from center the current
         location of the joystick is using vector trigonometry and properties.
         See https://en.wikipedia.org/wiki/Dot_product#Geometric_definition
-    double getControllerAngleFromCenter(frc::Joystick*): Same
-        as above, but simply returns the radian angle (no conversion
-        back to a REV Rotation value).
-    double getAbsoluteControllerMagnitude(frc::XboxController&): Gets the
+    double getClockwiseREVRotationsFromCenter(const VectorDouble&):
+        Same as above, but accepts a vector outright instead of stripping
+        one from the supplied controller.
+    double getStandardDegreeAngleFromCenter(const double&, const double&): Same
+        as above, but returns the result as a degree measure in standard
+        position.
+    double getLargestMagnitudeValue(const double&, const double&, const double&, const double&):
+        Returns the largest of the four values passed to the function.
+    VectorDouble getTranslationVector(const double&, const double&, double):
+        Calculates the translation vector to be used in total swerve movement
+        calculation by the control function. See the function itself for more.
+    double getControllerAbsoluteMagnitude(frc::Joystick*): Gets the
         unsigned velocity of the control stick using only absolute value.
-    bool getControllerAllInDeadzone(frc::XboxController*): Returns
-        true if each stick is within the deadzone specified in RobotMap,
-        false otherwise.
     bool getControllerInDeadzone(frc::Joystick*): If all axis of the
-        controller are within the RobotMap deadzone variable for
+        controller are within their RobotMap deadzone variables for
         playerOne's controller, returns true; otherwise, returns false.
+    void forceControllerXYZToZeroInDeadzone(const int&, const int&, const int&):
+        If any of the passed X, Y, or Z values fall outside of their global
+        deadzone, they will be set to 0. Otherwise, they are untouched.
 */
 
 #pragma once
 
 #include <math.h>
 
-#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/Joystick.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "rev/CANSparkMax.h"
 
+#include "NavX.h"
 #include "SwerveModule.h"
 #include "VectorDouble.h"
 
 class SwerveTrain {
 
     public:
-        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule) {
+        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet) {
 
             m_frontRight = &frontRightModule;
             m_frontLeft = &frontLeftModule;
             m_rearLeft = &rearLeftModule;
             m_rearRight = &rearRightModule;
+            navX = &navXToSet;
         }
 
         void setDriveSpeed(const double &driveSpeed) {
@@ -102,7 +114,7 @@ class SwerveTrain {
             m_rearRight->setSwerveSpeed(swerveSpeed);
         }
 
-        void setSwerveZeroPosition(const bool &verbose = false) {
+        void setZeroPosition(const bool &verbose = false) {
 
             m_frontRight->setZeroPosition();
             m_frontLeft->setZeroPosition();
@@ -148,9 +160,17 @@ class SwerveTrain {
         SwerveModule *m_frontLeft;
         SwerveModule *m_rearLeft;
         SwerveModule *m_rearRight;
+        NavX *navX;
 
-        double getControllerClockwiseREVRotationsFromCenter(frc::Joystick *controller);
-        double getControllerAngleFromCenter(frc::Joystick *controller);
+        double getClockwiseREVRotationsFromCenter(frc::Joystick *controller);
+        double getClockwiseREVRotationsFromCenter(const VectorDouble &vector);
+        double getStandardDegreeAngleFromCenter(const double &x, const double &y);
+        double getLargestMagnitudeValue(const double &frVal, const double &flVal, const double &rlVal, const double &rrVal) {
+
+            return std::max(std::max(frVal, flVal), std::max(rrVal, rlVal));
+        }
+        VectorDouble getTranslationVector(const double &x, const double &y, double angleGyro);
+
         double getControllerAbsoluteMagnitude(frc::Joystick *controller) {
 
             //Get the absolute values of the joystick coordinates
@@ -172,5 +192,16 @@ class SwerveTrain {
                 return true;
             }
             return false;
+        }
+        void forceControllerXYZToZeroInDeadzone(double &x, double &y, double &z) {
+
+            double absX = abs(x);
+            double absY = abs(y);
+            double absZ = abs(z);
+
+            if (absX < R_controllerDeadzone) {x = 0;}
+            if (absY < R_controllerDeadzone) {y = 0;}
+            if (absZ < R_controllerZDeadzone) {z = 0;}
+
         }
 };
