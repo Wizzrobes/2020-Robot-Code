@@ -17,8 +17,7 @@ SwerveModule rearRightModule(R_rearRightDriveMotorCANID, R_rearRightSwerveMotorC
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule);
 
 Launcher launcher(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
-Climber climber(R_launcherIndexMotorCANID);
-Climber secondClimber(R_launcherLaunchMotorCANID);
+Climber climber(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
 
 frc::Joystick *playerOne;
 frc::XboxController *playerTwo;
@@ -80,10 +79,12 @@ void Robot::TeleopPeriodic() {
 
         double climberSpeed = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
         climber.setSpeed(Climber::LiftMotor::kPrimary, climberSpeed);
+        //climber.setSpeed(Climber::LiftMotor::kSecondary, -climberSpeed);
     }
     else {
 
         climber.setSpeed(Climber::LiftMotor::kPrimary);
+        //climber.setSpeed(Climber::LiftMotor::kSecondary);
     }
 }
 
