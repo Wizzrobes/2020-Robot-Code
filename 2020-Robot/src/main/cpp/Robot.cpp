@@ -79,12 +79,12 @@ void Robot::TeleopPeriodic() {
 
         double climberSpeed = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
         climber.setSpeed(Climber::LiftMotor::kPrimary, climberSpeed);
-        //climber.setSpeed(Climber::LiftMotor::kSecondary, -climberSpeed);
+        climber.setSpeed(Climber::LiftMotor::kSecondary, -climberSpeed);
     }
     else {
 
         climber.setSpeed(Climber::LiftMotor::kPrimary);
-        //climber.setSpeed(Climber::LiftMotor::kSecondary);
+        climber.setSpeed(Climber::LiftMotor::kSecondary);
     }
 }
 
