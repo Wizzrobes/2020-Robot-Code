@@ -247,3 +247,91 @@ VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y,
     VectorDouble translationVector(abs(x) * cos(vectorAngle), abs(y) * sin(vectorAngle));
     return translationVector;
 }
+// Responsible for automonous lining up with the target.
+// The double s1 is a placeholder for the left side distance sensor
+// and s2 is the placeholder for the right-hand sensor.
+// tx is the horizontal offset of the target and limelight crosshair.
+void SwerveTrain::lineupToTarget(double s1, double s2, double tx) {
+    double rotationDir = 0;
+    double squareOfTwo = (sqrt(2) / 2);
+    double averageOfS = (s1 + s2) / 2;
+    VectorDouble leftVector(-1, 0);
+    VectorDouble rightVector(1, 0);
+    VectorDouble forwardVector(0, 1);
+    VectorDouble backwardsVector(0, -1);
+    VectorDouble frontRightAutoVector(0, 0);
+    VectorDouble frontLeftAutoVector(0, 0);
+    VectorDouble rearLeftAutoVector(0, 0);
+    VectorDouble rearRightAutoVector(0, 0);
+
+    // Sets rotationDir to 1 if right distance is less than the left,
+    // to -1 if left distance is less than the right, and keeps 0 if equal.
+    if (s1 > s2) {
+        rotationDir = 1;
+    }
+    else if (s2 > s1) {
+        rotationDir = -1;
+    }
+
+    frontRightAutoVector.i = rotationDir * squareOfTwo;
+    frontRightAutoVector.j = rotationDir * -squareOfTwo;
+
+    frontLeftAutoVector.i = rotationDir * squareOfTwo;
+    frontLeftAutoVector.j = rotationDir * squareOfTwo;
+
+    rearLeftAutoVector.i = rotationDir * -squareOfTwo;
+    rearLeftAutoVector.j = rotationDir * squareOfTwo;
+
+    rearRightAutoVector.i = rotationDir * -squareOfTwo;
+    rearRightAutoVector.j = rotationDir * -squareOfTwo;
+
+    while (notCentered(tx)) {
+        // Moves left or right based off of x-offset.
+        if (tx > 0) {
+
+            frontRightAutoVector = rightVector;
+            frontLeftAutoVector = rightVector;
+            rearLeftAutoVector = rightVector;
+            rearRightAutoVector = rightVector;
+        }
+        if (tx < 0) {
+            frontRightAutoVector = leftVector;
+            frontLeftAutoVector = leftVector;
+            rearLeftAutoVector = leftVector;
+            rearRightAutoVector = leftVector;
+        }
+    }
+    while (notInRange(averageOfS)) {
+        if (averageOfS > 12) {
+            frontRightAutoVector = forwardVector;
+            frontLeftAutoVector = forwardVector;
+            rearLeftAutoVector = forwardVector;
+            rearRightAutoVector = forwardVector;
+        }
+        if (averageOfS < 12) {
+            frontRightAutoVector = backwardsVector;
+            frontLeftAutoVector = backwardsVector;
+            rearLeftAutoVector = backwardsVector;
+            rearRightAutoVector = backwardsVector;
+        }
+    }
+}
+
+// Checks if the horizontal offset is greater than the limelight deadzone.
+bool notCentered(double offset) {
+    if(abs(offset) > R_limelightXDeadzone) {
+        return true;
+    }
+    else {
+        return false;
+    }
+ }
+
+bool notInRange(double distance) {
+    if (distance != 12) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}

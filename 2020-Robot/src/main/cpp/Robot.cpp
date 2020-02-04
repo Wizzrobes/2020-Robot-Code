@@ -50,6 +50,10 @@ void Robot::TeleopPeriodic() {
     }
 
 
+    if(playerTwo->GetXButton()) {
+        zion.lineupToTarget(); 
+    }
+
     if (playerTwo->GetYButton()) {
 
         frc::SmartDashboard::PutNumber("Launcher::Launch-Speed:", playerTwo->GetY(frc::GenericHID::kLeftHand));

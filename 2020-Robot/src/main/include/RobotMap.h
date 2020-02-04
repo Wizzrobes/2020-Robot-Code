@@ -38,6 +38,9 @@ const double R_controllerDeadzone = .075;
 //of the controller often results in errant rotation. Due to how easy it is to
 //drift, it is significantly higher.
 const double R_controllerZDeadzone = .3;
+// This deadzone is for the horizontal offset of the limelight because Zion does not
+// have to be perfectly on center with the target. In degrees.
+const double R_limelightXDeadzone = 0.5;
 
 //These are the playerTwo raw controller buttons that are used for manually
 //zeroing Zion one wheel at a time by holding them down.
