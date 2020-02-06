@@ -162,6 +162,7 @@ class SwerveTrain {
         SwerveModule *m_rearRight;
         NavX *navX;
 
+        void lineupToTarget(double s1, double s2, double tx);
         double getClockwiseREVRotationsFromCenter(frc::Joystick *controller);
         double getClockwiseREVRotationsFromCenter(const VectorDouble &vector);
         double getStandardDegreeAngleFromCenter(const double &x, const double &y);

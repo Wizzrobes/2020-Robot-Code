@@ -247,74 +247,109 @@ VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y,
     VectorDouble translationVector(abs(x) * cos(vectorAngle), abs(y) * sin(vectorAngle));
     return translationVector;
 }
+
+
 // Responsible for automonous lining up with the target.
 // The double s1 is a placeholder for the left side distance sensor
 // and s2 is the placeholder for the right-hand sensor.
 // tx is the horizontal offset of the target and limelight crosshair.
 void SwerveTrain::lineupToTarget(double s1, double s2, double tx) {
+
     double rotationDir = 0;
     double squareOfTwo = (sqrt(2) / 2);
     double averageOfS = (s1 + s2) / 2;
-    VectorDouble leftVector(-1, 0);
-    VectorDouble rightVector(1, 0);
-    VectorDouble forwardVector(0, 1);
-    VectorDouble backwardsVector(0, -1);
-    VectorDouble frontRightAutoVector(0, 0);
-    VectorDouble frontLeftAutoVector(0, 0);
-    VectorDouble rearLeftAutoVector(0, 0);
-    VectorDouble rearRightAutoVector(0, 0);
+    // Dependent on units the sensor outputs.
+    double shotDistance = 144;
 
-    // Sets rotationDir to 1 if right distance is less than the left,
-    // to -1 if left distance is less than the right, and keeps 0 if equal.
-    if (s1 > s2) {
-        rotationDir = 1;
-    }
-    else if (s2 > s1) {
-        rotationDir = -1;
-    }
+    // Vectors for movement in certain directions.
+    VectorDouble leftMovementVector(-1, 0);
+    VectorDouble rightMovementVector(1, 0);
+    VectorDouble forwardMovementVector(0, 1);
+    VectorDouble backwardsMovementVector(0, -1);
+    
+    // Vectors for the wheels themselves.
+    VectorDouble frontRightVector(0, 0);
+    VectorDouble frontLeftVector(0, 0);
+    VectorDouble rearLeftVector(0, 0);
+    VectorDouble rearRightVector(0, 0);
+    
+    // if and else if statements make sure the program runs in proper order:
+    // rotation, side-to-side, then forwards and backwards.
+    if (abs(s1 - s2) > 1) {
 
-    frontRightAutoVector.i = rotationDir * squareOfTwo;
-    frontRightAutoVector.j = rotationDir * -squareOfTwo;
-
-    frontLeftAutoVector.i = rotationDir * squareOfTwo;
-    frontLeftAutoVector.j = rotationDir * squareOfTwo;
-
-    rearLeftAutoVector.i = rotationDir * -squareOfTwo;
-    rearLeftAutoVector.j = rotationDir * squareOfTwo;
-
-    rearRightAutoVector.i = rotationDir * -squareOfTwo;
-    rearRightAutoVector.j = rotationDir * -squareOfTwo;
-
-    while (notCentered(tx)) {
-        // Moves left or right based off of x-offset.
-        if (tx > 0) {
-
-            frontRightAutoVector = rightVector;
-            frontLeftAutoVector = rightVector;
-            rearLeftAutoVector = rightVector;
-            rearRightAutoVector = rightVector;
+        // Sets rotationDir to 1 if right distance is less than the left,
+        // to -1 if left distance is less than the right, and keeps 0 if equal.
+        if (s1 > s2) {
+            rotationDir = 1;
         }
-        if (tx < 0) {
-            frontRightAutoVector = leftVector;
-            frontLeftAutoVector = leftVector;
-            rearLeftAutoVector = leftVector;
-            rearRightAutoVector = leftVector;
+        else if (s2 > s1) {
+            rotationDir = -1;
+        }
+
+        frontRightVector.i = rotationDir * squareOfTwo;
+        frontRightVector.j = rotationDir * -squareOfTwo;
+
+        frontLeftVector.i = rotationDir * squareOfTwo;
+        frontLeftVector.j = rotationDir * squareOfTwo;
+
+        rearLeftVector.i = rotationDir * -squareOfTwo;
+        rearLeftVector.j = rotationDir * squareOfTwo;
+
+        rearRightVector.i = rotationDir * -squareOfTwo;
+        rearRightVector.j = rotationDir * -squareOfTwo;
+    }
+    else if (notCentered(tx)) {
+
+        // Sets wheel vectors while Zion is not centered horizontally with target.
+        while (notCentered(tx)) {
+
+            // Moves left or right based off of x-offset.
+            if (tx > 0) {
+
+                frontRightVector = rightMovementVector;
+                frontLeftVector = rightMovementVector;
+                rearLeftVector = rightMovementVector;
+                rearRightVector = rightMovementVector;
+            }
+            if (tx < 0) {
+
+                frontRightVector = leftMovementVector;
+                frontLeftVector = leftMovementVector;
+                rearLeftVector = leftMovementVector;
+                rearRightVector = leftMovementVector;
+            }
         }
     }
-    while (notInRange(averageOfS)) {
-        if (averageOfS > 12) {
-            frontRightAutoVector = forwardVector;
-            frontLeftAutoVector = forwardVector;
-            rearLeftAutoVector = forwardVector;
-            rearRightAutoVector = forwardVector;
-        }
-        if (averageOfS < 12) {
-            frontRightAutoVector = backwardsVector;
-            frontLeftAutoVector = backwardsVector;
-            rearLeftAutoVector = backwardsVector;
-            rearRightAutoVector = backwardsVector;
+    else if (notInRange(averageOfS, shotDistance)) {
+
+        // Sets wheel vectors while Zion is not the proper distance away.
+        while (notInRange(averageOfS, shotDistance)) {
+
+            // Sets wheel vectors for forward and backwards movement to
+            // get the right distance away from target.
+            if (averageOfS > shotDistance) {
+
+                frontRightVector = forwardMovementVector;
+                frontLeftVector = forwardMovementVector;
+                rearLeftVector = forwardMovementVector;
+                rearRightVector = forwardMovementVector;
+            }
+            if (averageOfS < shotDistance) {
+
+                frontRightVector = backwardsMovementVector;
+                frontLeftVector = backwardsMovementVector;
+                rearLeftVector = backwardsMovementVector;
+                rearRightVector = backwardsMovementVector;
+            }
         }
     }
+
+    m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontRightVector));
+    m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontLeftVector));
+    m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearLeftVector));
+    m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearRightVector));
+
+    setDriveSpeed(R_zionExecutionCap);
 }
 
 // Checks if the horizontal offset is greater than the limelight deadzone.
@@ -325,10 +360,14 @@ bool notCentered(double offset) {
     else {
         return false;
     }
- }
+}
 
-bool notInRange(double distance) {
-    if (distance != 12) {
+// Finds if Zion is within range of the target.
+bool notInRange(double distance, double goalDist) {
+    // TODO: Change based on units that distance sensors report.
+    double distTolerance = 1;
+
+    if (abs(distance - goalDist) > distTolerance) {
         return true;
     }
     else {
