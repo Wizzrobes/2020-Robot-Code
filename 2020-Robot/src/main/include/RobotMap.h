@@ -21,6 +21,9 @@ const int R_rearLeftDriveMotorCANID    = 6;
 const int R_rearRightSwerveMotorCANID  = 7;
 const int R_rearRightDriveMotorCANID   = 8;
 
+//TODO: Find actual CANID
+const int R_intakeMotorCANID = 0;
+
 const int R_launcherIndexMotorCANID = 9;
 const int R_launcherLaunchMotorCANID = 10;
 /*___End RoboRIO CAN Bus ID Declarations___*/
