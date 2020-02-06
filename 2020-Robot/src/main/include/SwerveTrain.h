@@ -18,7 +18,7 @@ Public Methods
         the train.
     void setSwerveSpeed(const double&): Sets a speed to all swerve motors on
         the train.
-    void setZeroPosition(const bool&): Gets the current encoder values
+    void setZeroPosition(const bool& = false): Gets the current encoder values
         of the swerve motors and stores them as privates of the class. These
         are the values the swerve motors return to when invoking
         assumeSwerveZeroPosition().

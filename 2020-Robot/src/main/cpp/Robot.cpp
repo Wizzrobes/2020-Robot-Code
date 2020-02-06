@@ -3,6 +3,7 @@
 #include <frc/XboxController.h>
 
 #include "Climber.h"
+#include "Intake.h"
 #include "Launcher.h"
 #include "NavX.h"
 #include "Robot.h"
@@ -11,6 +12,7 @@
 #include "SwerveTrain.h"
 
 Climber climber(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
+Intake intake(R_intakeMotorCANID);
 Launcher launcher(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
 NavX navX(NavX::ConnectionType::kMXP);
 SwerveModule frontRightModule(R_frontRightDriveMotorCANID, R_frontRightSwerveMotorCANID);
