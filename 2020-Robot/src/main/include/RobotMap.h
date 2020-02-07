@@ -58,6 +58,8 @@ const int R_zeroButtonRR = 0;
 const double R_zionExecutionCap = .25;
 //And this is the execution cap for how fast manual zeroing can occur.
 const double R_controllerZeroExecutionCap = .1;
+//This is the speed for automatic lateral movement in autonomous.
+const double R_zionAutoLateralMovementSpeed = .4;
 
 //The amount of REV rotations it takes for a swerve assembly to make a full rotation.
 //Often, a REV Rotation is referred to as a Nic, although they mean different things.

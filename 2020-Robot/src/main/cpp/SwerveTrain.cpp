@@ -335,11 +335,10 @@ void SwerveTrain::lineupToTarget(const double &leftDistToWall, const double &rig
             rearRightVector = backwardsMovementVector;
         }
     }
-
     //Finally, write the calculated values to their respective motors.
     m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontRightVector));
     m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontLeftVector));
     m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearLeftVector));
     m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearRightVector));
-    setDriveSpeed(R_zionExecutionCap);
+    setDriveSpeed(R_zionAutoLateralMovementSpeed);
 }
