@@ -247,3 +247,99 @@ VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y,
     VectorDouble translationVector(abs(x) * cos(vectorAngle), abs(y) * sin(vectorAngle));
     return translationVector;
 }
+
+void SwerveTrain::lineupToTarget(const double &leftDistToWall, const double &rightDistToWall, const double &targetOffset, const double &targetDistance) {
+
+    double rotationDirection = 0;
+    double averageDistanceFromWall = (leftDistToWall + rightDistToWall) / 2;
+    //Dependent on units the sensor outputs.
+    double shotDistance = 144;
+
+    //Vectors for lateral movement in certain directions.
+    VectorDouble leftMovementVector(-1, 0);
+    VectorDouble rightMovementVector(1, 0);
+    VectorDouble forwardMovementVector(0, 1);
+    VectorDouble backwardsMovementVector(0, -1);
+    
+    //Empty vectors for the wheels themselves.
+    VectorDouble frontRightVector(0, 0);
+    VectorDouble frontLeftVector(0, 0);
+    VectorDouble rearLeftVector(0, 0);
+    VectorDouble rearRightVector(0, 0);
+    
+    //if and else if statements make sure the program runs in proper order-
+    //rotation to be square with the wall, left-to-right lateral motion to be
+    //centered with the target, and then front-to-back motion to set the proper
+    //distance from the target.
+    //If Zion is not plumb with the wall:
+    if (abs(leftDistToWall - rightDistToWall) > 0/*TOLERANCE*/) {
+
+        //Sets the rotation direction to 1 if right distance is less than the left,
+        //to -1 if left distance is less than the right, and keeps 0 if equal, as this
+        //indicates the direction in which rotation must commence to be plumb
+        //with the wall.
+        if (leftDistToWall > rightDistToWall) {
+
+            rotationDirection = 1;
+        }
+        else if (rightDistToWall > leftDistToWall) {
+
+            rotationDirection = -1;
+        }
+
+        //TODO: Better documentation than I can write :)
+        const double squareOfTwo = (sqrt(2) / 2);
+        frontRightVector.i = rotationDirection * squareOfTwo;
+        frontRightVector.j = rotationDirection * -squareOfTwo;
+        frontLeftVector.i = rotationDirection * squareOfTwo;
+        frontLeftVector.j = rotationDirection * squareOfTwo;
+        rearLeftVector.i = rotationDirection * -squareOfTwo;
+        rearLeftVector.j = rotationDirection * squareOfTwo;
+        rearRightVector.i = rotationDirection * -squareOfTwo;
+        rearRightVector.j = rotationDirection * -squareOfTwo;
+    }
+    //Next, if we're plumb with the wall, but not centered:
+    else if (abs(targetOffset) < 0/*TOLERANCE*/) {
+
+        //Move left or right based on the x-offset.
+        if (targetOffset > 0) {
+
+            frontRightVector = rightMovementVector;
+            frontLeftVector = rightMovementVector;
+            rearLeftVector = rightMovementVector;
+            rearRightVector = rightMovementVector;
+        }
+        if (targetOffset < 0) {
+
+            frontRightVector = leftMovementVector;
+            frontLeftVector = leftMovementVector;
+            rearLeftVector = leftMovementVector;
+            rearRightVector = leftMovementVector;
+        }
+    }
+    //Finally, if we're plumb and centered but off of target distance:
+    else if (abs(averageDistanceFromWall - targetDistance) > 0/*TOLERANCE*/) {
+
+        if (averageDistanceFromWall > shotDistance) {
+
+            frontRightVector = forwardMovementVector;
+            frontLeftVector = forwardMovementVector;
+            rearLeftVector = forwardMovementVector;
+            rearRightVector = forwardMovementVector;
+        }
+        if (averageDistanceFromWall < shotDistance) {
+
+            frontRightVector = backwardsMovementVector;
+            frontLeftVector = backwardsMovementVector;
+            rearLeftVector = backwardsMovementVector;
+            rearRightVector = backwardsMovementVector;
+        }
+    }
+
+    //Finally, write the calculated values to their respective motors.
+    m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontRightVector));
+    m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontLeftVector));
+    m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearLeftVector));
+    m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearRightVector));
+    setDriveSpeed(R_zionExecutionCap);
+}

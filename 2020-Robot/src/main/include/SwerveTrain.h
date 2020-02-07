@@ -38,9 +38,18 @@ Public Methods
         value is. Useful for low-level things.
     void publishSwervePositions(): Puts the current swerve encoder positions
         to the SmartDashboard.
+<<<<<<< HEAD
     void assumeAngle(const double&): Rotates to the supplied angle based
         on the current angle of the NavX attached to Zion. Finding this
         angle will likely require using the gyro, as it is relative.
+=======
+    void lineupToTarget(const double&, const double&, const double&, const double&):
+        Uses two distances from the wall (left and right from the front), an
+        offset from a target, and the desired distance away from the target to
+        drive Zion such that it will square itself with the wall, shift to align
+        with the target, and then move forward or backward to achieve the
+        desired distance.
+>>>>>>> Lineup
     void driveController(): Fully drives the swerve train on the supplied
         controller.
     void zeroController(): Allows use of a controller through
@@ -182,6 +191,7 @@ class SwerveTrain {
                 setDriveSpeed(0);
             }
         }
+        void lineupToTarget(const double &leftDistToWall, const double &rightDistToWall, const double &targetOffset, const double &targetDistance);
 
         void driveController(frc::Joystick *controller);
         void zeroController(frc::Joystick *controller);
@@ -201,7 +211,6 @@ class SwerveTrain {
             return std::max(std::max(frVal, flVal), std::max(rrVal, rlVal));
         }
         VectorDouble getTranslationVector(const double &x, const double &y, double angleGyro);
-
         double calculateAssumeAngleRotatationSpeed(const double &currentAngleOff) {
 
             //TODO: Document/improve regression
