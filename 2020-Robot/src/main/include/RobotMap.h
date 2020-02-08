@@ -52,11 +52,16 @@ const int R_zeroButtonRR = 0;
 const double R_zionExecutionCap = .25;
 //And this is the execution cap for how fast manual zeroing can occur.
 const double R_controllerZeroExecutionCap = .1;
+//This is the execution cap for autonomous movement, may change.
+const double R_zionAutoExecutionCap = 0.20;
 
 //The amount of REV rotations it takes for a swerve assembly to make a full rotation.
 //Often, a REV Rotation is referred to as a Nic, although they mean different things.
 //Truly, a Nic is ~17.976 REV Rotation values.
 const double R_nicsConstant = 17.9761447906494;
+// The change in encoder output per full wheel rotation around the axle.
+// This value can be used to move a certain distance using solely encoder values.
+const double R_kuhnsConstant = 8.3121115031;
 //If an xy coordinate plane is centered at the middle of the drivetrain, this
 //is the radian measure between the y-axis and the front right wheel. This is
 //the basic unit of a non-moving center turn, and it is modified as the basis
