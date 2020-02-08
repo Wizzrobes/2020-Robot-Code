@@ -341,8 +341,38 @@ void SwerveTrain::lineupShot(double tx, double s1, double s2) {
 
         setDriveSpeed(R_zionAutoExecutionCap);
     }
+    //If not at firing distance. . .
+    if (optimalDistance != 144) {
+        
+        //If too far away, move forward until at optimal distance 
+        if (optimalDistance > 144) {
 
-    // TODO: Add movement forwards & backwards of this function.
+            VectorDouble forwardsVector(0, 1);
+        }
+        
+        //If too close, move backward until at optimal distance
+        else if (optimalDistance < 144) {
+
+            VectorDouble backVector(0, -1);
+        }    
+    }
+    //If at optimal firing distance, fire balls from launcher
+    //Fifty is a random chosen number-must be adjusted based on speeds required for scoring
+    if (optimalDistance = 144) {
+        
+        double setAutoIndexSpeed (50);
+        double setAutoLaunchSpeed (50);
+        
+        //After x seconds (3 used as temporary filler), set index and launch speed back to zero
+        //Difference in time should be however long it takes to fire a full clip of balls-adjust as needed
+        time_t start = time(0);
+        double secondsSinceStart = difftime (time(0), start);
+        //If the number of seconds passed since the start of firing is equal to how long it takes to fire all balls . . .
+        if (secondsSinceStart = 3) {
+            double setAutoIndexSpeed (0);
+            double setAutoLaunchSpeed (0);    
+        //. . . set all launcher speeds to zero and stop firing    
+        }
+    } 
 }
-
 // TODO: Add rest of functions for remaining movements.
