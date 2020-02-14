@@ -6,14 +6,19 @@
 std::string Arduino::getRegister(const int &regToGet) {
 
     std::string resultString;
-    //If we're looking in the sanity register, just return the first digit in the
+    //If we're looking in the begin register, just return the first digit in the
     //registry and don't bother with the rest...
-    if (regToGet == kSanity) {
+    if (regToGet == Registry::kBegin) {
 
         resultString += m_registry.at(0);
     }
+    //If we're looking in the end register, just return the last digit...
+    if (regToGet == Registry::kEnd) {
+
+        resultString += m_registry.at(31);
+    }
     //Likewise, if we just want the whole thing, set the result string equal to it...
-    else if (regToGet == kRegistry) {
+    else if (regToGet == Registry::kRegistry) {
 
         resultString += m_registry;
     }
@@ -39,14 +44,14 @@ std::string Arduino::getRegister(const int &regToGet) {
 }
 bool Arduino::setRegister(const int &regToSet, const std::string &stringToSet) {
 
-    //If setting the sanity register...
-    if (regToSet == kSanity) {
+    //If setting the begin register...
+    if (regToSet == Registry::kBegin) {
 
         //Make sure that the supplied string has at least one character available...
         if (stringToSet.length() >= 1) {
 
             //If so, set the first char in the registry equal to it, returning success...
-            m_registry.at(kSanity) = stringToSet.at(0);
+            m_registry.at(Registry::kBegin) = stringToSet.at(0);
             return true;
         }
         //Otherwise, return failure.
@@ -55,8 +60,21 @@ bool Arduino::setRegister(const int &regToSet, const std::string &stringToSet) {
             return false;
         }
     }
+    //If setting the end register, do practically the same...
+    if (regToSet == Registry::kEnd) {
+
+        if (stringToSet.length() >= 1) {
+
+            m_registry.at(Registry::kEnd) = stringToSet.at(0);
+            return true;
+        }
+        else {
+
+            return false;
+        }
+    }
     //If setting the whole registry...
-    if (regToSet == kRegistry) {
+    if (regToSet == Registry::kRegistry) {
 
         //Ensure that the supplied string has a full 32 chars available...
         if (stringToSet.length() >= 32) {

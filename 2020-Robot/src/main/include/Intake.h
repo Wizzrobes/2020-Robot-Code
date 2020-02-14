@@ -26,4 +26,4 @@ class Intake {
 
     private:
         rev::CANSparkMax *m_intakeMotor;
-}
+};
