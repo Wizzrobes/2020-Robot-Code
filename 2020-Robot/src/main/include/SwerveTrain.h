@@ -193,8 +193,12 @@ class SwerveTrain {
         SwerveModule *m_rearRight;
         NavX *navX;
 
+        void runZionAutonomous();
+        void driveAutonomous();
+        void stopDriving();
         void moveToTarget();
-        void lineupShot(double tx, double s1, double s2);
+        void lineupShot();
+        void shootAuto();
         double getClockwiseREVRotationsFromCenter(frc::Joystick *controller);
         double getClockwiseREVRotationsFromCenter(const VectorDouble &vector);
         double getStandardDegreeAngleFromCenter(const double &x, const double &y);

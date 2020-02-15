@@ -30,7 +30,9 @@ void Robot::RobotInit() {
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
 }
 void Robot::RobotPeriodic() {}
-void Robot::AutonomousInit() {}
+void Robot::AutonomousInit() {
+    zion.runZionAutonomus();
+}
 void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
