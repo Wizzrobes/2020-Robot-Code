@@ -194,11 +194,14 @@ class SwerveTrain {
         NavX *navX;
 
         void runZionAutonomous();
-        void driveAutonomous();
+        void driveAutonomous(VectorDouble movement, double speed);
+        void turnAutonomous(double speed);
         void stopDriving();
         void moveToTarget();
         void lineupShot();
         void shootAuto();
+        void getTrenchRunPowerCells();
+        void returnToShootingPosition();
         double getClockwiseREVRotationsFromCenter(frc::Joystick *controller);
         double getClockwiseREVRotationsFromCenter(const VectorDouble &vector);
         double getStandardDegreeAngleFromCenter(const double &x, const double &y);
