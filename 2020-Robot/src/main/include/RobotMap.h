@@ -16,16 +16,15 @@ const int R_frontRightSwerveMotorCANID = 1;
 const int R_frontRightDriveMotorCANID  = 2;
 const int R_frontLeftSwerveMotorCANID  = 3;
 const int R_frontLeftDriveMotorCANID   = 4;
-const int R_rearLeftSwerveMotorCANID   = 5;
-const int R_rearLeftDriveMotorCANID    = 6;
-const int R_rearRightSwerveMotorCANID  = 7;
-const int R_rearRightDriveMotorCANID   = 8;
+const int R_rearLeftDriveMotorCANID    = 5;
+const int R_rearLeftSwerveMotorCANID   = 6;
+const int R_rearRightDriveMotorCANID   = 7;
+const int R_rearRightSwerveMotorCANID  = 8;
 
-//TODO: Find actual CANID
-const int R_intakeMotorCANID = 0;
+const int R_intakeMotorCANID = 9;
 
-const int R_launcherIndexMotorCANID = 9;
-const int R_launcherLaunchMotorCANID = 10;
+const int R_launcherIndexMotorCANID  = 10;
+const int R_launcherLaunchMotorCANID = 11;
 /*___End RoboRIO CAN Bus ID Declarations___*/
 
 /*_____PCM Pin Declarations_____*/
@@ -55,9 +54,16 @@ const int R_zeroButtonRR = 0;
 
 /*_____Global Robot Variable Settigns_____*/
 //This is the highest decimal percentage of full speed that Zion can actually go.
-const double R_zionExecutionCap = .25;
+const double R_zionExecutionCap = .75;
+//This one is for running the intake motors.
+const double R_intakeExecutionCap = .75;
 //And this is the execution cap for how fast manual zeroing can occur.
 const double R_controllerZeroExecutionCap = .1;
+
+//This is the default launcher index speed.
+const double R_launcherDefaultIndexSpeed = 1;
+//And this the default launcher launch speed.
+const double R_launcherDefaultLaunchSpeed = .745;
 //This is the speed for automatic lateral movement in autonomous.
 const double R_zionAutoLateralMovementSpeed = .4;
 
