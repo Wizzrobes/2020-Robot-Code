@@ -4,6 +4,7 @@
 
 #include "SwerveTrain.h"
 #include "VectorDouble.h"
+#include "Launcher.h"
 
 void SwerveTrain::driveController(frc::Joystick *controller) {
 
@@ -248,6 +249,7 @@ VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y,
     return translationVector;
 }
 
+// Autonomous Code
 
 // Backs up and moves the robot to lineup with the target side to side.
 // Needs motor encoder values to move a specified distance.
@@ -259,8 +261,8 @@ void SwerveTrain::moveToTarget() {
     // Distances to move. Will change based on match position.
     // How far to back up, in inches.
     double backupDistance = 60;
-    // Side movement distance, also in inches.
-    double sideMovementDist = 120;
+    // Side movement distance, also in inches. Might be eliminated with.
+    //double sideMovementDist = 120;
 
     double wheelCircumference = 4 * M_PI;
 
@@ -277,20 +279,36 @@ void SwerveTrain::moveToTarget() {
     }
     stopDriving();
 
-    double secondEncodeValue = m_frontRight->getDrivePosition();
+    // Use of encoder values may be eliminated with limelight usage.
+    //double secondEncodeValue = m_frontRight->getDrivePosition();
     // Motor encoder value we need to get to for side movement.
-    double secondGoalEncValue = secondEncodeValue + ((sideMovementDist / wheelCircumference) * R_kuhnsConstant);
+    //double secondGoalEncValue = secondEncodeValue + ((sideMovementDist / wheelCircumference) * R_kuhnsConstant);
 
     // Presumes we have to move right to reach target.
-    while ((secondGoalEncValue - m_frontRight->getDrivePosition()) > 0) {
+    /*while ((secondGoalEncValue - m_frontRight->getDrivePosition()) > 0) {
         driveAutonomous(backVector, R_zionAutoExecutionCap);
     }
+    */
+
+    // REMOVE SLASHES LATER WHEN FIXED
+    /*
+    while (not(getTarget())) {
+        driveAutonomous(backVector, R_zionAutoExecutionCap);
+    }
+    while (getTarget() && abs(getHorizontalOffset())) {
+        driveAutonomous(backVector, R_zionAutoExecutionCap)
+    }
     stopDriving();
+    */
 }
 
 // Turns and moves forwards/backwards for shot.
 void SwerveTrain::lineupShot() {
-    double averageOfS = sonar1Get() + sonar2Get()) / 2.0;
+    // Placeholder for sonar values.
+    double sonar1Get = 144;
+    double sonar2Get = 144;
+
+    double averageOfS = sonar1Get + sonar2Get / 2.0;
 
     // Deadzone for horizontal offset of crosshair and target. In degrees.
     double angleDeadzone = 1;
@@ -306,19 +324,20 @@ void SwerveTrain::lineupShot() {
     double optimalDistance = 144;
 
     // Turning Zion to be parallel to the wall.
-    while (abs((sonar1Get() - sonar2Get()) > 2) { //2 is meant to represent the deadzone in centimeters 
+    while (abs((sonar1Get - sonar2Get) > 2)) { //2 is meant to represent the deadzone in centimeters 
 
-        if (sonar1Get() > sonar2Get()) {
+        if (sonar1Get > sonar2Get) {
             turnAutonomous(R_zionAutoExecutionCap);
         }
-        else if (sonar2Get() > sonar1Get()) {
+        else if (sonar2Get > sonar1Get) {
             turnAutonomous(-R_zionAutoExecutionCap);
         }
     }
     stopDriving();
 
+    // REMOVE SLASHES WHEN FIXED
     // Moving side to side to align with target.
-    while (abs(getHorizontalOffset()) >= angleDeadzone) {
+    /* while (abs(getHorizontalOffset()) >= angleDeadzone) {
 
         if (getHorizontalOffset() < 0) {
             driveAutonomous(backwardsVector, R_zionAutoExecutionCap);
@@ -327,11 +346,13 @@ void SwerveTrain::lineupShot() {
             driveAutonomous(forwardsVector, R_zionAutoExecutionCap);
         }
     }
+    */
     stopDriving(); 
+    
 
     // Moving to get the proper distance away from the target.
-    while (abs((sonar1Get() + sonar2Get()) / 2.0 - optimalDistance) >= 5) { //5 represents a cm distance deadzone btween the robot and the wall
-        averageDistance  = sonar1Get() + sonar2Get()) / 2.0; 
+    while (abs((sonar1Get + sonar2Get) / 2.0 - optimalDistance) >= 5) { //5 represents a cm distance deadzone btween the robot and the wall
+        double averageDistance  = (sonar1Get + sonar2Get) / 2.0; 
             
         if (averageDistance < optimalDistance) {
             driveAutonomous(leftVector, R_zionAutoExecutionCap);
@@ -342,9 +363,9 @@ void SwerveTrain::lineupShot() {
     }
     stopDriving();
 
-    // TODO: Find what speeds the launch motor has to go.
-    launchMotor->Set(500);
-    indexMotor->Set(500);
+    // TODO: Find what speeds the launch motor has to go and proper names.
+    //SetIndexSpeed(50000);
+    //SetLaunchSpeed(50000);
 }
 
 
@@ -354,29 +375,31 @@ void SwerveTrain::getTrenchRunPowerCells() {
    
     // Distances to move. Will change based on trench measurements.
     // Movement to the left, in inches.
-    double sideMovementDist = 60;
+    double sideMovementDist = 30;
     // How far to move forwards into trench, also in inches.
     double forwardsDistance = 60;
 
     double wheelCircumference = 4 * M_PI;
 
     // Distance for wheel to move in rotation.
-    double wheelRotateDist = 20.5 * M_PI / 2;
+    double wheelRotateDist = (41 * M_PI) / 4;
         
     // Vectors for movement in directions.
-    VectorDouble leftVector(-1, 0);
+    VectorDouble leftVector(1, 0);
     VectorDouble forwardsVector(0, 1);
 
 
     // Rotate to line up for intake.
-     // The original value we started with. Uses front right wheel.
+    // The original value we started with. Uses front right wheel.
     double firstEncodeValue = m_frontRight->getDrivePosition();
 
     // The goal motor encoder value for  backwards movement. Check if moving forwards increases or decreases encoder.
     double goalEncoderValue = firstEncodeValue + ((wheelRotateDist / wheelCircumference) * R_kuhnsConstant);
 
-    while ((goalEncoderValue - m_frontRight->getDrivePosition()) > 0) {
-        turnAutonomous(R_zionAutoExecutionCap);
+    navX->resetAll(); 
+
+    while (90 - abs(navX->getYaw()) > 0) {
+        turnAutonomous(-R_zionAutoExecutionCap);
     }
     stopDriving();
 
@@ -385,7 +408,7 @@ void SwerveTrain::getTrenchRunPowerCells() {
     double secondEncodeValue = m_frontRight->getDrivePosition();
 
     // The goal motor encoder value for left movement. Check if moving forwards increases or decreases encoder.
-    double leftEncoderValue = secondEncodeValue + ((forwardsDistance / wheelCircumference) * R_kuhnsConstant);
+    double leftEncoderValue = secondEncodeValue + ((sideMovementDist / wheelCircumference) * R_kuhnsConstant);
     
     while ((leftEncoderValue - m_frontRight->getDrivePosition()) > 0) {
         driveAutonomous(leftVector, R_zionAutoExecutionCap);
@@ -395,7 +418,7 @@ void SwerveTrain::getTrenchRunPowerCells() {
 
     double thirdEncodeValue = m_frontRight->getDrivePosition();
     // Motor encoder value we need to get to for forwards movement.
-    double thirdGoalEncValue = thirdEncodeValue + ((sideMovementDist / wheelCircumference) * R_kuhnsConstant);
+    double thirdGoalEncValue = thirdEncodeValue + ((forwardsDistance / wheelCircumference) * R_kuhnsConstant);
 
     // Presumes we have to move right to reach target.
     while ((thirdGoalEncValue - m_frontRight->getDrivePosition()) > 0) {
@@ -429,6 +452,7 @@ void SwerveTrain::returnToShootingPosition() {
     // Motor encoder value we need to get to for backwards movement.
     double backGoalEncValue = backwardsEncodeValue + ((sideMovementDist / wheelCircumference) * R_kuhnsConstant);
 
+    
     // Presumes we have to move right to reach target.
     while ((backGoalEncValue - m_frontRight->getDrivePosition()) > 0) {
         driveAutonomous(backwardsVector, R_zionAutoExecutionCap);
@@ -462,19 +486,17 @@ void SwerveTrain::returnToShootingPosition() {
     stopDriving();
 }
 
-
-
 // TODO: Add rest of functions for remaining movements.
 
 // Order of operations for autonomous mode.
 void SwerveTrain::runZionAutonomous() {
     moveToTarget();
     lineupShot();
-    shootAuto();
+    //shootAuto();
     getTrenchRunPowerCells();
     returnToShootingPosition();
     lineupShot();
-    shootAuto();
+    //shootAuto();
 }
 
 // Sets direction and speed for linear movement.

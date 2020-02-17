@@ -31,7 +31,7 @@ void Robot::RobotInit() {
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
-    zion.runZionAutonomus();
+    //runZionAutonomous();
 }
 void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
@@ -44,6 +44,9 @@ void Robot::TeleopPeriodic() {
     else if (playerOne->GetRawButton(11)) {
 
         zion.driveController(playerOne);
+    }
+    else if (playerOne->GetRawButton(12)) {
+        zion.getTrenchRunPowerCells(); 
     }
     else {
 

@@ -45,11 +45,11 @@ class Limelight {
 
 double  limeGang() {
     double limeLightAngle = 0.392699; //Adjust This-it is an estimate of the angle the limelight is mounted at in simplified radians(currently at 20 degrees)
-    double aidsConstant = 73.25; //Adjust This-this is an estimate as to how high the sensor is
-    double kommieConstant = aidsConstant / tan(limeLightAngle); //Trig behind finding distance from Zion to wall
-    //kommieConstant is the target distance from wall, adjust the limelight angle accordingly
+    double sensorHeightConstant = 73.25; // Height difference between limelight and target.
+    double targetDistConstant = sensorHeightConstant / tan(limeLightAngle); //Trig behind finding distance from Zion to wall
+    //targetHeightConstant is the target distance from wall, adjust the limelight angle accordingly
 
-    if ( 14.5 < kommieConstant < 15.5 ) {
+    if (174 < targetDistConstant < 186) {
 
         //Continue Firing the cannoon-change the zone as needed to adjust for scoring
     }
