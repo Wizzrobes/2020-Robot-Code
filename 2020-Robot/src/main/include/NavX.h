@@ -12,6 +12,9 @@ Public Methods
     double getAbsoluteAngle(): Returns the absolute value of the angle value.
     void resetYaw(): Sets the yaw value to zero.
     void resetAll(): Resets all NavX return values.
+
+    enum ConnectionType: Used with the constructor to specify
+        which interface to construct on.
 */
 
 #pragma once

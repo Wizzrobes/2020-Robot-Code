@@ -13,7 +13,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     double y = -controller->GetY();
     //Take the Z value by the execution cap, as turning can be violent.
     //This way, it scales its violentness.
-    double z = -controller->GetZ() * R_zionExecutionCap;
+    double z = -controller->GetZ() * R_executionCapZion;
     //To prevent controller drift, if the values of X, Y, and Z are inside of
     //deadzone, set them to 0.
     forceControllerXYZToZeroInDeadzone(x, y, z);
@@ -112,10 +112,10 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearLeftResultVector));
         m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearRightResultVector));
 
-        m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * R_zionExecutionCap);
-        m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * R_zionExecutionCap);
-        m_rearLeft->setDriveSpeed(rearLeftResultVector.magnitude() * R_zionExecutionCap);
-        m_rearRight->setDriveSpeed(rearRightResultVector.magnitude() * R_zionExecutionCap);
+        m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * R_executionCapZion);
+        m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * R_executionCapZion);
+        m_rearLeft->setDriveSpeed(rearLeftResultVector.magnitude() * R_executionCapZion);
+        m_rearRight->setDriveSpeed(rearRightResultVector.magnitude() * R_executionCapZion);
     }
 }
 void SwerveTrain::zeroController(frc::Joystick *controller) {
@@ -125,19 +125,19 @@ void SwerveTrain::zeroController(frc::Joystick *controller) {
 
     if (controller->GetRawButton(R_zeroButtonFR)) {
 
-        m_frontRight->setSwerveSpeed(controllerTurningMagnitude * R_controllerZeroExecutionCap);
+        m_frontRight->setSwerveSpeed(controllerTurningMagnitude * R_executionCapControllerZero);
     }
     else if (controller->GetRawButton(R_zeroButtonFL)) {
 
-        m_frontLeft->setSwerveSpeed(controllerTurningMagnitude * R_controllerZeroExecutionCap);
+        m_frontLeft->setSwerveSpeed(controllerTurningMagnitude * R_executionCapControllerZero);
     }
     else if (controller->GetRawButton(R_zeroButtonRL)) {
 
-        m_rearLeft->setSwerveSpeed(controllerTurningMagnitude * R_controllerZeroExecutionCap);
+        m_rearLeft->setSwerveSpeed(controllerTurningMagnitude * R_executionCapControllerZero);
     }
     else if (controller->GetRawButton(R_zeroButtonRR)) {
 
-        m_rearRight->setSwerveSpeed(controllerTurningMagnitude * R_controllerZeroExecutionCap);
+        m_rearRight->setSwerveSpeed(controllerTurningMagnitude * R_executionCapControllerZero);
     }
     else {
 

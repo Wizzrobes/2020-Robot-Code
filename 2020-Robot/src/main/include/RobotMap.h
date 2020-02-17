@@ -12,37 +12,36 @@
 /*___End RoboRIO DIO Pin Declarations___*/
 
 /*_____RoboRIO CAN Bus ID Declarations_____*/
-const int R_frontRightSwerveMotorCANID = 1;
-const int R_frontRightDriveMotorCANID  = 2;
-const int R_frontLeftSwerveMotorCANID  = 3;
-const int R_frontLeftDriveMotorCANID   = 4;
-const int R_rearLeftDriveMotorCANID    = 5;
-const int R_rearLeftSwerveMotorCANID   = 6;
-const int R_rearRightDriveMotorCANID   = 7;
-const int R_rearRightSwerveMotorCANID  = 8;
+const int R_CANIDzionFrontRightSwerve = 1;
+const int R_CANIDzionFrontRightDrive  = 2;
+const int R_CANIDzionFrontLeftSwerve  = 3;
+const int R_CANIDzionFrontLeftDrive   = 4;
+const int R_CANIDzionRearLeftDrive    = 5;
+const int R_CANIDzionRearLeftSwerve   = 6;
+const int R_CANIDzionRearRightDrive   = 7;
+const int R_CANIDzionRearRightSwerve  = 8;
 
-const int R_intakeMotorCANID = 9;
+const int R_CANIDmotorIntake = 9;
 
-const int R_launcherIndexMotorCANID  = 10;
-const int R_launcherLaunchMotorCANID = 11;
+const int R_CANIDmotorLauncherIndex  = 10;
+const int R_CANIDmotorLauncherLaunch = 11;
 /*___End RoboRIO CAN Bus ID Declarations___*/
 
 /*_____PCM Pin Declarations_____*/
 /*___End PCM Pin Declarations___*/
 
 /*_____Controller Settings_____*/
-const int R_playerOneControllerPort = 0;
-const int R_playerTwoControllerPort = 1;
+const int R_controllerPortPlayerOne = 0;
+const int R_controllerPortPlayerTwo = 1;
 
 //This deadzone is used to determine when the controller is completely motionless
-const double R_controllerDeadzone = .075;
+const double R_deadzoneController = .075;
 //And this one is to determine when rotation is being induced, as simply operation
 //of the controller often results in errant rotation. Due to how easy it is to
 //drift, it is significantly higher.
-const double R_controllerZDeadzone = .3;
-// This deadzone is for the horizontal offset of the limelight because Zion does not
-// have to be perfectly on center with the target. In degrees.
-const double R_limelightXDeadzone = 0.75;
+const double R_deadzoneControllerZ = .3;
+// This deadzone is for the maximum allowable Limelight offset.
+const double R_deadzoneLimelightX = 0.75;
 
 //These are the playerTwo raw controller buttons that are used for manually
 //zeroing Zion one wheel at a time by holding them down.
@@ -54,17 +53,17 @@ const int R_zeroButtonRR = 0;
 
 /*_____Global Robot Variable Settigns_____*/
 //This is the highest decimal percentage of full speed that Zion can actually go.
-const double R_zionExecutionCap = .75;
+const double R_executionCapZion = .75;
 //This one is for running the intake motors.
-const double R_intakeExecutionCap = .75;
+const double R_executionCapIntake = .75;
 //And this is the execution cap for how fast manual zeroing can occur.
-const double R_controllerZeroExecutionCap = .1;
+const double R_executionCapControllerZero = .1;
 
 //This is the default launcher index speed.
-const double R_launcherDefaultIndexSpeed = 1;
+const double R_launcherDefaultSpeedIndex = 1;
 //And this the default launcher launch speed.
-const double R_launcherDefaultLaunchSpeed = .745;
-//This is the speed for automatic lateral movement in autonomous.
+const double R_launcherDefaultSpeedLaunch = .745;
+//This is the speed for automatic lateral movement in autonomous. CHANGE AFTER AUTO DRIVER
 const double R_zionAutoLateralMovementSpeed = .4;
 
 //The amount of REV rotations it takes for a swerve assembly to make a full rotation.

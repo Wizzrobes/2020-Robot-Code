@@ -14,14 +14,14 @@
 #include "SwerveTrain.h"
 
 //Climber climber(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
-Intake intake(R_intakeMotorCANID);
-Launcher launcher(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
+Intake intake(R_CANIDmotorIntake);
+Launcher launcher(R_CANIDmotorLauncherIndex, R_CANIDmotorLauncherLaunch);
 Limelight limelight;
 NavX navX(NavX::ConnectionType::kMXP);
-SwerveModule frontRightModule(R_frontRightDriveMotorCANID, R_frontRightSwerveMotorCANID);
-SwerveModule frontLeftModule(R_frontLeftDriveMotorCANID, R_frontLeftSwerveMotorCANID);
-SwerveModule rearLeftModule(R_rearLeftDriveMotorCANID, R_rearLeftSwerveMotorCANID);
-SwerveModule rearRightModule(R_rearRightDriveMotorCANID, R_rearRightSwerveMotorCANID);
+SwerveModule frontRightModule(R_CANIDzionFrontRightDrive, R_CANIDzionFrontRightSwerve);
+SwerveModule frontLeftModule(R_CANIDzionFrontLeftDrive, R_CANIDzionFrontLeftSwerve);
+SwerveModule rearLeftModule(R_CANIDzionRearLeftDrive, R_CANIDzionRearLeftSwerve);
+SwerveModule rearRightModule(R_CANIDzionRearRightDrive, R_CANIDzionRearRightSwerve);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 
 frc::Joystick *playerOne;
@@ -29,13 +29,13 @@ frc::XboxController *playerTwo;
 
 void Robot::RobotInit() {
 
-    playerOne = new frc::Joystick(R_playerOneControllerPort);
-    playerTwo = new frc::XboxController(R_playerTwoControllerPort);
+    playerOne = new frc::Joystick(R_controllerPortPlayerOne);
+    playerTwo = new frc::XboxController(R_controllerPortPlayerTwo);
 
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
 
-    frc::SmartDashboard::PutNumber("Launcher::Index-Speed:", R_launcherDefaultIndexSpeed);
-    frc::SmartDashboard::PutNumber("Launcher::Launch-Speed:", R_launcherDefaultLaunchSpeed);
+    frc::SmartDashboard::PutNumber("Launcher::Index-Speed:", R_launcherDefaultSpeedIndex);
+    frc::SmartDashboard::PutNumber("Launcher::Launch-Speed:", R_launcherDefaultSpeedLaunch);
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {}
@@ -65,7 +65,7 @@ void Robot::TeleopPeriodic() {
 }
 */
 
-    intake.setSpeed(-playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) * R_intakeExecutionCap + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand) * R_intakeExecutionCap);
+    intake.setSpeed(-playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) * R_executionCapIntake + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand) * R_executionCapIntake);
 
     if (playerTwo->GetYButton()) {
 

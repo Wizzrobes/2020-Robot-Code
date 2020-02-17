@@ -1,6 +1,11 @@
 /*
 class Intake
 
+    Constructors
+
+        Intake(const int&): Constructs an intake with a SPARK Max on the
+            designated CAN BUS ID.
+
     Public Methods
 
         void setSpeed(const double& = 0): Sets the speed of the intake

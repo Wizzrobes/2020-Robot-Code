@@ -38,18 +38,15 @@ Public Methods
         value is. Useful for low-level things.
     void publishSwervePositions(): Puts the current swerve encoder positions
         to the SmartDashboard.
-<<<<<<< HEAD
     void assumeAngle(const double&): Rotates to the supplied angle based
         on the current angle of the NavX attached to Zion. Finding this
         angle will likely require using the gyro, as it is relative.
-=======
     void lineupToTarget(const double&, const double&, const double&, const double&):
         Uses two distances from the wall (left and right from the front), an
         offset from a target, and the desired distance away from the target to
         drive Zion such that it will square itself with the wall, shift to align
         with the target, and then move forward or backward to achieve the
         desired distance.
->>>>>>> Lineup
     void driveController(): Fully drives the swerve train on the supplied
         controller.
     void zeroController(): Allows use of a controller through
@@ -244,7 +241,7 @@ class SwerveTrain {
             const double absX = abs(controller->GetX());
             const double absY = abs(controller->GetY());
             const double absZ = abs(controller->GetZ());
-            const double zone = R_controllerDeadzone;
+            const double zone = R_deadzoneController;
 
             if (absX < zone && absY < zone && absZ < zone) {
 
@@ -258,9 +255,9 @@ class SwerveTrain {
             double absY = abs(y);
             double absZ = abs(z);
 
-            if (absX < R_controllerDeadzone) {x = 0;}
-            if (absY < R_controllerDeadzone) {y = 0;}
-            if (absZ < R_controllerZDeadzone) {z = 0;}
+            if (absX < R_deadzoneController) {x = 0;}
+            if (absY < R_deadzoneController) {y = 0;}
+            if (absZ < R_deadzoneController) {z = 0;}
 
         }
 };
