@@ -11,9 +11,11 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     //TODO: Why does uninverting X solve our issues?
     double x = controller->GetX();
     double y = -controller->GetY();
-    double z = -controller->GetZ();
+    //Take the Z value by the execution cap, as turning can be violent.
+    //This way, it scales its violentness.
+    double z = -controller->GetZ() * R_zionExecutionCap;
     //To prevent controller drift, if the values of X, Y, and Z are inside of
-    //deadzone, set them to 0
+    //deadzone, set them to 0.
     forceControllerXYZToZeroInDeadzone(x, y, z);
 
     /*
