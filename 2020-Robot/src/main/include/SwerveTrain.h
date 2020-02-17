@@ -267,14 +267,16 @@ class SwerveTrain {
         void optimizeZ(double &x, double &y, double &z) {
             double xyMagnitude = sqrt(x*x + y*y); 
             double absZ = abs(z);
-            double zDeadzoneAdjustment = R_controllerZDeadzone + xyMagnitude * R_controllerZDeadzone; //possible lessening of xyMagnitude*absZ adjustment
+            double zDeadzoneAdjustment = R_controllerZDeadzone + .3 * xyMagnitude * R_controllerZDeadzone; //possible lessening of xyMagnitude*absZ adjustment
 
+            if(z > zDeadzoneAdjustment) {
+                z -= (zDeadzoneAdjustment - R_controllerDeadzone); 
+            } else if(z < -zDeadzoneAdjustment){z += (zDeadzoneAdjustment - R_controllerDeadzone);}
+            
             if(absZ < zDeadzoneAdjustment) {z = 0;} 
 
             //z is altered by a deadzone adjustment that ensures that once the deadzone is left the values smoothly increase 
             //tbe subtration of the standard controller deadzone parallels the exit of deadzone in standard xy movement
-            if(z > 0) {
-                z -= (zDeadzoneAdjustment - R_controllerDeadzone); 
-            } else {z += (zDeadzoneAdjustment - R_controllerDeadzone);}
+           
         }
 };

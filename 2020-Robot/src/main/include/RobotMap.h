@@ -16,10 +16,10 @@ const int R_frontRightSwerveMotorCANID = 1;
 const int R_frontRightDriveMotorCANID  = 2;
 const int R_frontLeftSwerveMotorCANID  = 3;
 const int R_frontLeftDriveMotorCANID   = 4;
-const int R_rearLeftSwerveMotorCANID   = 5;
-const int R_rearLeftDriveMotorCANID    = 6;
-const int R_rearRightSwerveMotorCANID  = 7;
-const int R_rearRightDriveMotorCANID   = 8;
+const int R_rearLeftSwerveMotorCANID   = 6;
+const int R_rearLeftDriveMotorCANID    = 5;
+const int R_rearRightSwerveMotorCANID  = 8;
+const int R_rearRightDriveMotorCANID   = 7;
 
 //TODO: Find actual CANID
 const int R_intakeMotorCANID = 0;
@@ -55,7 +55,7 @@ const int R_zeroButtonRR = 0;
 
 /*_____Global Robot Variable Settigns_____*/
 //This is the highest decimal percentage of full speed that Zion can actually go.
-const double R_zionExecutionCap = .25;
+const double R_zionExecutionCap = .75;
 //And this is the execution cap for how fast manual zeroing can occur.
 const double R_controllerZeroExecutionCap = .1;
 //This is the speed for automatic lateral movement in autonomous.
