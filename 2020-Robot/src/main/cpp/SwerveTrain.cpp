@@ -18,6 +18,9 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     //deadzone, set them to 0.
     forceControllerXYZToZeroInDeadzone(x, y, z);
 
+    //Scale Z to X and Y's magnitude
+    optimizeControllerXYToZ(x, y, z); 
+
     /*
     The translation vector is the "standard" vector - that is, if no rotation
     were applied, the robot would simply travel in the direction of this
