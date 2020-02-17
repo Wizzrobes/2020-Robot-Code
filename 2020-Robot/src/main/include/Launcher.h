@@ -7,17 +7,19 @@ class Launcher {
     public:
         Launcher(const int &indexMotorCANID, const int &launchMotorCANID) {
 
-            indexMotor = new rev::CANSparkMax(indexMotorCANID, rev::CANSparkMax::MotorType::kBrushless);
+            indexMotor = new rev::CANSparkMax(indexMotorCANID, rev::CANSparkMax::MotorType::kBrushed);
             launchMotor = new rev::CANSparkMax(launchMotorCANID, rev::CANSparkMax::MotorType::kBrushless);
         }
 
-        void setIndexSpeed(const double &speedToSet) {
+        void setIndexSpeed(const double &speedToSet = 0) {
 
-            indexMotor->Set(speedToSet);
+            //Both motors are mounted counterclockwise, so invert all numbers
+            //to turn in the sensible direction.
+            indexMotor->Set(-speedToSet);
         }
-        void setLaunchSpeed(const double &speedToSet) {
+        void setLaunchSpeed(const double &speedToSet = 0) {
 
-            launchMotor->Set(speedToSet);
+            launchMotor->Set(-speedToSet);
         }
 
     private:

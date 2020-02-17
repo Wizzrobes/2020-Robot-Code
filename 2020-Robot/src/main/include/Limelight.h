@@ -7,10 +7,11 @@ Constructors
 
 Public Methods
 
-    double getHorizontalOffset(): Returns the horizontal offset of the target
+    double horizontalOffset(): Returns the horizontal offset of the target
         (tx).
-    double getVerticalOffset(): Returns the vertical ofset of the target (ty).
-    bool getTarget(): Returns true if there is a target in-sight, false
+    double verticalOffset(): Returns the vertical offset of the target (ty).
+    double targetArea(): Returns the area of the target in-sight.
+    bool target(): Returns true if there is a target in-sight, false
         otherwise.
 */
 
@@ -26,15 +27,19 @@ class Limelight {
             table = NetworkTable::GetTable("limelight");
         }
 
-        double getHorizontalOffset() {
+        double horizontalOffset() {
 
             return table->GetNumber("tx", 0);
         }
-        double getVerticalOffset() {
+        double verticalOffset() {
 
             return table->GetNumber("ty", 0);
         }
-        bool getTarget() {
+        double targetArea() {
+
+            return table->GetNumber("ta", 0);
+        }
+        bool target() {
 
             return table->GetNumber("tv", 0);
         }

@@ -16,7 +16,7 @@ class Intake {
     public:
         Intake(const int &intakeMotorCANID) {
 
-            m_intakeMotor = new rev::CANSparkMax(intakeMotorCANID, rev::CANSparkMax::MotorType::kBrushless);
+            m_intakeMotor = new rev::CANSparkMax(intakeMotorCANID, rev::CANSparkMax::MotorType::kBrushed);
         }
 
         void setSpeed(const double &speedToSet = 0) {
