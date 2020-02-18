@@ -9,6 +9,10 @@ void setup() {
 
     Serial.begin(115200);
     Serial.setTimeout(50);
+    for (int x = 2; x < 13; x += 2) {
+
+        pinMode(x, OUTPUT);
+    }
 }
 void loop() {
 
@@ -74,8 +78,24 @@ void loop() {
         //If we did everything correctly...
         else {
 
-            //Acknowledge the registry.
-            Serial.println("ACK         :" + registry);
+            //Form a string of the first option register (six characters after the first)
+            String optionRegister = "000000";
+            for (unsigned x = 1; x != 7; ++x) {
+
+                optionRegister[x - 1] = registry.charAt(x);
+            }
+            //Step through it and assign 1s and 0s to LEDs on even pins 12-2 sequentially
+            for (unsigned x = 0; x != 6; ++x) {
+
+                if (optionRegister.charAt(x) == '1') {
+
+                    digitalWrite(12 - 2 * x, HIGH);
+                }
+                else {
+
+                    digitalWrite(12 - 2 * x, LOW);
+                }
+            }
         }
     }
 }
