@@ -91,7 +91,7 @@ class Arduino {
 
             arduino = new frc::SerialPort(baudRate, port);
             //Initialize the registry to its documented state
-            m_registry = std::string("A0000000000000000000000000000000Y");
+            m_registry = std::string("A000000000000000000000000000000Y");
         }
 
         std::string getRegister(const int &regToGet);

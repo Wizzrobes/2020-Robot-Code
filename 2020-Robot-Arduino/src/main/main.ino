@@ -78,14 +78,14 @@ void loop() {
         //If we did everything correctly...
         else {
 
-            //Form a string of the first tx register (six characters after the first)
-            String optionRegister = "000000";
-            for (unsigned x = 1; x != 7; ++x) {
+            //Form a string of the first tx register (five characters after the first)
+            String optionRegister = "00000";
+            for (unsigned x = 1; x != 6; ++x) {
 
                 optionRegister[x - 1] = registry.charAt(x);
             }
             //Step through it and assign 1s and 0s to LEDs on even pins 12-2 sequentially
-            for (unsigned x = 0; x != 6; ++x) {
+            for (unsigned x = 0; x != 5; ++x) {
 
                 if (optionRegister.charAt(x) == '1') {
 
