@@ -78,7 +78,7 @@ void loop() {
         //If we did everything correctly...
         else {
 
-            //Form a string of the first option register (six characters after the first)
+            //Form a string of the first tx register (six characters after the first)
             String optionRegister = "000000";
             for (unsigned x = 1; x != 7; ++x) {
 

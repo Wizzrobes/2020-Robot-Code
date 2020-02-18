@@ -3,6 +3,7 @@
 #include <frc/XboxController.h>
 #include <time.h>
 
+#include "Arduino.h"
 //#include "Climber.h"
 #include "Intake.h"
 #include "Launcher.h"
@@ -13,6 +14,7 @@
 #include "SwerveModule.h"
 #include "SwerveTrain.h"
 
+Arduino arduino;
 //Climber climber(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
 Intake intake(R_CANIDmotorIntake);
 Launcher launcher(R_CANIDmotorLauncherIndex, R_CANIDmotorLauncherLaunch);
@@ -38,8 +40,17 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutNumber("Launcher::Launch-Speed:", R_launcherDefaultSpeedLaunch);
 }
 void Robot::RobotPeriodic() {}
-void Robot::AutonomousInit() {}
-void Robot::AutonomousPeriodic() {}
+void Robot::AutonomousInit() {
+
+    frc::SmartDashboard::PutBoolean("RegistrySet:", arduino.setRegister(Arduino::Registry::kRegisterTx0, "101010"));
+}
+void Robot::AutonomousPeriodic() {
+
+    if (playerTwo->GetAButton()) {
+
+        frc::SmartDashboard::PutBoolean("RegistrySent:", arduino.tx());
+    }
+}
 void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
 

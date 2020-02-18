@@ -27,7 +27,7 @@ This class allows interfacing with an Arduino microcontroller as an auxiliary
         transmitted to the Arduino. It can be used to transmit any alphanumeric
         data, but it is logically used in modifying the behavior of whatevever
         device is returning data on Rx Register 0.
-    C-D. Tx Register 1-Tx Register 4
+    C-D. Tx Register 1-Tx Register 2
     E. Rx Register 0: This register is modified by the Arduino and then
         transmitted to the RoboRIO. It can also be used to receive any
         alphanumeric data from the Arduino, but it is logically used
@@ -90,8 +90,8 @@ class Arduino {
         Arduino(const frc::SerialPort::Port &port = frc::SerialPort::Port::kUSB1, const int &baudRate = 115200) {
 
             arduino = new frc::SerialPort(baudRate, port);
-            //Initialize the registry to 32 0 chars
-            m_registry = std::string(32, '0');
+            //Initialize the registry to its documented state
+            m_registry = std::string("A0000000000000000000000000000000Y");
         }
 
         std::string getRegister(const int &regToGet);
@@ -142,7 +142,7 @@ class Arduino {
         enum Registry {
 
             kBegin,
-            kRegisterTx0, kRegisterTx1 = 5, kRegisterTx2 = 7, kRegisterTx3 = 10, kRegisterTx4 = 13,
+            kRegisterTx0 = 1, kRegisterTx1 = 6, kRegisterTx2 = 11,
             kRegisterRx0 = 16, kRegisterRx1 = 21, kRegisterRx2 = 26,
             kEnd = 31,
             kRegistry
