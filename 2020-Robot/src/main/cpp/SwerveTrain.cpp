@@ -13,7 +13,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     double y = -controller->GetY();
     double z = controller->GetZ();
 
-    double angle = navX->getYawFull(); 
+    double angle = 0.0; 
     //To prevent controller drift, if the values of X, Y, and Z are inside of
     //deadzone, set them to 0
     forceControllerXYZToZeroInDeadzone(x, y, z);
@@ -31,28 +31,38 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     angle, so the gyro is needed to offset the vector described by X and Y.
     VectorDouble translationVector(0, 0);
     */
-    VectorDouble translationVector = getTranslationVector(x, y, 0.0);
+    //VectorDouble translationVector = getTranslationVector(x, y, 0.0);
+    VectorDouble translationVector (-x, y); //check invert x and y
 
+    //this conditional stops the robot from being field oriented
+    if((abs(x) > 0 || abs(y) > 0) && abs(z) > 0) {
+
+        angle = navX->getYawFull();
+    }
     /*
-    The rotation vectors are updated as field oriented vectors.  This means
-    that they are not in relation to the robot, rather then "field" (the NavX's
-    zero).  The rotational vecots are found by multiplying the controller's
+    The rotational vecots are found by multiplying the controller's
     rotational axis [-1, 1] by cosine of the wheel's RELATIVE yaw (the standard
     position we put the wheels in so that it can turn) minus the number of
     degrees we are offset from 0.  Then, for the j value we do the same, except
     we use sine.  All angles passed as paramaters to cos() and sin() are
     converted to radians first.
     */
-    VectorDouble frontRightRotationVector(z * cos((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)), z * sin((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)));
-    VectorDouble frontLeftRotationVector(z * cos((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)), z * sin((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)));
-    VectorDouble rearLeftRotationVector(z * cos((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)), z * sin((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)));
-    VectorDouble rearRightRotationVector(z * cos((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)), z * sin((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)));
+    VectorDouble frontRightRotationVector(  z * cos((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)),
+                                            z * sin((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)));
+
+    VectorDouble frontLeftRotationVector(   z * cos((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)),
+                                            z * sin((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)));
+
+    VectorDouble rearLeftRotationVector(    z * cos((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)),
+                                            z * sin((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)));
+
+    VectorDouble rearRightRotationVector(   z * cos((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)),
+                                            z * sin((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)));
 
     /*
     And the vector we actually want to apply to the swerves is the sum of
     the two vectors - the vector that forms "straight" (translationVector)
-    and the vector that forms strictly the rotation (rotationVector).  This
-    vector is FIELD-ORIENTED!
+    and the vector that forms strictly the rotation (rotationVector).
     */
     VectorDouble frontRightResultVector = translationVector + frontRightRotationVector;
     VectorDouble frontLeftResultVector = translationVector + frontLeftRotationVector;
@@ -73,7 +83,6 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         */
         assumeNearestZeroPosition();
         setDriveSpeed(0);
-        //navX->resetAll();
     }
     
     //Otherwise, go to the result vectors and use the magnitude to set the
@@ -81,18 +90,16 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     //respective resulting vector.
     else {
         /*
-        Here, all of the resulting vectors (in FIELD-ORIENTED form) are
+        Here, all of the resulting vectors are
         converted into nics so that they can be written to the swerve modules
         using assumeSwervePosition().  We get nics from degrees by calling
-        degreesToNics() and passing it the angle of the resulting vector + our
-        offset (becuase the vector is FIELD-ORIENTED) - 90 (becuase we need it
-        in the poper form, unit cirle.
+        getSwerveRotatingPosition().
         */
 
-        m_frontRight->assumeSwervePosition(m_frontRight->getSwerveNearestZeroPosition() + degreesToNics(frontRightResultVector.getUnitCircleRadianAngle() + angle - 90));
-        m_frontLeft->assumeSwervePosition(m_frontLeft->getSwerveNearestZeroPosition() + degreesToNics(frontLeftResultVector.getUnitCircleRadianAngle() + angle - 90));
-        m_rearLeft->assumeSwervePosition(m_rearLeft->getSwerveNearestZeroPosition() + degreesToNics(rearLeftResultVector.getUnitCircleRadianAngle() + angle - 90));
-        m_rearRight->assumeSwervePosition(m_rearRight->getSwerveNearestZeroPosition() + degreesToNics(rearRightResultVector.getUnitCircleRadianAngle() + angle - 90));
+        m_frontRight->assumeSwervePosition(m_frontRight->getTurnAroundCenterSwervePosition(frontRightResultVector, angle));
+        m_frontLeft->assumeSwervePosition(m_frontLeft->getTurnAroundCenterSwervePosition(frontLeftResultVector, angle));
+        m_rearLeft->assumeSwervePosition(m_rearLeft->getTurnAroundCenterSwervePosition(rearLeftResultVector, angle));
+        m_rearRight->assumeSwervePosition(m_rearRight->getTurnAroundCenterSwervePosition(rearRightResultVector, angle));
 
         m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * R_zionExecutionCap);
         m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * R_zionExecutionCap);
@@ -209,6 +216,7 @@ double SwerveTrain::getStandardDegreeAngleFromCenter(const double &x, const doub
     return angleRad;
 }
 //TODO: Inline function documentation
+//no longer needed in theory
 VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y, double angleGyro) {
 
     //TODO: Why does inverting this as well solve our problems?
@@ -327,3 +335,5 @@ void SwerveTrain::lineupToTarget(const double &leftDistToWall, const double &rig
     m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearRightVector));
     setDriveSpeed(R_zionAutoLateralMovementSpeed);
 }
+
+
