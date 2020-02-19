@@ -18,7 +18,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     //deadzone, set them to 0
     forceControllerXYZToZeroInDeadzone(x, y, z);
 
-   // optimizeZ(x, y, z); 
+    optimizeZ(x, y, z); 
 
     /*
     The translation vector is the "standard" vector - that is, if no rotation
@@ -38,6 +38,8 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     if((abs(x) > 0 || abs(y) > 0) && abs(z) > 0) {
 
         angle = navX->getYawFull();
+    } else {
+        navX->resetYaw(); 
     }
     /*
     The rotational vecots are found by multiplying the controller's
