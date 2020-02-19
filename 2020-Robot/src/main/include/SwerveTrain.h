@@ -41,6 +41,7 @@ Public Methods
     void assumeAngle(const double&): Rotates to the supplied angle based
         on the current angle of the NavX attached to Zion. Finding this
         angle will likely require using the gyro, as it is relative.
+    double degreesToNics(const double &angle): Convert the given angle to Nics.
     void lineupToTarget(const double&, const double&, const double&, const double&):
         Uses two distances from the wall (left and right from the front), an
         offset from a target, and the desired distance away from the target to
@@ -53,8 +54,8 @@ Public Methods
         a mapped button which is held down in correspondence to a motor
         to slowly override its zero from that controller's joystick
         value. This allows manual adjustment from an enabled state in case of
-        either drift or error. CURRENTLY WRITTEN FOR A JOYSTICK, WILL LIKELY
-        NEED TO CHANGE.
+        either drift or error.
+        TODO: CURRENTLY WRITTEN FOR A JOYSTICK, WILL LIKELY NEED TO CHANGE.
 
 Private Methods
 
@@ -187,6 +188,11 @@ class SwerveTrain {
                 assumeNearestZeroPosition();
                 setDriveSpeed(0);
             }
+        }
+
+        double degreesToNics(const double &angle) {
+
+            return R_nicsConstant * angle / 360;
         }
         void lineupToTarget(const double &leftDistToWall, const double &rightDistToWall, const double &targetOffset, const double &targetDistance);
 

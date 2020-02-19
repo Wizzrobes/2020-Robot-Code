@@ -34,46 +34,30 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     VectorDouble translationVector = getTranslationVector(x, y, 0.0);
 
     /*
-    The rotation vectors' i-components take the cosine of the R_ angle (see
-    RobotMap) in order to discern the first component of a vector which
-    points in the direction that would be applied to the swerve if the
-    rotation were only around center. This is multipled by the magnitude of Z
-    in order to make it a proportionally smaller component to
-    result in a less drastic turn, as a Z-value of 1 would imply the most
-    drastic turn possible. The j-component does the same, but using sine to
-    find the other half of the hypotenuse's components which make up the
-    direction that will be applied in rotation, as cosine only provides the
-    x-component. Cosine for X, sine for Y. If none of the Z-values were
-    negative, each vector applied to the swerves would point the same
-    direction - so axis inversion is used to ensure that traversing the
-    swerves from frontRight clockwise compounds 90 to the rotation vector.
+    The rotation vectors are updated as field oriented vectors.  This means
+    that they are not in relation to the robot, rather then "field" (the NavX's
+    zero).  The rotational vecots are found by multiplying the controller's
+    rotational axis [-1, 1] by cosine of the wheel's RELATIVE yaw (the standard
+    position we put the wheels in so that it can turn) minus the number of
+    degrees we are offset from 0.  Then, for the j value we do the same, except
+    we use sine.  All angles passed as paramaters to cos() and sin() are
+    converted to radians first.
     */
     VectorDouble frontRightRotationVector(z * cos((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)), z * sin((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)));
     VectorDouble frontLeftRotationVector(z * cos((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)), z * sin((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)));
     VectorDouble rearLeftRotationVector(z * cos((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)), z * sin((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)));
     VectorDouble rearRightRotationVector(z * cos((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)), z * sin((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)));
 
- // VectorDouble frontRightRotationVector(z * cos(R_angleFromCenterToFrontRightWheel), z * sin(R_angleFromCenterToFrontRightWheel));
-  //  VectorDouble frontLeftRotationVector(z * cos(R_angleFromCenterToFrontLeftWheel ), z * sin(R_angleFromCenterToFrontLeftWheel));
-  //  VectorDouble rearLeftRotationVector(z * cos(R_angleFromCenterToRearLeftWheel ), z * sin(R_angleFromCenterToRearLeftWheel));
-  //  VectorDouble rearRightRotationVector(z * cos(R_angleFromCenterToRearRightWheel), z * sin(R_angleFromCenterToRearRightWheel));
-
-
-
     /*
     And the vector we actually want to apply to the swerves is the sum of
     the two vectors - the vector that forms "straight" (translationVector)
-    and the vector that forms strictly the rotation (rotationVector).
+    and the vector that forms strictly the rotation (rotationVector).  This
+    vector is FIELD-ORIENTED!
     */
     VectorDouble frontRightResultVector = translationVector + frontRightRotationVector;
     VectorDouble frontLeftResultVector = translationVector + frontLeftRotationVector;
     VectorDouble rearLeftResultVector = translationVector + rearLeftRotationVector;
     VectorDouble rearRightResultVector = translationVector + rearRightRotationVector;
-
-  //  adjustVectorByGyro(frontRightResultVector);
-  //  adjustVectorByGyro(frontLeftResultVector);
-  //  adjustVectorByGyro(rearRightResultVector);
-  //  adjustVectorByGyro(rearLeftResultVector);
 
     //If the controller is in the total deadzone (entirely still)...
     if (getControllerInDeadzone(controller)) {
@@ -91,14 +75,24 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         setDriveSpeed(0);
         //navX->resetAll();
     }
+    
     //Otherwise, go to the result vectors and use the magnitude to set the
-    //speed of driving.
+    //speed of driving, and set each wheel's swerve position based on its
+    //respective resulting vector.
     else {
+        /*
+        Here, all of the resulting vectors (in FIELD-ORIENTED form) are
+        converted into nics so that they can be written to the swerve modules
+        using assumeSwervePosition().  We get nics from degrees by calling
+        degreesToNics() and passing it the angle of the resulting vector + our
+        offset (becuase the vector is FIELD-ORIENTED) - 90 (becuase we need it
+        in the poper form, unit cirle.
+        */
 
-        m_frontRight->assumeSwervePosition(m_frontRight->getSwerveNearestZeroPosition() + (R_nicsConstant * (frontRightResultVector.getUnitCircleRadianAngle() + angle - 90) / 360));
-        m_frontLeft->assumeSwervePosition(m_frontLeft->getSwerveNearestZeroPosition() + (R_nicsConstant * (frontLeftResultVector.getUnitCircleRadianAngle() + angle - 90) / 360));
-        m_rearLeft->assumeSwervePosition(m_rearLeft->getSwerveNearestZeroPosition() + (R_nicsConstant * (rearLeftResultVector.getUnitCircleRadianAngle() + angle - 90) / 360));
-        m_rearRight->assumeSwervePosition(m_rearRight->getSwerveNearestZeroPosition() + (R_nicsConstant * (rearRightResultVector.getUnitCircleRadianAngle() + angle - 90) / 360));
+        m_frontRight->assumeSwervePosition(m_frontRight->getSwerveNearestZeroPosition() + degreesToNics(frontRightResultVector.getUnitCircleRadianAngle() + angle - 90));
+        m_frontLeft->assumeSwervePosition(m_frontLeft->getSwerveNearestZeroPosition() + degreesToNics(frontLeftResultVector.getUnitCircleRadianAngle() + angle - 90));
+        m_rearLeft->assumeSwervePosition(m_rearLeft->getSwerveNearestZeroPosition() + degreesToNics(rearLeftResultVector.getUnitCircleRadianAngle() + angle - 90));
+        m_rearRight->assumeSwervePosition(m_rearRight->getSwerveNearestZeroPosition() + degreesToNics(rearRightResultVector.getUnitCircleRadianAngle() + angle - 90));
 
         m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * R_zionExecutionCap);
         m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * R_zionExecutionCap);
