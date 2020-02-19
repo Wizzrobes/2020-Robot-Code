@@ -42,7 +42,7 @@ struct VectorDouble {
             return sqrt(pow(i, 2) + pow(j, 2));
         }
 
-        double getUnitCircleRadianAngle() {
+        double getUnitCircleDegreeAngle() {
             double calculatedAngle = 0;
 
             if (i > 0 && j > 0) {

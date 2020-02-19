@@ -67,6 +67,8 @@ Private Methods
 
 #include "RobotMap.h"
 
+#include "VectorDouble.h"
+
 class SwerveModule {
 
     public:
@@ -156,6 +158,10 @@ class SwerveModule {
         void assumeSwerveNearestZeroPosition() {
 
             assumeSwervePosition(getSwerveNearestZeroPosition());
+        }
+
+        double getSwerveRotatingPosition(VectorDouble &vector, const double &angle) {//rename
+            return getSwerveNearestZeroPosition() + (R_nicsConstant * (vector.getUnitCircleDegreeAngle() + angle - 90.) / 360.);
         }
 
     private:
