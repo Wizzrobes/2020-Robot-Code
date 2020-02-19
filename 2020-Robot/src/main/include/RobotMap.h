@@ -36,11 +36,11 @@ const int R_playerOneControllerPort = 0;
 const int R_playerTwoControllerPort = 1;
 
 //This deadzone is used to determine when the controller is completely motionless
-const double R_controllerDeadzone = .075;
+const double R_controllerDeadzone = .0175;
 //And this one is to determine when rotation is being induced, as simply operation
 //of the controller often results in errant rotation. Due to how easy it is to
 //drift, it is significantly higher.
-const double R_controllerZDeadzone = .3;
+const double R_controllerZDeadzone = .4;
 // This deadzone is for the horizontal offset of the limelight because Zion does not
 // have to be perfectly on center with the target. In degrees.
 const double R_limelightXDeadzone = 0.75;
@@ -55,7 +55,7 @@ const int R_zeroButtonRR = 0;
 
 /*_____Global Robot Variable Settigns_____*/
 //This is the highest decimal percentage of full speed that Zion can actually go.
-const double R_zionExecutionCap = .75;
+const double R_zionExecutionCap = .5;
 //And this is the execution cap for how fast manual zeroing can occur.
 const double R_controllerZeroExecutionCap = .1;
 //This is the speed for automatic lateral movement in autonomous.
@@ -69,7 +69,11 @@ const double R_nicsConstant = 17.9761447906494;
 //is the radian measure between the y-axis and the front right wheel. This is
 //the basic unit of a non-moving center turn, and it is modified as the basis
 //for moving and turning at the same time.
-const double R_angleFromCenterToFrontRightWheel = (M_PI / 4.0);
+const double R_angleFromCenterToFrontLeftWheel = 45.;
+const double R_angleFromCenterToFrontRightWheel = 315.;
+const double R_angleFromCenterToRearLeftWheel = 135.;
+const double R_angleFromCenterToRearRightWheel = 225.;
+
 
 //These contants are used for the functions which provide assuming a position.
 //See those functions for further detail.

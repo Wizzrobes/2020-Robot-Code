@@ -43,6 +43,14 @@ class NavX {
 
             return navX->GetYaw();
         }
+
+        double getYawFull(){
+            if(getYaw() < 0) {
+                return getYaw() + 360;
+            } else {
+                return getYaw();
+            }
+        }
         double getAngle() {
 
             return navX->GetAngle();

@@ -9,14 +9,16 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
 
     //All value are inverted as the functions' logic is written for an upside-down Zion
     //TODO: Why does uninverting X solve our issues?
-    double x = controller->GetX();
+    double x = -controller->GetX();
     double y = -controller->GetY();
-    double z = -controller->GetZ();
+    double z = controller->GetZ();
+
+    double angle = navX->getYawFull(); 
     //To prevent controller drift, if the values of X, Y, and Z are inside of
     //deadzone, set them to 0
     forceControllerXYZToZeroInDeadzone(x, y, z);
 
-    optimizeZ(x, y, z); 
+   // optimizeZ(x, y, z); 
 
     /*
     The translation vector is the "standard" vector - that is, if no rotation
@@ -46,10 +48,17 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     direction - so axis inversion is used to ensure that traversing the
     swerves from frontRight clockwise compounds 90 to the rotation vector.
     */
-    VectorDouble frontRightRotationVector(z * cos(R_angleFromCenterToFrontRightWheel), z * sin(R_angleFromCenterToFrontRightWheel));
-    VectorDouble frontLeftRotationVector(z * cos(R_angleFromCenterToFrontRightWheel), -z * sin(R_angleFromCenterToFrontRightWheel));
-    VectorDouble rearLeftRotationVector(-z * cos(R_angleFromCenterToFrontRightWheel), -z * sin(R_angleFromCenterToFrontRightWheel));
-    VectorDouble rearRightRotationVector(-z * cos(R_angleFromCenterToFrontRightWheel), z * sin(R_angleFromCenterToFrontRightWheel));
+    VectorDouble frontRightRotationVector(z * cos((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)), z * sin((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)));
+    VectorDouble frontLeftRotationVector(z * cos((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)), z * sin((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)));
+    VectorDouble rearLeftRotationVector(z * cos((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)), z * sin((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)));
+    VectorDouble rearRightRotationVector(z * cos((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)), z * sin((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)));
+
+ // VectorDouble frontRightRotationVector(z * cos(R_angleFromCenterToFrontRightWheel), z * sin(R_angleFromCenterToFrontRightWheel));
+  //  VectorDouble frontLeftRotationVector(z * cos(R_angleFromCenterToFrontLeftWheel ), z * sin(R_angleFromCenterToFrontLeftWheel));
+  //  VectorDouble rearLeftRotationVector(z * cos(R_angleFromCenterToRearLeftWheel ), z * sin(R_angleFromCenterToRearLeftWheel));
+  //  VectorDouble rearRightRotationVector(z * cos(R_angleFromCenterToRearRightWheel), z * sin(R_angleFromCenterToRearRightWheel));
+
+
 
     /*
     And the vector we actually want to apply to the swerves is the sum of
@@ -61,31 +70,10 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     VectorDouble rearLeftResultVector = translationVector + rearLeftRotationVector;
     VectorDouble rearRightResultVector = translationVector + rearRightRotationVector;
 
-    /*
-    Due to the way that the vector math is completed, it is currently
-    possible for a vector's magnitude to evaluate to a value of greater
-    than 1. As this is in error to send to a speed controller, the following
-    calculations ensure that the magnitude of a vector will always evaluate
-    to exactly one in the event that it was over one. The rest of the motor
-    values then scale proportionally to this value, using the second block
-    of code, which prevents non-standard turning from occurring through
-    changing motor ratios not by a standard value.
-    */
-    double largestMagnitude = getLargestMagnitudeValue(frontRightResultVector.magnitude(), frontLeftResultVector.magnitude(), rearLeftResultVector.magnitude(), rearRightResultVector.magnitude());
-    if (largestMagnitude > 1) {
-
-        frontRightResultVector.i /= largestMagnitude;
-        frontRightResultVector.j /= largestMagnitude;
-
-        frontLeftResultVector.i /= largestMagnitude;
-        frontLeftResultVector.j /= largestMagnitude;
-
-        rearLeftResultVector.i /= largestMagnitude;
-        rearLeftResultVector.j /= largestMagnitude;
-
-        rearRightResultVector.i /= largestMagnitude;
-        rearRightResultVector.j /= largestMagnitude;
-    }
+  //  adjustVectorByGyro(frontRightResultVector);
+  //  adjustVectorByGyro(frontLeftResultVector);
+  //  adjustVectorByGyro(rearRightResultVector);
+  //  adjustVectorByGyro(rearLeftResultVector);
 
     //If the controller is in the total deadzone (entirely still)...
     if (getControllerInDeadzone(controller)) {
@@ -101,16 +89,16 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         */
         assumeNearestZeroPosition();
         setDriveSpeed(0);
-        navX->resetAll();
+        //navX->resetAll();
     }
     //Otherwise, go to the result vectors and use the magnitude to set the
     //speed of driving.
     else {
 
-        m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontRightResultVector));
-        m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(frontLeftResultVector));
-        m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearLeftResultVector));
-        m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearRightResultVector));
+        m_frontRight->assumeSwervePosition(m_frontRight->getSwerveNearestZeroPosition() + (R_nicsConstant * (frontRightResultVector.getUnitCircleRadianAngle() + angle - 90) / 360));
+        m_frontLeft->assumeSwervePosition(m_frontLeft->getSwerveNearestZeroPosition() + (R_nicsConstant * (frontLeftResultVector.getUnitCircleRadianAngle() + angle - 90) / 360));
+        m_rearLeft->assumeSwervePosition(m_rearLeft->getSwerveNearestZeroPosition() + (R_nicsConstant * (rearLeftResultVector.getUnitCircleRadianAngle() + angle - 90) / 360));
+        m_rearRight->assumeSwervePosition(m_rearRight->getSwerveNearestZeroPosition() + (R_nicsConstant * (rearRightResultVector.getUnitCircleRadianAngle() + angle - 90) / 360));
 
         m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * R_zionExecutionCap);
         m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * R_zionExecutionCap);
@@ -118,6 +106,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         m_rearRight->setDriveSpeed(rearRightResultVector.magnitude() * R_zionExecutionCap);
     }
 }
+
 void SwerveTrain::zeroController(frc::Joystick *controller) {
 
     //This one is also built for being upside down, so invert it.

@@ -42,6 +42,44 @@ struct VectorDouble {
             return sqrt(pow(i, 2) + pow(j, 2));
         }
 
+        double getUnitCircleRadianAngle() {
+            double calculatedAngle = 0;
+
+            if (i > 0 && j > 0) {
+                calculatedAngle = atan(j / i) * (180 / M_PI);
+            }
+            //if quadrant II
+            else if (i < 0 && j > 0) {
+                calculatedAngle = 180 - atan(j / -i) * (180 / M_PI);
+            }
+            //if quadrant III
+            else if (i < 0 && j < 0) {
+                calculatedAngle = 180 + atan(-j / -i) * (180 / M_PI);
+            }
+            //if quadrant IV
+            else if (i > 0 && j < 0) {
+                calculatedAngle = 360 - atan(-j / i) * (180 / M_PI);
+            }
+
+            else if (i == 0 && j > 0) {
+
+                calculatedAngle = 90;
+            }
+            else if (i == 0 && j < 0) {
+
+                calculatedAngle = 270;
+            }
+            else if (i > 0 && j == 0) {
+
+                calculatedAngle = 0;
+            }
+            else if (i < 0 && j == 0) {
+
+                calculatedAngle = 180;
+            }
+            return calculatedAngle; 
+        }
+
         double i;
         double j;
 };
