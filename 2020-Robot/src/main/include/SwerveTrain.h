@@ -186,6 +186,7 @@ class SwerveTrain {
         void driveController(frc::Joystick *controller);
         void zeroController(frc::Joystick *controller);
         void getTrenchRunPowerCells();
+        void returnToShootingPosition();
 
     private:
         SwerveModule *m_frontRight;
@@ -201,8 +202,6 @@ class SwerveTrain {
         void moveToTarget();
         void lineupShot();
         void shootAuto();
-      
-        void returnToShootingPosition();
         double getClockwiseREVRotationsFromCenter(frc::Joystick *controller);
         double getClockwiseREVRotationsFromCenter(const VectorDouble &vector);
         double getStandardDegreeAngleFromCenter(const double &x, const double &y);
