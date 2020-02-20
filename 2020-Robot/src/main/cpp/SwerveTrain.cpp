@@ -7,17 +7,17 @@
 
 void SwerveTrain::driveController(frc::Joystick *controller) {
 
-    //All value are inverted as the functions' logic is written for an upside-down Zion
-    //TODO: Why does uninverting X solve our issues?
+    //TODO: Why does inverting certain things work?
     double x = -controller->GetX();
     double y = -controller->GetY();
     double z = controller->GetZ();
 
-    double angle = 0.0; 
+    double angle = 0.;
     //To prevent controller drift, if the values of X, Y, and Z are inside of
     //deadzone, set them to 0
     forceControllerXYZToZeroInDeadzone(x, y, z);
 
+    //To prevent accidental turning, optimize Z to X and Y's magnitude.
     optimizeZ(x, y, z); 
 
     /*
@@ -31,35 +31,51 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     angle, so the gyro is needed to offset the vector described by X and Y.
     VectorDouble translationVector(0, 0);
     */
-    //VectorDouble translationVector = getTranslationVector(x, y, 0.0);
-    VectorDouble translationVector (-x, y); //check invert x and y
+    //TODO: why inverted?
+    VectorDouble translationVector (-x, y);
 
-    //this conditional stops the robot from being field oriented
-    if((abs(x) > 0 || abs(y) > 0) && abs(z) > 0) {
+    //This conditional stops the robot from being field oriented
+    //TODO: Make it more usable and state why
+    if ((abs(x) > 0 || abs(y) > 0) && abs(z) > 0) {
 
         angle = navX->getYawFull();
-    } else {
+    }
+    else {
+
         navX->resetYaw(); 
     }
+
     /*
-    The rotational vecots are found by multiplying the controller's
-    rotational axis [-1, 1] by cosine of the wheel's RELATIVE yaw (the standard
-    position we put the wheels in so that it can turn) minus the number of
-    degrees we are offset from 0.  Then, for the j value we do the same, except
-    we use sine.  All angles passed as paramaters to cos() and sin() are
-    converted to radians first.
+    The rotational vectors are found by multiplying the controller's
+    rotational axis [-1, 1] by the cosine of the wheel's RELATIVE yaw (the
+    position we put the wheels in so that it can turn, with zero at the top)
+    minus the number of degrees we are offset from 0.  Then, for the j value
+    we do the same, except we use sine, for Y.  All angles passed as paramaters
+    to cos() and sin() are converted to radians first.
     */
-    VectorDouble frontRightRotationVector(  z * cos((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)),
-                                            z * sin((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)));
+    VectorDouble frontRightRotationVector (
 
-    VectorDouble frontLeftRotationVector(   z * cos((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)),
-                                            z * sin((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)));
+        z * cos((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)),
+        z * sin((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180))
+    );
 
-    VectorDouble rearLeftRotationVector(    z * cos((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)),
-                                            z * sin((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)));
+    VectorDouble frontLeftRotationVector (
 
-    VectorDouble rearRightRotationVector(   z * cos((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)),
-                                            z * sin((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)));
+        z * cos((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)),
+        z * sin((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180))
+    );
+
+    VectorDouble rearLeftRotationVector (
+
+        z * cos((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)),
+        z * sin((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180))
+    );
+
+    VectorDouble rearRightRotationVector (
+
+        z * cos((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)),
+        z * sin((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180))
+    );
 
     /*
     And the vector we actually want to apply to the swerves is the sum of
@@ -91,17 +107,18 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     //speed of driving, and set each wheel's swerve position based on its
     //respective resulting vector.
     else {
+
         /*
         Here, all of the resulting vectors are
-        converted into nics so that they can be written to the swerve modules
-        using assumeSwervePosition().  We get nics from degrees by calling
+        converted into Nics so that they can be written to the swerve modules
+        using assumeSwervePosition().  We get Nics from degrees by calling
         getSwerveRotatingPosition().
         */
 
-        m_frontRight->assumeSwervePosition(m_frontRight->getTurnAroundCenterSwervePosition(frontRightResultVector, angle));
-        m_frontLeft->assumeSwervePosition(m_frontLeft->getTurnAroundCenterSwervePosition(frontLeftResultVector, angle));
-        m_rearLeft->assumeSwervePosition(m_rearLeft->getTurnAroundCenterSwervePosition(rearLeftResultVector, angle));
-        m_rearRight->assumeSwervePosition(m_rearRight->getTurnAroundCenterSwervePosition(rearRightResultVector, angle));
+        m_frontRight->assumeSwervePosition(m_frontRight->getStandardDegreeSwervePosition(frontRightResultVector, angle));
+        m_frontLeft->assumeSwervePosition(m_frontLeft->getStandardDegreeSwervePosition(frontLeftResultVector, angle));
+        m_rearLeft->assumeSwervePosition(m_rearLeft->getStandardDegreeSwervePosition(rearLeftResultVector, angle));
+        m_rearRight->assumeSwervePosition(m_rearRight->getStandardDegreeSwervePosition(rearRightResultVector, angle));
 
         m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * R_zionExecutionCap);
         m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * R_zionExecutionCap);

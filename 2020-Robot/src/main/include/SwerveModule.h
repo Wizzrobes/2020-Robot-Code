@@ -32,6 +32,8 @@ Public Methods
     double getSwerveSpeed(): Returns the speed of the swerve encoder in RPM.
     Note that the values returned by the get functions persist across disables, but
         not across power cycles.
+    double getStandardDegreeSwervePosition(VectorDouble&, const double&):
+        D O C U M E N T  M E
     void assumeSwervePosition(const double& positionToAssume): Uses a
         mathematical function to assign a speed to the swerve motor to move
         quickly and accurately, within a tolerance, to any REV rotation value,
@@ -149,6 +151,11 @@ class SwerveModule {
 
             return m_swerveMotorEncoder->GetVelocity();
         }
+        //TODO: Inline function documentation
+        double getStandardDegreeSwervePosition(VectorDouble &vector, const double &angle) {
+
+            return getSwerveNearestZeroPosition() + (R_nicsConstant * (vector.getUnitCircleDegreeAngle() + angle - 90.) / 360.);
+        }
 
         void assumeSwervePosition(const double &positionToAssume);
         void assumeSwerveZeroPosition() {
@@ -158,10 +165,6 @@ class SwerveModule {
         void assumeSwerveNearestZeroPosition() {
 
             assumeSwervePosition(getSwerveNearestZeroPosition());
-        }
-
-        double getTurnAroundCenterSwervePosition(VectorDouble &vector, const double &angle) {
-            return getSwerveNearestZeroPosition() + (R_nicsConstant * (vector.getUnitCircleDegreeAngle() + angle - 90.) / 360.);
         }
 
     private:

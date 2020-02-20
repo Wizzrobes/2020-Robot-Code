@@ -78,6 +78,11 @@ Private Methods
         speed at which to rotate for the assumeAngle() function based on how
         far away from the target angle we are. Uses a regression to do so, very
         similar to calculateAssumePositionSpeed() in SwerveModule.
+    void optimizeZ(const double&, const double&, double&): Scales the value
+        of the supplied Z double based on the magnitude of the supplied
+        X and Y doubles. Since the joystick is easy to accidentally rotate
+        when driving at high speeds, this makes it much more difficult to
+        accidentally turn the robot. See the function for the math.
     double getControllerAbsoluteMagnitude(frc::Joystick*): Gets the
         unsigned velocity of the control stick using only absolute value.
     bool getControllerInDeadzone(frc::Joystick*): If all axis of the
@@ -234,6 +239,29 @@ class SwerveTrain {
             }
         }
 
+        //TODO: Inline function documentation
+        void optimizeZ(const double &x, const double &y, double &z) {
+
+            double magnitudeXY = sqrt(x * x + y * y); 
+            double absZ = abs(z);
+            double deadzoneAdjustmentZ = R_controllerZDeadzone + .3 * magnitudeXY * R_controllerZDeadzone;
+
+            if (z > deadzoneAdjustmentZ) {
+
+                z -= deadzoneAdjustmentZ - R_controllerDeadzone;
+
+            }
+            else if (z < - deadzoneAdjustmentZ) {
+
+                z += deadzoneAdjustmentZ - R_controllerDeadzone;
+            }
+
+            if (absZ < deadzoneAdjustmentZ) {
+
+                z = 0;
+            }
+        }
+
         double getControllerAbsoluteMagnitude(frc::Joystick *controller) {
 
             //Get the absolute values of the joystick coordinates
@@ -266,20 +294,5 @@ class SwerveTrain {
             if (absY < R_controllerDeadzone) {y = 0;}
             if (absZ < R_controllerZDeadzone) {z = 0;}
 
-        }
-
-        void optimizeZ(double &x, double &y, double &z) {
-            double xyMagnitude = sqrt(x*x + y*y); 
-            double absZ = abs(z);
-            double zDeadzoneAdjustment = R_controllerZDeadzone + .3 * xyMagnitude * R_controllerZDeadzone; //possible lessening of xyMagnitude*absZ adjustment
-
-            if(z > zDeadzoneAdjustment) {
-                z -= (zDeadzoneAdjustment - R_controllerDeadzone); 
-            } else if(z < -zDeadzoneAdjustment){z += (zDeadzoneAdjustment - R_controllerDeadzone);}
-            
-            if(absZ < zDeadzoneAdjustment) {z = 0;} 
-
-            //z is altered by a deadzone adjustment that ensures that once the deadzone is left the values smoothly increase 
-            //tbe subtration of the standard controller deadzone parallels the exit of deadzone in standard xy movement
         }
 };
