@@ -41,6 +41,7 @@ Public Methods
     void assumeAngle(const double&): Rotates to the supplied angle based
         on the current angle of the NavX attached to Zion. Finding this
         angle will likely require using the gyro, as it is relative.
+    double degreesToNics(const double &angle): Convert the given angle to Nics.
     void lineupToTarget(const double&, const double&, const double&, const double&):
         Uses two distances from the wall (left and right from the front), an
         offset from a target, and the desired distance away from the target to
@@ -53,8 +54,8 @@ Public Methods
         a mapped button which is held down in correspondence to a motor
         to slowly override its zero from that controller's joystick
         value. This allows manual adjustment from an enabled state in case of
-        either drift or error. CURRENTLY WRITTEN FOR A JOYSTICK, WILL LIKELY
-        NEED TO CHANGE.
+        either drift or error.
+        TODO: CURRENTLY WRITTEN FOR A JOYSTICK, WILL LIKELY NEED TO CHANGE.
 
 Private Methods
 
@@ -77,6 +78,10 @@ Private Methods
         speed at which to rotate for the assumeAngle() function based on how
         far away from the target angle we are. Uses a regression to do so, very
         similar to calculateAssumePositionSpeed() in SwerveModule.
+    void optimizeControllerXYToZ(const double&, const double&, double &z):
+        Scales the value of X with a propotion constant to the magnitude of
+        X and Y. Makes rotation harder to incude as speed increases, which
+        makes strafing with a joystick much more reliable.
     double getControllerAbsoluteMagnitude(frc::Joystick*): Gets the
         unsigned velocity of the control stick using only absolute value.
     bool getControllerInDeadzone(frc::Joystick*): If all axis of the
@@ -85,10 +90,6 @@ Private Methods
     void forceControllerXYZToZeroInDeadzone(const int&, const int&, const int&):
         If any of the passed X, Y, or Z values fall outside of their global
         deadzone, they will be set to 0. Otherwise, they are untouched.
-    void optimizeControllerXYToZ(const double&, const double&, double &z):
-        Scales the value of X with a propotion constant to the magnitude of
-        X and Y. Makes rotation harder to incude as speed increases, which
-        makes strafing with a joystick much more reliable.
 */
 
 #pragma once
@@ -192,6 +193,12 @@ class SwerveTrain {
                 setDriveSpeed(0);
             }
         }
+
+        double degreesToNics(const double &angle) {
+
+            return R_nicsConstant * angle / 360;
+        }
+
         void lineupToTarget(const double &leftDistToWall, const double &rightDistToWall, const double &targetOffset, const double &targetDistance);
 
         void driveController(frc::Joystick *controller);
@@ -231,6 +238,27 @@ class SwerveTrain {
             }
         }
 
+        //TODO: Inline function documentation
+        void optimizeControllerXYToZ(const double &x, const double &y, double &z) {
+
+            double magnitudeXY = sqrt(x*x + y*y);
+            double absZ = abs(z);
+            double deadzoneAdjustmentZ = R_deadzoneControllerZ + .3 * magnitudeXY * R_deadzoneControllerZ;
+
+            if (z > deadzoneAdjustmentZ) {
+
+                z -= (deadzoneAdjustmentZ - R_deadzoneController); 
+            }
+            else if (z < -deadzoneAdjustmentZ) {
+
+                z += (deadzoneAdjustmentZ - R_deadzoneController);
+            }
+            if (absZ < deadzoneAdjustmentZ) {
+
+                z = 0;
+            }
+        }
+
         double getControllerAbsoluteMagnitude(frc::Joystick *controller) {
 
             //Get the absolute values of the joystick coordinates
@@ -262,26 +290,5 @@ class SwerveTrain {
             if (absX < R_deadzoneController) {x = 0;}
             if (absY < R_deadzoneController) {y = 0;}
             if (absZ < R_deadzoneController) {z = 0;}
-        }
-
-        //TODO: Inline function documentation
-        void optimizeControllerXYToZ(const double &x, const double &y, double &z) {
-
-            double magnitudeXY = sqrt(x*x + y*y);
-            double absZ = abs(z);
-            double deadzoneAdjustmentZ = R_deadzoneControllerZ + .3 * magnitudeXY * R_deadzoneControllerZ;
-
-            if (z > deadzoneAdjustmentZ) {
-
-                z -= (deadzoneAdjustmentZ - R_deadzoneController); 
-            }
-            else if (z < -deadzoneAdjustmentZ) {
-
-                z += (deadzoneAdjustmentZ - R_deadzoneController);
-            }
-            if (absZ < deadzoneAdjustmentZ) {
-
-                z = 0;
-            }
         }
 };

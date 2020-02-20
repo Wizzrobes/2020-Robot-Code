@@ -64,6 +64,7 @@ const double R_executionCapIntake = .75;
 const double R_launcherDefaultSpeedIndex = 1;
 //And this the default launcher launch speed.
 const double R_launcherDefaultSpeedLaunch = .745;
+
 //This is the speed for automatic lateral movement in autonomous. CHANGE AFTER AUTO DRIVER
 const double R_zionAutoLateralMovementSpeed = .4;
 
@@ -75,7 +76,11 @@ const double R_nicsConstant = 17.9761447906494;
 //is the radian measure between the y-axis and the front right wheel. This is
 //the basic unit of a non-moving center turn, and it is modified as the basis
 //for moving and turning at the same time.
-const double R_angleFromCenterToFrontRightWheel = (M_PI / 4.0);
+const double R_angleFromCenterToFrontLeftWheel = 45.;
+const double R_angleFromCenterToFrontRightWheel = 315.;
+const double R_angleFromCenterToRearLeftWheel = 135.;
+const double R_angleFromCenterToRearRightWheel = 225.;
+
 
 //These contants are used for the functions which provide assuming a position.
 //See those functions for further detail.

@@ -13,6 +13,8 @@ Public Methods:
     VectorDouble operator+ const(VectorDouble&): Returns the resultant vector
         of the addition of two VectorDoubles.
     double magnitude(): Returns the magnitude of a VectorDouble.
+    double unitCircleAngleDeg(): Returns the angle in degrees of the operated
+        vector when inscribed in standard position.
 */
 
 #pragma once
@@ -40,6 +42,49 @@ struct VectorDouble {
         double magnitude() {
 
             return sqrt(pow(i, 2) + pow(j, 2));
+        }
+        //TODO: Inline function documentation
+        double unitCircleAngleDeg() {
+
+            double calculatedAngle = 0;
+
+            //Quadrant I
+            if (i > 0 && j > 0) {
+
+                calculatedAngle = atan(j / i) * (180 / M_PI);
+            }
+            //Quadrant II
+            else if (i < 0 && j > 0) {
+
+                calculatedAngle = 180 - atan(j / -i) * (180 / M_PI);
+            }
+            //Quadrant III
+            else if (i < 0 && j < 0) {
+
+                calculatedAngle = 180 + atan(-j / -i) * (180 / M_PI);
+            }
+            //Quadrant IV
+            else if (i > 0 && j < 0) {
+
+                calculatedAngle = 360 - atan(-j / i) * (180 / M_PI);
+            }
+            else if (i == 0 && j > 0) {
+
+                calculatedAngle = 90;
+            }
+            else if (i == 0 && j < 0) {
+
+                calculatedAngle = 270;
+            }
+            else if (i > 0 && j == 0) {
+
+                calculatedAngle = 0;
+            }
+            else if (i < 0 && j == 0) {
+
+                calculatedAngle = 180;
+            }
+            return calculatedAngle; 
         }
 
         double i;

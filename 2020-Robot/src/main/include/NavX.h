@@ -8,6 +8,8 @@ Constructors
 Public Methods
 
     double getYaw(): Returns the yaw value.
+    double getYawFull(): Returns the yaw value from 0-360.
+        Rolls over at extremes; used with the standard unit circle.
     double getAngle(): Returns the angle value.
     double getAbsoluteAngle(): Returns the absolute value of the angle value.
     void resetYaw(): Sets the yaw value to zero.
@@ -45,6 +47,18 @@ class NavX {
         double getYaw() {
 
             return navX->GetYaw();
+        }
+        //TODO: Does this promote any benefit over getAngle()?
+        double getYawFull(){
+
+            if (getYaw() < 0) {
+
+                return getYaw() + 360;
+            }
+            else {
+
+                return getYaw();
+            }
         }
         double getAngle() {
 
