@@ -6,90 +6,92 @@ class SwerveTrain
 
 Constructors
 
-    SwerveTrain(SwerveModule&, SwerveModule&, SwerveModule&, SwerveModule&,
-        NavX&):
+    SwerveTrain(SwerveModule&, SwerveModule&, SwerveModule&, SwerveModule&, NavX&)
         Creates a swerve train with the swerve modules on the front right,
         front left, back left, and back right positions, and takes a NavX
         for use in calculating rotational vectors.
 
 Public Methods
 
-    void setDriveSpeed(const double&): Sets a speed to all driving motors on
-        the train.
-    void setSwerveSpeed(const double&): Sets a speed to all swerve motors on
-        the train.
-    void setZeroPosition(const bool& = false): Gets the current encoder values
-        of the swerve motors and stores them as privates of the class. These
-        are the values the swerve motors return to when invoking
-        assumeSwerveZeroPosition().
+    void setDriveSpeed(const double&)
+        Sets a speed to all driving motors on the train.
+    void setSwerveSpeed(const double&)
+        Sets a speed to all swerve motors on the train.
+    void setZeroPosition(const bool& = false)
+        Gets the current encoder values of the swerve motors and stores them
+        as privates of the class. These are the values the swerve motors return
+        to when invoking assumeSwerveZeroPosition().
         If the passed bool is true, publishes the stored data to the
         SmartDashboard. This is currently used for returning to and maintaining
         "straight".
-    void assumeZeroPosition(): Drives the swerves to return to their
-        zero position.
-    void assumeNearestZeroPosition(): Drives the swerves to the
-        nearest Nic's Constant multiple of its zero value, CW or CCW.
-        In doing so, really only drives the swerve to either 0 or
-        the value of one Nic's Constant. Since the pathfinding function
+    void assumeZeroPosition()
+        Drives the swerves to return to their zero position.
+    void assumeNearestZeroPosition()
+        Drives the swerves to the nearest Nic's Constant multiple of its zero
+        value, CW or CCW. In doing so, really only drives the swerve to either
+        0 or the value of one Nic's Constant. Since the pathfinding function
         thinks clockwise, this ends up driving it to zero the fastest
         way possible, making use of getSwervePositionSingleRotation() as
         the driver function to make this possible. assumeSwerveZeroPosition()
         cannot make this optimization, and simply goes to whatever the zero
         value is. Useful for low-level things.
-    void publishSwervePositions(): Puts the current swerve encoder positions
-        to the SmartDashboard.
-    void assumeAngle(const double&): Rotates to the supplied angle based
-        on the current angle of the NavX attached to Zion. Finding this
-        angle will likely require using the gyro, as it is relative.
-    double degreesToNics(const double &angle): Convert the given angle to Nics.
-    void lineupToTarget(const double&, const double&, const double&, const double&):
+    void publishSwervePositions()
+        Puts the current swerve encoder positions to the SmartDashboard.
+    void assumeAngle(const double&)
+        Rotates to the supplied angle based on the current angle of the NavX
+        attached to Zion. Finding this angle will likely require using the
+        gyro, as it is relative.
+    void lineupToTarget(const double&, const double&, const double&, const double&)
         Uses two distances from the wall (left and right from the front), an
         offset from a target, and the desired distance away from the target to
         drive Zion such that it will square itself with the wall, shift to align
         with the target, and then move forward or backward to achieve the
         desired distance.
-    void driveController(): Fully drives the swerve train on the supplied
-        controller.
-    void zeroController(): Allows use of a controller through
-        a mapped button which is held down in correspondence to a motor
-        to slowly override its zero from that controller's joystick
-        value. This allows manual adjustment from an enabled state in case of
-        either drift or error.
-        TODO: CURRENTLY WRITTEN FOR A JOYSTICK, WILL LIKELY NEED TO CHANGE.
+    void driveController()
+        Fully drives the swerve train on the supplied controller.
+    void zeroController()
+        Allows use of a controller through a mapped button which is held down
+        in correspondence to a motor to slowly override its zero from that
+        controller's joystick value. This allows manual adjustment from an
+        enabled state in case of either drift or error.
+        TODO: CURRENTLY WRITTEN FOR A JOYSTICK, WILL NEED TO CHANGE.
 
 Private Methods
 
-    double getClockwiseREVRotationsFromCenter(frc::Joystick*):
+    double getClockwiseREVRotationsFromCenter(frc::Joystick*)
         Discernes how many clockwise REV rotations from center the current
         location of the joystick is using vector trigonometry and properties.
         See https://en.wikipedia.org/wiki/Dot_product#Geometric_definition
-    double getClockwiseREVRotationsFromCenter(const VectorDouble&):
+    double getClockwiseREVRotationsFromCenter(const VectorDouble&)
         Same as above, but accepts a vector outright instead of stripping
         one from the supplied controller.
-    double getStandardDegreeAngleFromCenter(const double&, const double&): Same
-        as above, but returns the result as a degree measure in standard
+    double getStandardDegreeAngleFromCenter(const double&, const double&)
+        Same as above, but returns the result as a degree measure in standard
         position.
-    double getLargestMagnitudeValue(const double&, const double&, const double&, const double&):
+    double getLargestMagnitudeValue(const double&, const double&, const double&, const double&)
         Returns the largest of the four values passed to the function.
-    VectorDouble getTranslationVector(const double&, const double&, double):
+    VectorDouble getTranslationVector(const double&, const double&, double)
         Calculates the translation vector to be used in total swerve movement
         calculation by the control function. See the function itself for more.
-    double calculateAssumeAngleRotationSpeed(const double&): Calculates the
-        speed at which to rotate for the assumeAngle() function based on how
-        far away from the target angle we are. Uses a regression to do so, very
-        similar to calculateAssumePositionSpeed() in SwerveModule.
-    void optimizeControllerXYToZ(const double&, const double&, double &z):
-        Scales the value of X with a propotion constant to the magnitude of
-        X and Y. Makes rotation harder to incude as speed increases, which
-        makes strafing with a joystick much more reliable.
-    double getControllerAbsoluteMagnitude(frc::Joystick*): Gets the
-        unsigned velocity of the control stick using only absolute value.
-    bool getControllerInDeadzone(frc::Joystick*): If all axis of the
-        controller are within their RobotMap deadzone variables for
-        playerOne's controller, returns true; otherwise, returns false.
-    void forceControllerXYZToZeroInDeadzone(const int&, const int&, const int&):
+    double calculateAssumeAngleRotationSpeed(const double&)
+        Calculates the speed at which to rotate for the assumeAngle() function
+        based on how far away from the target angle we are. Uses a regression
+        to do so, very similar to calculateAssumePositionSpeed() in
+        SwerveModule.
+    double getControllerAbsoluteMagnitude(frc::Joystick*)
+        Gets the unsigned velocity of the control stick using only absolute
+        value.
+    bool getControllerInDeadzone(frc::Joystick*)
+        If all axis of the controller are within their RobotMap deadzone
+        variables for playerOne's controller, returns true; otherwise, returns
+        false.
+    void forceControllerXYZToZeroInDeadzone(const int&, const int&, const int&)
         If any of the passed X, Y, or Z values fall outside of their global
         deadzone, they will be set to 0. Otherwise, they are untouched.
+    void optimizeControllerXYToZ(const double&, const double&, double &)
+        Scales the value of Z with a propotion constant to the magnitude of
+        X and Y. Makes rotation harder to incude as speed increases, which
+        makes strafing with a joystick much more reliable.
 */
 
 #pragma once
@@ -194,22 +196,12 @@ class SwerveTrain {
             }
         }
 
-        double degreesToNics(const double &angle) {
-
-            return R_nicsConstant * angle / 360;
-        }
-
         void lineupToTarget(const double &leftDistToWall, const double &rightDistToWall, const double &targetOffset, const double &targetDistance);
 
         void driveController(frc::Joystick *controller);
         void zeroController(frc::Joystick *controller);
 
     private:
-        SwerveModule *m_frontRight;
-        SwerveModule *m_frontLeft;
-        SwerveModule *m_rearLeft;
-        SwerveModule *m_rearRight;
-        NavX *navX;
 
         double getClockwiseREVRotationsFromCenter(frc::Joystick *controller);
         double getClockwiseREVRotationsFromCenter(const VectorDouble &vector);
@@ -235,27 +227,6 @@ class SwerveTrain {
             else {
 
                 return speed;
-            }
-        }
-
-        //TODO: Inline function documentation
-        void optimizeControllerXYToZ(const double &x, const double &y, double &z) {
-
-            double magnitudeXY = sqrt(x*x + y*y);
-            double absZ = abs(z);
-            double deadzoneAdjustmentZ = R_deadzoneControllerZ + .3 * magnitudeXY * R_deadzoneControllerZ;
-
-            if (z > deadzoneAdjustmentZ) {
-
-                z -= (deadzoneAdjustmentZ - R_deadzoneController); 
-            }
-            else if (z < -deadzoneAdjustmentZ) {
-
-                z += (deadzoneAdjustmentZ - R_deadzoneController);
-            }
-            if (absZ < deadzoneAdjustmentZ) {
-
-                z = 0;
             }
         }
 
@@ -291,4 +262,30 @@ class SwerveTrain {
             if (absY < R_deadzoneController) {y = 0;}
             if (absZ < R_deadzoneController) {z = 0;}
         }
+        //TODO: Inline function documentation
+        void optimizeControllerXYToZ(const double &x, const double &y, double &z) {
+
+            double magnitudeXY = sqrt(x * x + y * y);
+            double absZ = abs(z);
+            double deadzoneAdjustmentZ = R_deadzoneControllerZ + .3 * magnitudeXY * R_deadzoneControllerZ;
+
+            if (z > deadzoneAdjustmentZ) {
+
+                z -= (deadzoneAdjustmentZ - R_deadzoneController); 
+            }
+            else if (z < -deadzoneAdjustmentZ) {
+
+                z += (deadzoneAdjustmentZ - R_deadzoneController);
+            }
+            if (absZ < deadzoneAdjustmentZ) {
+
+                z = 0;
+            }
+        }
+
+        SwerveModule *m_frontRight;
+        SwerveModule *m_frontLeft;
+        SwerveModule *m_rearLeft;
+        SwerveModule *m_rearRight;
+        NavX *navX;
 };

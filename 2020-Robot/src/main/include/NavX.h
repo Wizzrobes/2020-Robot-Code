@@ -3,20 +3,27 @@ class NavX
 
 Constructors
 
-    NavX(const int&): Creates a NavX on the specified interface (kUSB, kMXP)
+    NavX(const int&)
+        Creates a NavX on the specified interface (kUSB, kMXP)
 
 Public Methods
 
-    double getYaw(): Returns the yaw value.
-    double getYawFull(): Returns the yaw value from 0-360.
+    double getYaw()
+        Returns the yaw value.
+    double getYawFull()
+        Returns the yaw value from 0-360.
         Rolls over at extremes; used with the standard unit circle.
-    double getAngle(): Returns the angle value.
-    double getAbsoluteAngle(): Returns the absolute value of the angle value.
-    void resetYaw(): Sets the yaw value to zero.
-    void resetAll(): Resets all NavX return values.
+    double getAngle()
+        Returns the angle value.
+    double getAbsoluteAngle()
+        Returns the absolute value of the angle value.
+    void resetYaw()
+        Sets the yaw value to zero.
+    void resetAll()
+        Resets all NavX return values.
 
-    enum ConnectionType: Used with the constructor to specify
-        which interface to construct on.
+    enum ConnectionType
+        Used with the constructor to specify which interface to construct on.
 */
 
 #pragma once

@@ -1,20 +1,22 @@
 /*
-class VectorDouble
+struct VectorDouble
 
 Constructors:
 
-    VectorDouble(const double&, const double&): Creates a 2D vector with its
-        components i and j, such that A<i,j>.
+    VectorDouble(const double&, const double&)
+        Creates a 2D vector with its components i and j, such that A<i,j>.
 
 Public Methods:
 
-    double operator* const(VectorDouble&): Returns the dot product of two
-        VectorDoubles.
-    VectorDouble operator+ const(VectorDouble&): Returns the resultant vector
-        of the addition of two VectorDoubles.
-    double magnitude(): Returns the magnitude of a VectorDouble.
-    double unitCircleAngleDeg(): Returns the angle in degrees of the operated
-        vector when inscribed in standard position.
+    double operator* const(VectorDouble&)
+        Returns the dot product of two VectorDoubles.
+    VectorDouble operator+ const(VectorDouble&)
+        Returns the resultant vector of the addition of two VectorDoubles.
+    double magnitude()
+        Returns the magnitude of the VectorDouble.
+    double unitCircleAngleDeg()
+        Returns the angle in degrees of the operated vector when inscribed in
+        standard position.
 */
 
 #pragma once

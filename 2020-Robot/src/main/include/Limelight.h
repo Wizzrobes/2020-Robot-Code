@@ -3,16 +3,19 @@ class Limelight
 
 Constructors
 
-    Limelight: Creates a limelight on the default NetworkTable.
+    Limelight
+        Creates a limelight on the default NetworkTable.
 
 Public Methods
 
-    double horizontalOffset(): Returns the horizontal offset of the target
-        (tx).
-    double verticalOffset(): Returns the vertical offset of the target (ty).
-    double targetArea(): Returns the area of the target in-sight.
-    bool target(): Returns true if there is a target in-sight, false
-        otherwise.
+    double horizontalOffset()
+        Returns the horizontal offset of the target (tx).
+    double verticalOffset()
+        Returns the vertical offset of the target (ty).
+    double targetArea()
+        Returns the area of the target in-sight.
+    bool target()
+        Returns true if there is a target in-sight, false otherwise.
 */
 
 #pragma once

@@ -27,9 +27,6 @@ const int R_CANIDmotorLauncherIndex  = 10;
 const int R_CANIDmotorLauncherLaunch = 11;
 /*___End RoboRIO CAN Bus ID Declarations___*/
 
-/*_____PCM Pin Declarations_____*/
-/*___End PCM Pin Declarations___*/
-
 /*_____Controller Settings_____*/
 const int R_controllerPortPlayerOne = 0;
 const int R_controllerPortPlayerTwo = 1;
@@ -80,7 +77,6 @@ const double R_angleFromCenterToFrontLeftWheel = 45.;
 const double R_angleFromCenterToFrontRightWheel = 315.;
 const double R_angleFromCenterToRearLeftWheel = 135.;
 const double R_angleFromCenterToRearRightWheel = 225.;
-
 
 //These contants are used for the functions which provide assuming a position.
 //See those functions for further detail.

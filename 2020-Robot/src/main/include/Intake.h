@@ -1,15 +1,16 @@
 /*
 class Intake
 
-    Constructors
+Constructors
 
-        Intake(const int&): Constructs an intake with a SPARK Max on the
-            designated CAN BUS ID.
+    Intake(const int&)
+        Constructs an intake with a SPARK Max on the designated CAN BUS ID
+        in order to actuate it with a brushed motor.
 
-    Public Methods
+Public Methods
 
-        void setSpeed(const double& = 0): Sets the speed of the intake
-            motor. Defaults to 0.
+    void setSpeed(const double& = 0)
+        Sets the speed of the intake motor. Defaults to 0.
 */
 
 #pragma once

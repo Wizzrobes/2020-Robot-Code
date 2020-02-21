@@ -46,16 +46,16 @@ class Arduino
 
 Constructors
 
-    Arduino(const frc::SerialPort::Port&, const int&): Creates a serial
-        interface called Arduino on the specified port at the specified
-        baud rate. These default to frc::SerialPort::Port::kUSB1 and
+    Arduino(const frc::SerialPort::Port&, const int&)
+        Creates a serial interface called Arduino on the specified port at the
+        specified baud rate. These default to frc::SerialPort::Port::kUSB1 and
         115200, respectively.
 
 Public Methods
 
-    std::string getRegister(const Register&): Takes a register as defined in
-        enum Register and returns a string of the values found there. Does
-        no error checking itself! :)
+    std::string getRegister(const Register&)
+        Takes a register as defined in enum Register and returns a string of
+        the values found there. Does no error checking itself! :)
     bool setRegister(const Register&, const std::string&): Takes a register
         as defined in enum Register and sets its full contents to the most
         usable data of the passed string starting at the beginning. Returns
@@ -67,13 +67,16 @@ Public Methods
         to this, the order is set, tx, rx, get. This allows a bit more control
         over the whole system. The entire thing is pretty low-level;
         be careful.
-    bool tx(): Configures and transmits the registry, returns false if any of
+    bool tx()
+        Configures and transmits the registry; returns false if any of
         those events fail at any time. If false is returned, no data was sent!
-    bool rx(): Tries to receive 32 bytes to place into the registry. If it
+    bool rx()
+        Tries to receive 32 bytes to place into the registry. If it
         gets all of them, sets it to the registry, if it doesn't, no data is
         updated! TODO: DOES NO ERROR CHECKING YET
 
-    enum Registry: Used as a paramater for the get and set function to denote
+    enum Registry
+        Used as a paramater for the get and set function to denote
         which register is being operated on in the registry.
 */
 
@@ -149,9 +152,9 @@ class Arduino {
         };
 
     private:
-        frc::SerialPort *arduino;
-
         //Setup a string to operate on the registry, and refer a StringRef to it for seial use
         std::string m_registry;
         wpi::StringRef m_registryRef = m_registry;
+
+        frc::SerialPort *arduino;
 };

@@ -3,19 +3,21 @@ class Climber
 
     Constructors
 
-        Climber(const int&, const int&): Create a climber with its primary
-            and secondary motors on the provided CAN Bus IDs.
+        Climber(const int&, const int&)
+            Create a climber with its primary and secondary motors on the
+                provided CAN Bus IDs.
 
     Public Methods
 
-        void setSpeed(const int&, const double& = 0): Sets the speed of the
-            supplied motor(s) to the passed double (defaults to 0).
-        void getSpeed(const int&): Returns the encoder speed of the supplied
-            motor in some REV value. Note that if both motors are passed,
-            zero is returned as an error!
+        void setSpeed(const int&, const double& = 0)
+            Sets the speed of the supplied motor(s) to the passed double
+            (defaults to 0).
+        void getSpeed(const int&)
+            Returns the encoder speed of the supplied motor in some REV value
+            Note that if both motors are passed, zero is returned as an error!
 
-        enum LiftMotor: Used to select which motor the set and get functions
-            operate on.
+        enum LiftMotor
+            Used to select which motor the set and get functions operate on.
 */
 
 #pragma once
@@ -39,7 +41,7 @@ class Climber {
 
         void setSpeed(const int &motor, const double &speedToSet = 0) {
 
-            switch(motor) {
+            switch (motor) {
 
                 case LiftMotor::kPrimary: m_primaryMotor->Set(speedToSet); break;
                 case LiftMotor::kSecondary: m_secondaryMotor->Set(speedToSet); break;
