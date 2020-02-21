@@ -58,6 +58,11 @@ void Robot::TeleopPeriodic() {
 
         zion.setZeroPosition();
     }
+    
+    if (playerOne->GetRawButton(1)) {
+        
+        navX.resetYaw();
+    }
     zion.driveController(playerOne);
 
 /*

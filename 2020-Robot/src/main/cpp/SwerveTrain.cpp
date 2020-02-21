@@ -13,7 +13,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     double z = controller->GetZ();
 
     //TODO: What is this?
-    double angle = 0.;
+    double angle = navX->getYawFull();
 
     //To prevent controller drift, if the values of X, Y, and Z are inside of
     //deadzone, set them to 0.
@@ -38,14 +38,14 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
 
     //This conditional stops the robot from being field oriented
     //TODO: Make it more usable and state why
-    if ((abs(x) > 0 || abs(y) > 0) && abs(z) > 0) {
+    /*if ((abs(x) > 0 || abs(y) > 0) && abs(z) > 0) {
 
         angle = navX->getYawFull();
     }
     else {
 
         navX->resetYaw(); 
-    }
+    }*/
 
     /*
     The rotational vectors are found by multiplying the controller's
