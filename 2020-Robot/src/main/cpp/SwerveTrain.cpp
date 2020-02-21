@@ -292,20 +292,19 @@ void SwerveTrain::moveToTarget() {
     //double secondGoalEncValue = secondEncodeValue + ((sideMovementDist / wheelCircumference) * R_kuhnsConstant);
 
 
-    // TODO: Fix later when can be called properly.
-    // Remove comment slashes when fixed; will not build otherwise.
-
-
+    // TODO: Fix when can be called properly.
     // Moves Zion left if target is not acquired. Unlikely to be too far right.
     while (!limelight.getTarget()) {
         driveAutonomous(backVector, R_zionAutoExecutionCap);
     }
+
     // Movement if Zion is left of target...
     while (limelight.getTarget() && limelight.getHorizontalOffset() < -0.5) {
         frc::SmartDashboard::PutNumber("TX", limelight.getHorizontalOffset());
         driveAutonomous(backVector, R_zionAutoExecutionCap);
     }
     stopDriving();
+
     // ... and movement if Zion is right of target.
     while (limelight.getTarget() && limelight.getHorizontalOffset() > 0.5) {
          frc::SmartDashboard::PutNumber("TX", limelight.getHorizontalOffset());
@@ -347,17 +346,18 @@ void SwerveTrain::lineupShot() {
     stopDriving();
 
 
-    // Remove comment slashes when fixed; will not build otherwise.
+    Limelight limelight;
+    // TODO: Fix when can be called properly.
     // Moving side to side to align with target.
-    /*while (abs(getHorizontalOffset()) >= angleDeadzone) {
+    while (abs(limelight.getHorizontalOffset()) >= angleDeadzone) {
 
-        if (getHorizontalOffset() < 0) {
+        if (limelight.getHorizontalOffset() > 0.5) {
             driveAutonomous(backwardsVector, R_zionAutoExecutionCap);
         }
-        else if (getHorizontalOffset() > 0) {
+        else if (limelight.getHorizontalOffset() < -0.5) {
             driveAutonomous(forwardsVector, R_zionAutoExecutionCap);
         }
-    }*/    
+    }    
     stopDriving(); 
     
 

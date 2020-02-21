@@ -48,14 +48,14 @@ double  limeGang() {
     double limeLightAngle = 0.392699; //Adjust This-it is an estimate of the angle the limelight is mounted at in simplified radians(currently at 20 degrees)
     double sensorHeightConstant = 73.25; // Height difference between limelight and target.
     double targetDistConstant = sensorHeightConstant / tan(limeLightAngle); //Trig behind finding distance from Zion to wall
-    //targetHeightConstant is the target distance from wall, adjust the limelight angle accordingly
+    //targetDistConstant is the target distance from wall, adjust the limelight angle accordingly
 
-    if (174 < targetDistConstant < 186) {
-
+    if (174 < targetDistConstant && targetDistConstant < 186) {
+        return 0; // Placed because of warning.
         //Continue Firing the cannoon-change the zone as needed to adjust for scoring
     }
     else{ 
-
+        return 0; // Placed because of warning.
         //Stop firing the cannoon clearly it aint lined up just like your hairline
     }
 
