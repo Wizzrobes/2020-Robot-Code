@@ -104,7 +104,6 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         assumeNearestZeroPosition();
         setDriveSpeed(0);
     }
-    
     //Otherwise, go to the result vectors and use the magnitude to set the
     //speed of driving, and set each wheel's swerve position based on its
     //respective resulting vector.
@@ -113,10 +112,10 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         /*
         Here, all of the resulting vectors are
         converted into Nics so that they can be written to the swerve modules
-        using assumeSwervePosition().  We get Nics from degrees by calling
+        using assumeSwervePosition(). They were in degrees before to enable the
+        use of common trigonomoetry. We get Nics from degrees by calling
         getSwerveRotatingPosition().
         */
-
         m_frontRight->assumeSwervePosition(m_frontRight->getStandardDegreeSwervePosition(frontRightResultVector, angle));
         m_frontLeft->assumeSwervePosition(m_frontLeft->getStandardDegreeSwervePosition(frontLeftResultVector, angle));
         m_rearLeft->assumeSwervePosition(m_rearLeft->getStandardDegreeSwervePosition(rearLeftResultVector, angle));
@@ -236,31 +235,6 @@ double SwerveTrain::getStandardDegreeAngleFromCenter(const double &x, const doub
     angleRad *= (180. / M_PI);
     return angleRad;
 }
-//TODO: Inline function documentation
-//no longer needed in theory
-VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y, double angleGyro) {
-
-    //TODO: Why does inverting this as well solve our problems?
-    double joystickAngle = getStandardDegreeAngleFromCenter(-x, y);
-
-    double vectorAngle = 0;
-    if (angleGyro < 0.) {
-
-        angleGyro += 360.;
-    }
-    vectorAngle = 450. - joystickAngle + angleGyro;
-    if (vectorAngle > 360.) {
-
-       vectorAngle = fmod (vectorAngle, 360.);
-    }
-    //Make the conversion to radians to faciliate trigonometric usage
-    vectorAngle *= (M_PI / 180.);
-
-    //The absolute value of X and Y is taken because cosine and sine account
-    //for signage - allowing X and Y signage causes double negative errors.
-    VectorDouble translationVector(abs(x) * cos(vectorAngle), abs(y) * sin(vectorAngle));
-    return translationVector;
-}
 
 void SwerveTrain::lineupToTarget(const double &leftDistToWall, const double &rightDistToWall, const double &targetOffset, const double &targetDistance) {
 
@@ -356,5 +330,3 @@ void SwerveTrain::lineupToTarget(const double &leftDistToWall, const double &rig
     m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(rearRightVector));
     setDriveSpeed(R_zionAutoLateralMovementSpeed);
 }
-
-

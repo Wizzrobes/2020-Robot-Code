@@ -70,9 +70,6 @@ Private Methods
         position.
     double getLargestMagnitudeValue(const double&, const double&, const double&, const double&)
         Returns the largest of the four values passed to the function.
-    VectorDouble getTranslationVector(const double&, const double&, double)
-        Calculates the translation vector to be used in total swerve movement
-        calculation by the control function. See the function itself for more.
     double calculateAssumeAngleRotationSpeed(const double&)
         Calculates the speed at which to rotate for the assumeAngle() function
         based on how far away from the target angle we are. Uses a regression
@@ -210,7 +207,6 @@ class SwerveTrain {
 
             return std::max(std::max(frVal, flVal), std::max(rrVal, rlVal));
         }
-        VectorDouble getTranslationVector(const double &x, const double &y, double angleGyro);
         double calculateAssumeAngleRotatationSpeed(const double &currentAngleOff) {
 
             //TODO: Document/improve regression
