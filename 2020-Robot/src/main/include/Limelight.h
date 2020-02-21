@@ -28,7 +28,8 @@ class Limelight {
 
         double getHorizontalOffset() {
 
-            return table->GetNumber("tx", 0);
+            return table->GetNumber("tx",0.0);
+
         }
         double getVerticalOffset() {
 

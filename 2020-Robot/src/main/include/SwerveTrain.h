@@ -187,6 +187,10 @@ class SwerveTrain {
         void zeroController(frc::Joystick *controller);
         void getTrenchRunPowerCells();
         void returnToShootingPosition();
+        void lineupShot();
+        void runZionAutonomous();
+        void moveToTarget();
+        
 
     private:
         SwerveModule *m_frontRight;
@@ -195,12 +199,9 @@ class SwerveTrain {
         SwerveModule *m_rearRight;
         NavX *navX;
 
-        void runZionAutonomous();
         void driveAutonomous(VectorDouble movement, double speed);
         void turnAutonomous(double speed);
         void stopDriving();
-        void moveToTarget();
-        void lineupShot();
         void shootAuto();
         double getClockwiseREVRotationsFromCenter(frc::Joystick *controller);
         double getClockwiseREVRotationsFromCenter(const VectorDouble &vector);

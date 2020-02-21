@@ -47,10 +47,9 @@ void Robot::TeleopPeriodic() {
     }
     else if (playerOne->GetRawButton(12)) {
         zion.getTrenchRunPowerCells();
-        zion.returnToShootingPosition(); 
     }
     else if (playerOne->GetRawButton(10)) {
-        zion.returnToShootingPosition();
+        zion.moveToTarget();
     }
     else {
 

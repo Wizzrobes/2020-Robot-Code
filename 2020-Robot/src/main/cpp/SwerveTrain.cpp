@@ -5,6 +5,7 @@
 #include "SwerveTrain.h"
 #include "VectorDouble.h"
 #include "Launcher.h"
+#include "Limelight.h"
 
 void SwerveTrain::driveController(frc::Joystick *controller) {
 
@@ -254,14 +255,17 @@ VectorDouble SwerveTrain::getTranslationVector(const double &x, const double &y,
 
 // Backs up and moves the robot to lineup with the target side to side.
 // Needs motor encoder values to move a specified distance.
+Limelight limelight; 
 void SwerveTrain::moveToTarget() {
 
     // The original value we started with. Uses front right wheel.
     double startingEncodeValue = m_frontRight->getDrivePosition();
+    
+    frc::SmartDashboard::PutNumber("TX", limelight.getHorizontalOffset());
 
     // Distances to move. Will change based on match position.
     // How far to back up, in inches.
-    double backupDistance = 60;
+    double backupDistance = 10;
     // Side movement distance, also in inches. Might be eliminated with.
     //double sideMovementDist = 120;
 
@@ -291,18 +295,22 @@ void SwerveTrain::moveToTarget() {
     // TODO: Fix later when can be called properly.
     // Remove comment slashes when fixed; will not build otherwise.
 
+
     // Moves Zion left if target is not acquired. Unlikely to be too far right.
-    /*while (not(getTarget())) {
+    while (!limelight.getTarget()) {
         driveAutonomous(backVector, R_zionAutoExecutionCap);
     }
     // Movement if Zion is left of target...
-    while (getTarget() && getHorizontalOffset() > 0.1) {
+    while (limelight.getTarget() && limelight.getHorizontalOffset() < -0.5) {
+        frc::SmartDashboard::PutNumber("TX", limelight.getHorizontalOffset());
         driveAutonomous(backVector, R_zionAutoExecutionCap);
     }
+    stopDriving();
     // ... and movement if Zion is right of target.
-    while (getTarget() && getHorizontalOffset() < -0.1) {
+    while (limelight.getTarget() && limelight.getHorizontalOffset() > 0.5) {
+         frc::SmartDashboard::PutNumber("TX", limelight.getHorizontalOffset());
         driveAutonomous(forwardsVector, R_zionAutoExecutionCap);
-    }*/
+    }
     stopDriving();
 }
 
@@ -438,6 +446,7 @@ void SwerveTrain::returnToShootingPosition() {
     // Vectors for movement in a linear direction.
     VectorDouble rightVector(-1, 0);
     VectorDouble backwardsVector(0, -1);
+    VectorDouble forwardsVector(0, 1);
 
 
     // Moves back down the trench run to get back to shooting distance.
@@ -472,6 +481,8 @@ void SwerveTrain::returnToShootingPosition() {
         turnAutonomous(-R_zionAutoExecutionCap);
     }
     stopDriving();
+
+    driveAutonomous(forwardsVector, 0);
 }
 
 // TODO: Add rest of functions for remaining movements.
