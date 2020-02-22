@@ -4,7 +4,7 @@ class Limelight
 Constructors
 
     Limelight
-        Creates a limelight on the default NetworkTable.
+        Creates a limelight on the default NetworkTable interface.
 
 Public Methods
 
@@ -16,11 +16,13 @@ Public Methods
         Returns the area of the target in-sight.
     bool target()
         Returns true if there is a target in-sight, false otherwise.
+    All return 0 in event of a null target.
 */
 
 #pragma once
 
-#include "networktables/NetworkTable.h"
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableInstance.h>
 
 class Limelight {
 
@@ -48,5 +50,5 @@ class Limelight {
         }
 
     private:
-        std::shared_ptr<NetworkTable> table;
+        std::shared_ptr<NetworkTable> table = nt::NetworkTableInstance::GetDefault().GetTable("limelight");
 };
