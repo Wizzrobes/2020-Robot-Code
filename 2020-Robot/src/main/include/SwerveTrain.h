@@ -13,8 +13,8 @@ Constructors
 
 Public Methods
 
-    void setDriveSpeed(const double&)
-        Sets a speed to all driving motors on the train. Defaults to 0.
+    void setDriveSpeed(const int&, const double&)
+        Sets a speed to the driving motors on the train.
     void setSwerveSpeed(const double&)
         Sets a speed to all swerve motors on the train.
     void setZeroPosition(const bool& = false)
@@ -45,6 +45,9 @@ Public Methods
         controller's joystick value. This allows manual adjustment from an
         enabled state in case of either drift or error.
         TODO: CURRENTLY WRITTEN FOR A JOYSTICK, WILL NEED TO CHANGE.
+
+    enum Motor
+        Selects a motor that the setDriveSpeed function should operate on.
 
 Protected Methods
 
@@ -157,10 +160,16 @@ class SwerveTrain {
         void driveController(frc::Joystick *controller);
         void zeroController(frc::Joystick *controller);
 
-    protected:
+    private:
 
         double getClockwiseREVRotationsFromCenter(frc::Joystick *controller);
+    public:
+
+        //This is very useful in accurate auto positioning, so it is
+        //overriden public, specifically for Hal pass use.
         double getClockwiseREVRotationsFromCenter(const VectorDouble &vector);
+    private:
+
         double getStandardDegreeAngleFromCenter(const double &x, const double &y);
         double getLargestMagnitudeValue(const double &frVal, const double &flVal, const double &rlVal, const double &rrVal) {
 
@@ -220,6 +229,11 @@ class SwerveTrain {
             }
         }
 
+    //Allow the peices of the SwerveTrain to be public for convenient
+    //low-level access when needed. SwerveTrain is a great container.
+    //This is primarily used for Hal, the auto driver, so he can set low-level
+    //module commands through one passed SwerveTrain.
+    public:
         SwerveModule *m_frontRight;
         SwerveModule *m_frontLeft;
         SwerveModule *m_rearLeft;
