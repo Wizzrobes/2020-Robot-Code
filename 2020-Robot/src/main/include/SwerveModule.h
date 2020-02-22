@@ -162,7 +162,7 @@ class SwerveModule {
         //TODO: Inline function documentation
         double getStandardDegreeSwervePosition(VectorDouble &vector, const double &angle) {
 
-            return getSwerveNearestZeroPosition() + (R_nicsConstant * (vector.unitCircleAngleDeg() + angle - 90.) / 360.);
+            return (R_nicsConstant * (vector.unitCircleAngleDeg() + angle - 90.) / 360.);
         }
 
         void assumeSwervePosition(const double &positionToAssume);
