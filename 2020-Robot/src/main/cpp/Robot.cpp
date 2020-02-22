@@ -1,10 +1,9 @@
 #include <cameraserver/CameraServer.h>
 #include <frc/Joystick.h>
 #include <frc/XboxController.h>
-#include <time.h>
 
 #include "Arduino.h"
-//#include "Climber.h"
+#include "Climber.h"
 #include "Intake.h"
 #include "Launcher.h"
 #include "Limelight.h"
@@ -15,7 +14,7 @@
 #include "SwerveTrain.h"
 
 Arduino arduino;
-//Climber climber(R_launcherIndexMotorCANID, R_launcherLaunchMotorCANID);
+Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate);
 Intake intake(R_CANIDmotorIntake);
 Launcher launcher(R_CANIDmotorLauncherIndex, R_CANIDmotorLauncherLaunch);
 Limelight limelight;
@@ -36,21 +35,12 @@ void Robot::RobotInit() {
 
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
 
-    frc::SmartDashboard::PutNumber("Launcher::Index-Speed:", R_launcherDefaultSpeedIndex);
-    frc::SmartDashboard::PutNumber("Launcher::Launch-Speed:", R_launcherDefaultSpeedLaunch);
+    frc::SmartDashboard::PutNumber("Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
+    frc::SmartDashboard::PutNumber("Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
 }
 void Robot::RobotPeriodic() {}
-void Robot::AutonomousInit() {
-
-    frc::SmartDashboard::PutBoolean("RegistrySet:", arduino.setRegister(Arduino::Registry::kRegisterTx0, "101010"));
-}
-void Robot::AutonomousPeriodic() {
-
-    if (playerTwo->GetAButton()) {
-
-        frc::SmartDashboard::PutBoolean("RegistrySent:", arduino.tx());
-    }
-}
+void Robot::AutonomousInit() {}
+void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
 
@@ -58,45 +48,35 @@ void Robot::TeleopPeriodic() {
 
         zion.setZeroPosition();
     }
-    
     if (playerOne->GetRawButton(1)) {
         
         navX.resetYaw();
     }
     zion.driveController(playerOne);
 
-/*
+
     if (playerTwo->GetBackButton()) {
 
-        double climberSpeed = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
-        climber.setSpeed(Climber::LiftMotor::kPrimary, climberSpeed);
-        climber.setSpeed(Climber::LiftMotor::kSecondary, -climberSpeed);
+        double climbSpeed = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
+        double translateSpeed = playerTwo->GetX(frc::GenericHID::kLeftHand);
+        climber.setSpeed(Climber::Motor::kClimb, climbSpeed);
+        climber.setSpeed(Climber::Motor::kTranslate, translateSpeed);
     }
     else {
 
-        climber.setSpeed(Climber::LiftMotor::kPrimary);
-        climber.setSpeed(Climber::LiftMotor::kSecondary);
+        climber.setSpeed(Climber::Motor::kClimb);
+        climber.setSpeed(Climber::Motor::kTranslate);
     }
-}
-*/
 
     intake.setSpeed(-playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) * R_executionCapIntake + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand) * R_executionCapIntake);
 
-    if (playerTwo->GetYButton()) {
-
-        frc::SmartDashboard::PutNumber("Launcher::Launch-Speed:", playerTwo->GetY(frc::GenericHID::kLeftHand));
-    }
     if (playerTwo->GetXButton()) {
 
         frc::SmartDashboard::PutNumber("Launcher::Index-Speed:", playerTwo->GetY(frc::GenericHID::kLeftHand));
     }
-    if (playerTwo->GetBButton()) {
+    if (playerTwo->GetYButton()) {
 
-        launcher.setLaunchSpeed(frc::SmartDashboard::GetNumber("Launcher::Launch-Speed:", 0));
-    }
-    else {
-
-        launcher.setLaunchSpeed(0);
+        frc::SmartDashboard::PutNumber("Launcher::Launch-Speed:", playerTwo->GetY(frc::GenericHID::kLeftHand));
     }
     if (playerTwo->GetAButton()) {
 
@@ -106,8 +86,14 @@ void Robot::TeleopPeriodic() {
 
         launcher.setIndexSpeed(0);
     }
+    if (playerTwo->GetBButton()) {
 
-    frc::SmartDashboard::PutNumber("LimeTA:", limelight.targetArea());
+        launcher.setLaunchSpeed(frc::SmartDashboard::GetNumber("Launcher::Launch-Speed:", 0));
+    }
+    else {
+
+        launcher.setLaunchSpeed(0);
+    }
 }
 
 void Robot::TestPeriodic() {}

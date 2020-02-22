@@ -3,80 +3,52 @@ class Climber
 
     Constructors
 
-        Climber(const int&, const int&)
-            Create a climber with its primary and secondary motors on the
-                provided CAN Bus IDs.
+        Climber(const int&)
+            Create a climber with its motor as a Victor SPX speed controller
+                on the supplied PWM Port.
 
     Public Methods
 
         void setSpeed(const int&, const double& = 0)
-            Sets the speed of the supplied motor(s) to the passed double
+            Sets the speed of the supplied motor to the passed double
             (defaults to 0).
-        void getSpeed(const int&)
-            Returns the encoder speed of the supplied motor in some REV value
-            Note that if both motors are passed, zero is returned as an error!
 
         enum LiftMotor
-            Used to select which motor the set and get functions operate on.
+            Used to select which motor the set function operates on.
 */
 
 #pragma once
 
-#include "rev/CANSparkMax.h"
+#include <frc/VictorSP.h>
 
 class Climber {
 
     public:
-        Climber(const int &primaryMotorCANID, const int &secondaryMotorCANID) {
+        Climber(const int &climbMotorPWMPort, const int &translateMotorPWMPort) {
 
-            m_primaryMotor = new rev::CANSparkMax(primaryMotorCANID, rev::CANSparkMax::MotorType::kBrushless);
-            m_secondaryMotor = new rev::CANSparkMax(secondaryMotorCANID, rev::CANSparkMax::MotorType::kBrushless);
-
-            m_primaryMotorEncoder = new rev::CANEncoder(m_primaryMotor->GetEncoder());
-            m_secondaryMotorEncoder = new rev::CANEncoder(m_secondaryMotor->GetEncoder());
-
-            m_primaryMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
-            m_secondaryMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+            m_climbMotor = new frc::VictorSP(climbMotorPWMPort);
+            m_translateMotor = new frc::VictorSP(translateMotorPWMPort);
         }
 
         void setSpeed(const int &motor, const double &speedToSet = 0) {
 
             switch (motor) {
 
-                case LiftMotor::kPrimary: m_primaryMotor->Set(speedToSet); break;
-                case LiftMotor::kSecondary: m_secondaryMotor->Set(speedToSet); break;
-                case LiftMotor::kBoth:
-                    m_primaryMotor->Set(speedToSet);
-                    m_secondaryMotor->Set(speedToSet);
+                case Motor::kClimb: m_climbMotor->Set(speedToSet); break;
+                case Motor::kTranslate: m_translateMotor->Set(speedToSet); break;
+                case Motor::kBoth:
+                    m_climbMotor->Set(speedToSet);
+                    m_translateMotor->Set(speedToSet);
                     break;
             }
         }
 
-        double getSpeed(const int &motor) {
-            
-            if (motor == LiftMotor::kPrimary) {
+        enum Motor {
 
-                return m_primaryMotorEncoder->GetVelocity();
-            }
-            if (motor == LiftMotor::kSecondary) {
-
-                return m_secondaryMotorEncoder->GetVelocity();
-            }
-            else {
-
-                return 0;
-            }
-        }
-
-        enum LiftMotor {
-
-            kPrimary, kSecondary, kBoth
+            kClimb, kTranslate, kBoth
         };
 
     private:
-        rev::CANSparkMax *m_primaryMotor;
-        rev::CANSparkMax *m_secondaryMotor;
-
-        rev::CANEncoder *m_primaryMotorEncoder;
-        rev::CANEncoder *m_secondaryMotorEncoder;
+        frc::VictorSP *m_climbMotor;
+        frc::VictorSP *m_translateMotor;
 };

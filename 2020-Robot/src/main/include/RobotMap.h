@@ -6,6 +6,8 @@
 #include <math.h>
 
 /*_____RoboRIO PWM Pin Declarations_____*/
+const int R_PWMPortClimberMotorClimb = 0;
+const int R_PWMPortClimberMotorTranslate = 0;
 /*___End RoboRIO PWM Pin Declarations___*/
 
 /*_____RoboRIO DIO Pin Declarations_____*/
