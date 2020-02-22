@@ -86,7 +86,7 @@ struct VectorDouble {
 
                 calculatedAngle = 180;
             }
-            return calculatedAngle; 
+            return calculatedAngle;
         }
 
         double i;

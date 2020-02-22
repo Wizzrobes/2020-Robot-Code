@@ -267,7 +267,7 @@ class SwerveTrain {
 
             if (z > deadzoneAdjustmentZ) {
 
-                z -= (deadzoneAdjustmentZ - R_deadzoneController); 
+                z -= (deadzoneAdjustmentZ - R_deadzoneController);
             }
             else if (z < -deadzoneAdjustmentZ) {
 

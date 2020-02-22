@@ -20,7 +20,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     forceControllerXYZToZeroInDeadzone(x, y, z);
 
     //To prevent accidental turning, optimize Z to X and Y's magnitude.
-    optimizeControllerXYToZ(x, y, z); 
+    optimizeControllerXYToZ(x, y, z);
 
     /*
     The translation vector is the "standard" vector - that is, if no rotation
@@ -44,7 +44,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     }
     else {
 
-        navX->resetYaw(); 
+        navX->resetYaw();
     }*/
 
     /*
@@ -248,13 +248,13 @@ void SwerveTrain::lineupToTarget(const double &leftDistToWall, const double &rig
     VectorDouble rightMovementVector(1, 0);
     VectorDouble forwardMovementVector(0, 1);
     VectorDouble backwardsMovementVector(0, -1);
-    
+
     //Empty vectors for the wheels themselves.
     VectorDouble frontRightVector(0, 0);
     VectorDouble frontLeftVector(0, 0);
     VectorDouble rearLeftVector(0, 0);
     VectorDouble rearRightVector(0, 0);
-    
+
     //if and else if statements make sure the program runs in proper order-
     //rotation to be square with the wall, left-to-right lateral motion to be
     //centered with the target, and then front-to-back motion to set the proper
