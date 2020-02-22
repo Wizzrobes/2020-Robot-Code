@@ -4,6 +4,7 @@
 
 #include "Arduino.h"
 #include "Climber.h"
+#include "HAL.h"
 #include "Intake.h"
 #include "Launcher.h"
 #include "Limelight.h"
@@ -25,6 +26,8 @@ SwerveModule rearLeftModule(R_CANIDzionRearLeftDrive, R_CANIDzionRearLeftSwerve)
 SwerveModule rearRightModule(R_CANIDzionRearRightDrive, R_CANIDzionRearRightSwerve);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 
+HAL Hal(arduino, intake, launcher, limelight, navX, zion);
+
 frc::Joystick *playerOne;
 frc::XboxController *playerTwo;
 
@@ -39,9 +42,7 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutNumber("Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
 }
 void Robot::RobotPeriodic() {}
-void Robot::AutonomousInit() {
-    //runZionAutonomous();
-}
+void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
@@ -74,15 +75,15 @@ void Robot::TeleopPeriodic() {
 
     if (playerTwo->GetXButton()) {
 
-        frc::SmartDashboard::PutNumber("Launcher::Index-Speed:", playerTwo->GetY(frc::GenericHID::kLeftHand));
+        frc::SmartDashboard::PutNumber("Launcher::Speed-Index:", playerTwo->GetY(frc::GenericHID::kLeftHand));
     }
     if (playerTwo->GetYButton()) {
 
-        frc::SmartDashboard::PutNumber("Launcher::Launch-Speed:", playerTwo->GetY(frc::GenericHID::kLeftHand));
+        frc::SmartDashboard::PutNumber("Launcher::Speed-Launch:", playerTwo->GetY(frc::GenericHID::kLeftHand));
     }
     if (playerTwo->GetAButton()) {
 
-        launcher.setIndexSpeed(frc::SmartDashboard::GetNumber("Launcher::Index-Speed:", 0));
+        launcher.setIndexSpeed(frc::SmartDashboard::GetNumber("Launcher::Speed-Index:", 0));
     }
     else {
 
@@ -90,7 +91,7 @@ void Robot::TeleopPeriodic() {
     }
     if (playerTwo->GetBButton()) {
 
-        launcher.setLaunchSpeed(frc::SmartDashboard::GetNumber("Launcher::Launch-Speed:", 0));
+        launcher.setLaunchSpeed(frc::SmartDashboard::GetNumber("Launcher::Speed-Launch:", 0));
     }
     else {
 
