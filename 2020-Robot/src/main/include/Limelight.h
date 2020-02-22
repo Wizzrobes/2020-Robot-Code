@@ -29,13 +29,12 @@ class Limelight {
     public:
         Limelight() {
 
-            table = NetworkTable::GetTable("limelight");
+            table = nt::NetworkTableInstance::GetDefault().GetTable("limelight-lnchr");
         }
 
         double horizontalOffset() {
 
             return table->GetNumber("tx",0.0);
-
         }
         double verticalOffset() {
 
@@ -51,22 +50,28 @@ class Limelight {
         }
 
     private:
-        std::shared_ptr<NetworkTable> table = nt::NetworkTableInstance::GetDefault().GetTable("limelight");
+        std::shared_ptr<NetworkTable> table;
 };
 
-double  limeGang() {
-    double limeLightAngle = 0.392699; //Adjust This-it is an estimate of the angle the limelight is mounted at in simplified radians(currently at 20 degrees)
-    double sensorHeightConstant = 73.25; // Height difference between limelight and target.
-    double targetDistConstant = sensorHeightConstant / tan(limeLightAngle); //Trig behind finding distance from Zion to wall
-    //targetDistConstant is the target distance from wall, adjust the limelight angle accordingly
+/*
+double limelightTest() {
 
-    if (174 < targetDistConstant && targetDistConstant < 186) {
-        return 0; // Placed because of warning.
-        //Continue Firing the cannoon-change the zone as needed to adjust for scoring
-    }
-    else{ 
-        return 0; // Placed because of warning.
-        //Stop firing the cannoon clearly it aint lined up just like your hairline
-    }
+    //Radian angle of limelight from horizon
+    const double limelightAngleRad = 0.392699;
+    // Height difference between limelight and target
+    const double sensorHeight = 73.25;
+    //Trig behind finding distance from Zion to wall
+    const double targetDistance = sensorHeight / tan(limelightAngleRad);
 
+    if (174 < targetDistance && targetDistance < 186) {
+
+        return 0;
+        //Continue firing the cannon
+    }
+    else {
+
+        return 0;
+        //Stop firing the cannoon
+    }
 }
+*/

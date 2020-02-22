@@ -12,6 +12,15 @@ Public Methods
     void zionAssumeAngle(const double&)
         Rotates to the supplied angle based on the current angle of the NavX
         attached to Zion, with speed to do so found via regression.
+    void zionAssumeDirection(const int&)
+        Uses a supplied ZionDirections to set the swerves to the
+        appropriate position to move in that direction. Sets no speed
+        to the motors!
+    void zionAssumeDistance(const double&)
+        Uses the supplied distance to move that far in whatever direction
+        the swerves are currently set for. As such, the usual order is a
+        zionAssumeDirection followed by this. Zero speed is set once the
+        distance is achieved.
     void zionLineupToTarget(const double&, const double&, const double&, const double&)
         Uses two distances from the wall (left and right from the front), an
         offset from a target, and the desired distance away from the target to
@@ -25,6 +34,11 @@ Public Methods
     void zionTrenchGrabToShootingPosition()
         Same as above, but minus the intake and the exact opposite
         movements.
+    void zionTurn(const bool& = true)
+        Sets the swerves to 45* positions and turns them at the global auto
+        rotation speed clockwise if true, counterclockwise if false.
+        Does no cleanup! Therefore, run it in a conditional and clean it up.
+        TODO: make that better ;)
 
     enum ZionDirections
         Used by the assume functions to specify which directions to
@@ -37,20 +51,6 @@ Private Methods
         based on how far away from the target angle we are. Uses a regression
         to do so; very similar to calculateAssumePositionSpeed() in
         SwerveModule.
-    void zionAssumeDirection(const int&)
-        Uses a supplied ZionDirections to set the swerves to the
-        appropriate position to move in that direction. Sets no speed
-        to the motors!
-    void zionAssumeDistance(const double&)
-        Uses the supplied distance to move that far in whatever direction
-        the swerves are currently set for. As such, the usual order is a
-        zionAssumeDirection followed by this. Zero speed is set once the
-        distance is achieved.
-    void zionTurn(const bool& = true)
-        Sets the swerves to 45* positions and turns them at the global auto
-        rotation speed clockwise if true, counterclockwise if false.
-        Does no cleanup! Therefore, run it in a conditional and clean it up.
-        TODO: make that better ;)
 */
 
 #include <math.h>
@@ -100,7 +100,45 @@ class HAL : public SwerveTrain {
                 setDriveSpeed();
             }
         }
+        void zionAssumeDirection(const int &directionToMove) {
 
+            VectorDouble forward(0,-1);
+            VectorDouble right(-1,0);
+            VectorDouble backward(0,1);
+            VectorDouble left(1,0);
+
+            void setZionMotorsToVector(VectorDouble &vectorToSet) {
+
+                m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectortoSet));
+                m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+                m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+                m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
+            }
+
+            switch (directionToMove) {
+
+                case kForward: setZionMotorsToVector(forward); break;
+                case kRight: setZionMotorsToVector(right); break;
+                case kBackward: setZionMotorsToVector(backward); break;
+                case kLeft: setZionMotorsToVector(left); break;
+            }
+        }
+        void zionAssumeDistance(const double &distanceToMove) {
+
+            double encoderValue = m_frontRight->getDrivePosition();
+            //Calculate the end goal encoder value with circumference and the
+            //known amount of encoder values per rotation.
+            double encoderValueGoal = encoderValue + ((distanceToMove / circumferenceWheel) * R_kuhnsConstant);
+            //Move until we're there and stop.
+            if ((encoderValueGoal - m_frontRight->getDrivePosition()) > 0) {
+
+                setDriveSpeed(R_zionAutoMovementSpeedLateral);
+            }
+            else {
+
+                setDriveSpeed();
+            }
+        }
         void zionLineupToTarget(const double &leftDistToWall, const double &rightDistToWall, const double &targetOffset, const double &targetDistance) {
 
             //TODO: ?
@@ -202,6 +240,24 @@ class HAL : public SwerveTrain {
 
             zionAssumeAngle(navX->getAngle() + 90.);
         }
+        //TODO: Inline function documentation
+        void zionTurn(const bool &direction = true) {
+
+            double sqt = sqrt(2) / 2;
+            double spd = R_zionAutoMovementSpeedRotational;
+
+            VectorDouble vectorFrontRight(spd * sqt, spd * sqt);
+            VectorDouble vectorFrontLeft(spd * sqt, -spd * sqt);
+            VectorDouble vectorRearLeft(-spd * sqt, -spd * sqt);
+            VectorDouble vectorRearRight(-spd * sqt, spd * sqt);
+
+            m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorFrontRight));
+            m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorFrontLeft));
+            m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorRearLeft));
+            m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorRearRight));
+
+            setDriveSpeed(direction ? spd : -spd);
+        }
 
         enum ZionDirections {
 
@@ -226,63 +282,6 @@ class HAL : public SwerveTrain {
 
                 return speed;
             }
-        }
-        void zionAssumeDirection(const int &directionToMove) {
-
-            VectorDouble forward(0,-1);
-            VectorDouble right(-1,0);
-            VectorDouble backward(0,1);
-            VectorDouble left(1,0);
-
-            void setZionMotorsToVector(VectorDouble &vectorToSet) {
-
-                m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectortoSet));
-                m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
-                m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
-                m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorToSet));
-            }
-
-            switch (directionToMove) {
-
-                case kForward: setZionMotorsToVector(forward); break;
-                case kRight: setZionMotorsToVector(right); break;
-                case kBackward: setZionMotorsToVector(backward); break;
-                case kLeft: setZionMotorsToVector(left); break;
-            }
-        }
-        void zionAssumeDistance(const double &distanceToMove) {
-
-            double encoderValue = m_frontRight->getDrivePosition();
-            //Calculate the end goal encoder value with circumference and the
-            //known amount of encoder values per rotation.
-            double encoderValueGoal = encoderValue + ((distanceToMove / circumferenceWheel) * R_kuhnsConstant);
-            //Move until we're there and stop.
-            if ((encoderValueGoal - m_frontRight->getDrivePosition()) > 0) {
-
-                setDriveSpeed(R_zionAutoMovementSpeedLateral);
-            }
-            else {
-
-                setDriveSpeed();
-            }
-        }
-        //TODO: Inline function documentation
-        void zionTurn(const bool &direction = true) {
-
-            double sqt = sqrt(2) / 2;
-            double spd = R_zionAutoMovementSpeedRotational;
-
-            VectorDouble vectorFrontRight(spd * sqt, spd * sqt);
-            VectorDouble vectorFrontLeft(spd * sqt, -spd * sqt);
-            VectorDouble vectorRearLeft(-spd * sqt, -spd * sqt);
-            VectorDouble vectorRearRight(-spd * sqt, spd * sqt);
-
-            m_frontRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorFrontRight));
-            m_frontLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorFrontLeft));
-            m_rearLeft->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorRearLeft));
-            m_rearRight->assumeSwervePosition(getClockwiseREVRotationsFromCenter(vectorRearRight));
-
-            setDriveSpeed(direction ? spd : -spd);
         }
 
         Arduino *arduino;
