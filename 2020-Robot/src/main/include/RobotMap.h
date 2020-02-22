@@ -64,13 +64,22 @@ const double R_launcherDefaultSpeedIndex = 1;
 //And this the default launcher launch speed.
 const double R_launcherDefaultSpeedLaunch = .745;
 
-//This is the speed for automatic lateral movement in autonomous. CHANGE AFTER AUTO DRIVER
-const double R_zionAutoLateralMovementSpeed = .4;
+//This is the speed for automatic lateral movement in autonomous.
+const double R_zionAutoMovementSpeedLateral = .4;
+//And for rotational movement.
+const double R_zionAutoMovementSpeedRotational = .4;
+//How many inches the robot can be off in assuming a distance.
+const double R_zionAutoToleranceDistance = 10;
+//This is the tolerance for autonomous angle assumption in degrees.
+const double R_zionAutoToleranceAngle = 10;
 
 //The amount of REV rotations it takes for a swerve assembly to make a full rotation.
 //Often, a REV Rotation is referred to as a Nic, although they mean different things.
 //Truly, a Nic is ~17.976 REV Rotation values.
 const double R_nicsConstant = 17.9761447906494;
+//The change in encoder output per full wheel rotation around the axle.
+//This value can be used to move a certain distance using solely encoder values.
+const double R_kuhnsConstant = 8.3121115031;
 //If an xy coordinate plane is centered at the middle of the drivetrain, this
 //is the radian measure between the y-axis and the front right wheel. This is
 //the basic unit of a non-moving center turn, and it is modified as the basis

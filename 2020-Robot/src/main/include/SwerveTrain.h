@@ -14,7 +14,7 @@ Constructors
 Public Methods
 
     void setDriveSpeed(const double&)
-        Sets a speed to all driving motors on the train.
+        Sets a speed to all driving motors on the train. Defaults to 0.
     void setSwerveSpeed(const double&)
         Sets a speed to all swerve motors on the train.
     void setZeroPosition(const bool& = false)
@@ -37,16 +37,6 @@ Public Methods
         value is. Useful for low-level things.
     void publishSwervePositions()
         Puts the current swerve encoder positions to the SmartDashboard.
-    void assumeAngle(const double&)
-        Rotates to the supplied angle based on the current angle of the NavX
-        attached to Zion. Finding this angle will likely require using the
-        gyro, as it is relative.
-    void lineupToTarget(const double&, const double&, const double&, const double&)
-        Uses two distances from the wall (left and right from the front), an
-        offset from a target, and the desired distance away from the target to
-        drive Zion such that it will square itself with the wall, shift to align
-        with the target, and then move forward or backward to achieve the
-        desired distance.
     void driveController()
         Fully drives the swerve train on the supplied controller.
     void zeroController()
@@ -56,7 +46,7 @@ Public Methods
         enabled state in case of either drift or error.
         TODO: CURRENTLY WRITTEN FOR A JOYSTICK, WILL NEED TO CHANGE.
 
-Private Methods
+Protected Methods
 
     double getClockwiseREVRotationsFromCenter(frc::Joystick*)
         Discernes how many clockwise REV rotations from center the current
@@ -70,11 +60,6 @@ Private Methods
         position.
     double getLargestMagnitudeValue(const double&, const double&, const double&, const double&)
         Returns the largest of the four values passed to the function.
-    double calculateAssumeAngleRotationSpeed(const double&)
-        Calculates the speed at which to rotate for the assumeAngle() function
-        based on how far away from the target angle we are. Uses a regression
-        to do so, very similar to calculateAssumePositionSpeed() in
-        SwerveModule.
     double getControllerAbsoluteMagnitude(frc::Joystick*)
         Gets the unsigned velocity of the control stick using only absolute
         value.
@@ -116,7 +101,7 @@ class SwerveTrain {
             navX = &navXToSet;
         }
 
-        void setDriveSpeed(const double &driveSpeed) {
+        void setDriveSpeed(const double &driveSpeed = 0) {
 
             m_frontRight->setDriveSpeed(driveSpeed);
             m_frontLeft->setDriveSpeed(driveSpeed);
@@ -169,36 +154,10 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("RR Swrv Pos", m_rearRight->getSwervePosition());
         }
 
-        void assumeAngle(const double &angle) {
-
-            const double currentAngleOff = navX->getYaw() - angle;
-
-            //If the current angle that we're off is not within tolerance...
-            if (abs(currentAngleOff) > 0/*TOLERANCE*/) {
-
-                //Set the wheels to their diagonal positions (at incremental 45*
-                //angles found with radians converted into Nics) and turn
-                //with the speed calculated via regression...
-                m_frontRight->assumeSwervePosition((1.0 / 8.0) * R_nicsConstant);
-                m_frontLeft->assumeSwervePosition((3.0 / 8.0) * R_nicsConstant);
-                m_rearLeft->assumeSwervePosition((5.0 / 8.0) * R_nicsConstant);
-                m_rearRight->assumeSwervePosition((7.0 / 8.0) * R_nicsConstant);
-                setDriveSpeed(calculateAssumeAngleRotatationSpeed(currentAngleOff));
-            }
-            //Otherwise, go to the closest zero and stop moving.
-            else {
-
-                assumeNearestZeroPosition();
-                setDriveSpeed(0);
-            }
-        }
-
-        void lineupToTarget(const double &leftDistToWall, const double &rightDistToWall, const double &targetOffset, const double &targetDistance);
-
         void driveController(frc::Joystick *controller);
         void zeroController(frc::Joystick *controller);
 
-    private:
+    protected:
 
         double getClockwiseREVRotationsFromCenter(frc::Joystick *controller);
         double getClockwiseREVRotationsFromCenter(const VectorDouble &vector);
@@ -206,24 +165,6 @@ class SwerveTrain {
         double getLargestMagnitudeValue(const double &frVal, const double &flVal, const double &rlVal, const double &rrVal) {
 
             return std::max(std::max(frVal, flVal), std::max(rrVal, rlVal));
-        }
-        double calculateAssumeAngleRotatationSpeed(const double &currentAngleOff) {
-
-            //TODO: Document/improve regression
-            double speed = pow(((2.469135802 * pow(10, -6)) * currentAngleOff), 3) + (0.0061111111 * currentAngleOff);
-
-            if (speed > 1) {
-
-                speed = 1;
-            }
-            else if (speed < -1) {
-
-                speed = -1;
-            }
-            else {
-
-                return speed;
-            }
         }
 
         double getControllerAbsoluteMagnitude(frc::Joystick *controller) {

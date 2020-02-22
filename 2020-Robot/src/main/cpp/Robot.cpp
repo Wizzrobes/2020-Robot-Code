@@ -39,7 +39,9 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutNumber("Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
 }
 void Robot::RobotPeriodic() {}
-void Robot::AutonomousInit() {}
+void Robot::AutonomousInit() {
+    //runZionAutonomous();
+}
 void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
