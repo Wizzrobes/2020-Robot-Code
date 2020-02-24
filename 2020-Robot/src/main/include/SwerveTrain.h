@@ -17,6 +17,11 @@ Public Methods
         Sets a speed to the driving motors on the train.
     void setSwerveSpeed(const double&)
         Sets a speed to all swerve motors on the train.
+    void setSwerveBrake(const bool&)
+        If true, sets the swerves to brake mode (as defaultly constructed),
+        if false, sets them to coast. Persists across calls. This is used to
+        "unlock and lock" all of the swerve wheels for easy manual zeroing,
+        instead of fighting the wheel brake as defaultly constructed.
     void setZeroPosition(const bool& = false)
         Gets the current encoder values of the swerve motors and stores them
         as privates of the class. These are the values the swerve motors return
@@ -118,6 +123,13 @@ class SwerveTrain {
             m_rearLeft->setSwerveSpeed(swerveSpeed);
             m_rearRight->setSwerveSpeed(swerveSpeed);
         }
+        void setSwerveBrake(const bool &brake) {
+
+            m_frontRight->setSwerveBrake(brake);
+            m_frontLeft->setSwerveBrake(brake);
+            m_rearLeft->setSwerveBrake(brake);
+            m_rearRight->setSwerveBrake(brake);
+        }
 
         void setZeroPosition(const bool &verbose = false) {
 
@@ -128,10 +140,10 @@ class SwerveTrain {
 
             if (verbose) {
 
-                frc::SmartDashboard::PutNumber("FR Swrv Pos0", m_frontRight->getSwerveZeroPosition());
-                frc::SmartDashboard::PutNumber("FL Swrv Pos0", m_frontLeft->getSwerveZeroPosition());
-                frc::SmartDashboard::PutNumber("RL Swrv Pos0", m_rearLeft->getSwerveZeroPosition());
-                frc::SmartDashboard::PutNumber("RR Swrv Pos0", m_rearRight->getSwerveZeroPosition());
+                frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFR", m_frontRight->getSwerveZeroPosition());
+                frc::SmartDashboard::PutNumber("Zion::Swerve::0PosFL", m_frontLeft->getSwerveZeroPosition());
+                frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRL", m_rearLeft->getSwerveZeroPosition());
+                frc::SmartDashboard::PutNumber("Zion::Swerve::0PosRR", m_rearRight->getSwerveZeroPosition());
             }
         }
         void assumeZeroPosition() {
@@ -151,10 +163,10 @@ class SwerveTrain {
 
         void publishSwervePositions() {
 
-            frc::SmartDashboard::PutNumber("FR Swrv Pos", m_frontRight->getSwervePosition());
-            frc::SmartDashboard::PutNumber("FL Swrv Pos", m_frontLeft->getSwervePosition());
-            frc::SmartDashboard::PutNumber("RL Swrv Pos", m_rearLeft->getSwervePosition());
-            frc::SmartDashboard::PutNumber("RR Swrv Pos", m_rearRight->getSwervePosition());
+            frc::SmartDashboard::PutNumber("Zion::Swerve::PosFR", m_frontRight->getSwervePosition());
+            frc::SmartDashboard::PutNumber("Zion::Swerve::PosFL", m_frontLeft->getSwervePosition());
+            frc::SmartDashboard::PutNumber("Zion::Swerve::PosRL", m_rearLeft->getSwervePosition());
+            frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->getSwervePosition());
         }
 
         void driveController(frc::Joystick *controller);

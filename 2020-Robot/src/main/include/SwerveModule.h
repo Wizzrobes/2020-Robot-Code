@@ -14,6 +14,10 @@ Public Methods
         Sets the driving speed to a double.
     void setSwerveSpeed(const double&)
         Sets the swerve speed to a double.
+    void setSwerveBrake(const bool &)
+        If true, sets the swerve to brake mode, if false, to coast mode.
+        This is used in SwerveTrain to allow "unlocking" the swerve wheels
+        for zeroing by overriding the default brake initialization.
     void setZeroPosition()
         Sets the zero position to the current position.
     double getDrivePosition()
@@ -105,10 +109,22 @@ class SwerveModule {
 
             m_swerveMotor->Set(speedToSet);
         }
+        void setSwerveBrake(const bool &brake) {
+
+            if (brake) {
+
+                m_swerveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+            }
+            else {
+
+                m_swerveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
+            }
+        }
         void setZeroPosition() {
 
             m_swerveZeroPosition = m_swerveMotorEncoder->GetPosition();
         }
+
         double getDrivePosition() {
 
             return m_driveMotorEncoder->GetPosition();
