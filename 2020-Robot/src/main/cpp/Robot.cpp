@@ -26,7 +26,7 @@ SwerveModule rearLeftModule(R_CANIDzionRearLeftDrive, R_CANIDzionRearLeftSwerve)
 SwerveModule rearRightModule(R_CANIDzionRearRightDrive, R_CANIDzionRearRightSwerve);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 
-Hal hal(arduino, intake, launcher, limelight, navX, zion);
+Hal Hal9000(arduino, intake, launcher, limelight, navX, zion);
 
 frc::Joystick *playerOne;
 frc::XboxController *playerTwo;

@@ -36,7 +36,7 @@ const int R_controllerPortPlayerOne = 0;
 const int R_controllerPortPlayerTwo = 1;
 
 //This deadzone is used to determine when the controller is completely motionless
-const double R_deadzoneController = .2;
+const double R_deadzoneController = .1;
 //And this one is to determine when rotation is being induced, as simply operation
 //of the controller often results in errant rotation. Due to how easy it is to
 //drift, it is significantly higher.

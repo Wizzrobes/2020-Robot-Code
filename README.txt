@@ -39,7 +39,7 @@ FRC Team 4624's 2020-Robot-Code
    The code in this project is also fully documented, with a complete
     write-up in the Arduino header file in 2020-Robot. Documentation
     follows the template laid out in 2020-Robot.
-  Compiling-Usage
+  Compiling/Usage
    This project is written and maintained in the Arduino IDE version
     1.8.4 - any version higher than 1.0 (and possibly older) should
     be able to both compile it and upload it to a board just fine.
