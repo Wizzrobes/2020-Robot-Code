@@ -40,11 +40,16 @@ void Robot::RobotInit() {
 
     frc::SmartDashboard::PutNumber("Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
     frc::SmartDashboard::PutNumber("Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
+
+    zion.setSwerveBrake(false);
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
-void Robot::TeleopInit() {}
+void Robot::TeleopInit() {
+
+    zion.setSwerveBrake(true);
+}
 void Robot::TeleopPeriodic() {
 
     if (playerOne->GetRawButtonPressed(3)) {
@@ -62,16 +67,29 @@ void Robot::TeleopPeriodic() {
 
         double climbSpeed = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
         double translateSpeed = playerTwo->GetX(frc::GenericHID::kLeftHand);
+        double wheelSpeed = playerTwo->GetX(frc::GenericHID::kRightHand);
+        bool lock = !playerTwo->GetBumper(frc::GenericHID::kRightHand);
         climber.setSpeed(Climber::Motor::kClimb, climbSpeed);
         climber.setSpeed(Climber::Motor::kTranslate, translateSpeed);
+        climber.setSpeed(Climber::Motor::kWheel, wheelSpeed);
+        climber.lock(lock);
     }
     else {
 
         climber.setSpeed(Climber::Motor::kClimb);
         climber.setSpeed(Climber::Motor::kTranslate);
+        climber.setSpeed(Climber::Motor::kWheel);
+        climber.lock();
     }
 
-    intake.setSpeed(-playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) * R_executionCapIntake + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand) * R_executionCapIntake);
+    if (!playerTwo->GetBackButton()) {
+
+        intake.setSpeed(-playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) * R_executionCapIntake + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand) * R_executionCapIntake);
+    }
+    else {
+
+        intake.setSpeed();
+    }
 
     if (playerTwo->GetXButton()) {
 

@@ -14,10 +14,10 @@ Public Methods
     void setSpeed(const int&, const double& = 0)
         Sets the speed of the supplied LiftMotor to the passed double
         (defaults to 0).
-
-    void unlock(const bool& = false)
-        If true, unlocks the motor to move the arm up. If false or null,
-        locks it. Persists across calls (it's hardware ;))
+    void lock(const bool& = true)
+        If true, locks the climber in the up direction. If false or null,
+        unlocks it. Persists across calls (it's hardware ;)). Defaults to
+        locking.
 
     enum LiftMotor
         Used to select which motor the set function operates on.
@@ -54,15 +54,16 @@ class Climber {
                     break;
             }
         }
-        void unlock(const bool &action = false) {
+
+        void lock(const bool &action = true) {
 
             if (action) {
 
-                m_ratchetServo->SetAngle(15);
+                m_ratchetServo->SetAngle(0);
             }
             else {
 
-                m_ratchetServo->SetAngle(0);
+                m_ratchetServo->SetAngle(15);
             }
         }
 
