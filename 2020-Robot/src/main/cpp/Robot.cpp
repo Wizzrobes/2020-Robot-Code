@@ -4,7 +4,7 @@
 
 #include "Arduino.h"
 #include "Climber.h"
-#include "HAL.h"
+#include "Hal.h"
 #include "Intake.h"
 #include "Launcher.h"
 #include "Limelight.h"
@@ -26,7 +26,7 @@ SwerveModule rearLeftModule(R_CANIDzionRearLeftDrive, R_CANIDzionRearLeftSwerve)
 SwerveModule rearRightModule(R_CANIDzionRearRightDrive, R_CANIDzionRearRightSwerve);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 
-HAL Hal(arduino, intake, launcher, limelight, navX, zion);
+Hal hal(arduino, intake, launcher, limelight, navX, zion);
 
 frc::Joystick *playerOne;
 frc::XboxController *playerTwo;

@@ -70,10 +70,10 @@ Private Methods
 #include "SwerveTrain.h"
 #include "VectorDouble.h"
 
-class HAL {
+class Hal {
 
     public:
-        HAL(Arduino &refArduino, Intake &refIntake, Launcher &refLauncher, Limelight &refLimelight, NavX &refNavX, SwerveTrain &refZion) {
+        Hal(Arduino &refArduino, Intake &refIntake, Launcher &refLauncher, Limelight &refLimelight, NavX &refNavX, SwerveTrain &refZion) {
 
             *arduino = refArduino;
             *intake = refIntake;
