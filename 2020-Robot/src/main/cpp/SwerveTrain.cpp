@@ -103,7 +103,6 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         Due to this, it must be reset when not in movement to allow
         this behavior to occur...
         */
-        assumeNearestZeroPosition();
         setDriveSpeed(0);
     }
     //Otherwise, go to the result vectors and use the magnitude to set the

@@ -7,7 +7,9 @@
 
 /*_____RoboRIO PWM Pin Declarations_____*/
 const int R_PWMPortClimberMotorClimb = 0;
-const int R_PWMPortClimberMotorTranslate = 0;
+const int R_PWMPortClimberMotorTranslate = 1;
+const int R_PWMPortClimberMotorWheel = 2;
+const int R_PWMPortClimberServoLock = 3;
 /*___End RoboRIO PWM Pin Declarations___*/
 
 /*_____RoboRIO DIO Pin Declarations_____*/

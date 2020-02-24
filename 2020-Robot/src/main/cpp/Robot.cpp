@@ -15,7 +15,7 @@
 #include "SwerveTrain.h"
 
 Arduino arduino;
-Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate);
+Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock);
 Intake intake(R_CANIDmotorIntake);
 Launcher launcher(R_CANIDmotorLauncherIndex, R_CANIDmotorLauncherLaunch);
 Limelight limelight;

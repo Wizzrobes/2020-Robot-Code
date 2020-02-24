@@ -6,13 +6,18 @@ Constructors
     Climber(const int&, const int&, const int&)
         Create a climber with its climb, translate, and wheel-rotate 
         motors as Victor SPX speed controller objects
-        on the supplied PWM ports.
+        on the supplied PWM ports, and its servo for locking its ratchet
+        on another PWM port.
 
 Public Methods
 
     void setSpeed(const int&, const double& = 0)
-        Sets the speed of the supplied motor to the passed double
+        Sets the speed of the supplied LiftMotor to the passed double
         (defaults to 0).
+
+    void unlock(const bool& = false)
+        If true, unlocks the motor to move the arm up. If false or null,
+        locks it. Persists across calls (it's hardware ;))
 
     enum LiftMotor
         Used to select which motor the set function operates on.
@@ -20,16 +25,19 @@ Public Methods
 
 #pragma once
 
+#include <frc/Servo.h>
 #include <frc/VictorSP.h>
 
 class Climber {
 
     public:
-        Climber(const int &climbMotorPWMPort, const int &translateMotorPWMPort, const int &wheelMotorPWMPort) {
+        Climber(const int &climbMotorPWMPort, const int &translateMotorPWMPort, const int &wheelMotorPWMPort, const int &servoPWMPort) {
 
             m_climbMotor = new frc::VictorSP(climbMotorPWMPort);
             m_translateMotor = new frc::VictorSP(translateMotorPWMPort);
             m_wheelMotor = new frc::VictorSP(wheelMotorPWMPort);
+
+            m_ratchetServo = new frc::Servo(servoPWMPort);
         }
 
         void setSpeed(const int &motor, const double &speedToSet = 0) {
@@ -46,6 +54,17 @@ class Climber {
                     break;
             }
         }
+        void unlock(const bool &action = false) {
+
+            if (action) {
+
+                m_ratchetServo->SetAngle(15);
+            }
+            else {
+
+                m_ratchetServo->SetAngle(0);
+            }
+        }
 
         enum Motor {
 
@@ -56,4 +75,6 @@ class Climber {
         frc::VictorSP *m_climbMotor;
         frc::VictorSP *m_translateMotor;
         frc::VictorSP *m_wheelMotor;
+
+        frc::Servo *m_ratchetServo;
 };
