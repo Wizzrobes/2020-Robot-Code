@@ -14,7 +14,7 @@
 #include "SwerveModule.h"
 #include "SwerveTrain.h"
 
-//Arduino arduino;
+Arduino arduino;
 Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock);
 Intake intake(R_CANIDmotorIntake);
 Launcher launcher(R_CANIDmotorLauncherIndex, R_CANIDmotorLauncherLaunch);
@@ -26,7 +26,7 @@ SwerveModule rearLeftModule(R_CANIDzionRearLeftDrive, R_CANIDzionRearLeftSwerve)
 SwerveModule rearRightModule(R_CANIDzionRearRightDrive, R_CANIDzionRearRightSwerve);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 
-//Hal Hal9000(arduino, intake, launcher, limelight, navX, zion);
+Hal Hal9000(arduino, intake, launcher, limelight, navX, zion);
 
 frc::Joystick *playerOne;
 frc::XboxController *playerTwo;

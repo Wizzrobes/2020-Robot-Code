@@ -13,7 +13,7 @@ Constructors
 
 Public Methods
 
-    void setDriveSpeed(const int&, const double&)
+    void setDriveSpeed(const double&)
         Sets a speed to the driving motors on the train.
     void setSwerveSpeed(const double&)
         Sets a speed to all swerve motors on the train.
@@ -50,16 +50,13 @@ Public Methods
         controller's joystick value. This allows manual adjustment from an
         enabled state in case of either drift or error.
         TODO: CURRENTLY WRITTEN FOR A JOYSTICK, WILL NEED TO CHANGE.
-
-    enum Motor
-        Selects a motor that the setDriveSpeed function should operate on.
-
-Protected Methods
-
     double getClockwiseREVRotationsFromCenter(frc::Joystick*)
         Discernes how many clockwise REV rotations from center the current
         location of the joystick is using vector trigonometry and properties.
         See https://en.wikipedia.org/wiki/Dot_product#Geometric_definition
+
+Private Methods
+
     double getClockwiseREVRotationsFromCenter(const VectorDouble&)
         Same as above, but accepts a vector outright instead of stripping
         one from the supplied controller.
@@ -178,7 +175,7 @@ class SwerveTrain {
     public:
 
         //This is very useful in accurate auto positioning, so it is
-        //overriden public, specifically for Hal pass use.
+        //overriden public, specifically for Hal pass use at a low level.
         double getClockwiseREVRotationsFromCenter(const VectorDouble &vector);
     private:
 

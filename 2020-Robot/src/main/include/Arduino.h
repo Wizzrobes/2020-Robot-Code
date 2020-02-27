@@ -1,160 +1,152 @@
 /*
 This class allows interfacing with an Arduino microcontroller as an auxiliary
-    processor to the RoboRIO with both data transmission (Tx) and reception
-    (Rx). This is implemented for use in exporting sensor data of sensors
-    which require more low-level operation and pinging than the RIO can handle
-    alone, as well as commanding devices connected to an Arduino, such as RGB
-    LED strips, which are also too high-refresh and low-level for the RIO to
-    efffectively manage. The way it does this is over USB, which is over
-    serial. To minimize and simplify the amount of serial transactions
-    necessary, it only completes one transaction with one object each time data
-    transmission occurs, and it fulfills this with a string called the
-    registry, formed of multiple registers (locations where data is stored). On
-    each cycle, the RoboRIO sends the registry out over serial, and the Arduino
-    responds with the registry in-turn. Data can be added or extracted from the
-    registry, which fulfills both transmission and reception of alphanumeric
-    data. Below is a diagram of the 32-character registry, which contains
-    8 registers each delimited with |:
+    processor to the RoboRIO through DIO ports on each controller. Toggling
+    the state of certain ports from the RIO illicits a certain response from
+    others connected to it, as described in the PhoneBook. Currently, the
+    Arduino is only used for dual sonar measurement from the launching side
+    of the robot for distance-based triangulation and positioning. See the
+    Arduino sketch for more detail on that side of things.
 
-    |x|xxxxx|xxxxx|xxxxx|xxxxx|xxxxx|xxxxx|x|
-    A B     C     D     E     F     G     H
+PhoneBook
+    ------------------------------
+    |RIOPort|Dir|ArduPin|Function|
+    ------------------------------
+    0       ->  2       RefA: Enables measurement of "far" sonar distances
+    1       ->  3       RefB: Enables measurement of "close" sonar distances
+    2       <-  4       RefC: Low if no measuring, high if left sonar is target
+    3       <-  5       RefD: Low if no measuring, high if rght sonar is target
+    4       <-  6       RefE: Low if no measure, high if skewed left
+    5       <-  7       RefF: Low if no measure, high if skewed right
 
-    A. Begin Register: This value should read 'A' when the Rio transmits the
-        registry, and will read 'B' after the Arduino responds with the registry.
-        Any other value at any other time is in error. This is used to ensure
-        success over many serial transactions occurring at many times.
-    B. Tx Register 0: This register is modified by the RoboRIO and then
-        transmitted to the Arduino. It can be used to transmit any alphanumeric
-        data, but it is logically used in modifying the behavior of whatevever
-        device is returning data on Rx Register 0.
-    C-D. Tx Register 1-Tx Register 2
-    E. Rx Register 0: This register is modified by the Arduino and then
-        transmitted to the RoboRIO. It can also be used to receive any
-        alphanumeric data from the Arduino, but it is logically used
-        to receive data from whatever sensor is transmitting on Register 0.
-    F-G. Rx Register 1-Rx Register 2
-    H. End Register: This value should read 'Y' when the Rio transmits, and
-        'Z' on receive. This is to ensure that both ends of the registry
-        were transmitted and received properly. Length is also checked.
-
-    On the RIO, the registry is a WPI::StringRef object, allowing it to
-        interface with the FRC Serial functions. It is usually referenced by a
-        temporary string to be operated on, and then used as-is.
+    RefA
+        Setting this pin high begins measurement and report of sonar
+        distances according to the "far" distance as defined in the Arduino
+        sketch.
+    RefB
+        Same as above, but for the "close" sonar distances. This system
+        allows measurement of two target distances from the wall. Setting
+        both of these pins high is the equivalent of both low. These
+        distances are defined in the Arduino sketch,
+    RefC
+        Once measurement begins, this pin is high if the left sonar sensor
+        is in tolerance for the current target distance, "close" or "far".
+        Tolerances are also defined in the Arduino sketch.
+    RefD
+        Same as above, but for the right sensor.
+    RefE
+        Once measurement begins, this pin is high if the robot needs to
+        rotate clockwise in order to be normal to the wall, within another
+        tolerance. Low otherwise.
+    RefF
+        Same as above, but for counterclockwise.
 
 
 class Arduino
 
 Constructors
 
-    Arduino(const frc::SerialPort::Port&, const int&)
-        Creates a serial interface called Arduino on the specified port at the
-        specified baud rate. These default to frc::SerialPort::Port::kUSB1 and
-        115200, respectively.
+    Arduino()
+        Creates an interface with the Arduino on the pins as defined in the
+        PhoneBook. These are kept out of RobotMap as they need never change.
 
 Public Methods
 
-    std::string getRegister(const Register&)
-        Takes a register as defined in enum Register and returns a string of
-        the values found there. Does no error checking itself! :)
-    bool setRegister(const Register&, const std::string&): Takes a register
-        as defined in enum Register and sets its full contents to the most
-        usable data of the passed string starting at the beginning. Returns
-        true if that operation was possible, false if it was not. In case of
-        failure, no data in the registry is updated!
-    Note that these get/setters allow getting and setting of things that
-        shouldn't necessarily be get or set - setting a received register
-        is such an example, as is tampering with one to be transmitted. Due
-        to this, the order is set, tx, rx, get. This allows a bit more control
-        over the whole system. The entire thing is pretty low-level;
-        be careful.
-    bool tx()
-        Configures and transmits the registry; returns false if any of
-        those events fail at any time. If false is returned, no data was sent!
-    bool rx()
-        Tries to receive 32 bytes to place into the registry. If it
-        gets all of them, sets it to the registry, if it doesn't, no data is
-        updated! TODO: DOES NO ERROR CHECKING YET
+    void setSonarRxMode(const int& = SonarDistances::kIdle)
+        Sets the mode of the Arudino to measure either close or far distances,
+        or to go idle, with a SonarDistances argument. Writes this setting to
+        the Arduino immediately. Always sets all outbound pins for safety.
+        Does nothing in event of malformed argument. Defaults to idling.
+    bool getSonarInTarget(const int&)
+        Takes a SonarSides argument, returns true if that side was in target,
+        false if it was not. Returns false in event of malformed argument.
+    bool getSonarSkew(cosnt int&)
+        Takes a SonarSides argument, returns true if the robot is skewed
+        in that direciton, false if it was not. Returns false in event of a
+        malformed argument.
 
-    enum Registry
-        Used as a paramater for the get and set function to denote
-        which register is being operated on in the registry.
+    enum SonarDistances
+        Used as a paramater for the setRxMode function to specify either
+        close, far, or idle measurement.
+    enum SonarSides
+        Used as a paramater for the getSonarInTarget function to specify which
+        side sensor to read, left or right.
 */
 
 #pragma once
 
-#include <array>
-
-#include <frc/SerialPort.h>
-#include <wpi/StringRef.h>
+#include <frc/DigitalInput.h>
+#include <frc/DigitalOutput.h>
 
 class Arduino {
 
     public:
-        Arduino(const frc::SerialPort::Port &port = frc::SerialPort::Port::kUSB1, const int &baudRate = 115200) {
+        Arduino() {
 
-            arduino = new frc::SerialPort(baudRate, port);
-            //Initialize the registry to its documented state
-            m_registry = std::string("A000000000000000000000000000000Y");
+            m_txReportFar = new frc::DigitalOutput(0);
+            m_txReportClose = new frc::DigitalOutput(1);
+
+            m_rxDistanceLeft = new frc::DigitalInput(2);
+            m_rxDistanceRight = new frc::DigitalInput(3);
+            m_rxSkewLeft = new frc::DigitalInput(4);
+            m_rxSkewRight = new frc::DigitalInput(5);
         }
 
-        std::string getRegister(const int &regToGet);
-        bool setRegister(const int &regToSet, const std::string &stringToSet);
+        void setSonarRxMode(const int &operation = SonarDistances::kIdle) {
 
-        bool tx() {
+            switch (operation) {
 
-            //Setup the registry to be transmitted and check its total length;
-            //while doing so, return false if any of the operations fail, and
-            //then transmit if they all pass.
-            if (setRegister(Registry::kBegin, "A")) {
+                case SonarDistances::kIdle:
+                    m_txReportClose->Set(false);
+                    m_txReportFar->Set(false);
+                    break;
+                case SonarDistances::kClose:
+                    m_txReportClose->Set(true);
+                    m_txReportFar->Set(false);
+                    break;
+                case SonarDistances::kFar:
+                    m_txReportClose->Set(false);
+                    m_txReportFar->Set(true);
+            }
+        }
 
-                if (setRegister(Registry::kEnd, "Y")) {
+        bool getSonarInTarget(const int &side) {
 
-                    if (m_registry.length() == 32) {
+            switch (side) {
 
-                        if (arduino->Write(m_registryRef) == 32) {
-
-                            return true;
-                        }
-                    }
-                }
+                case SonarSides::kLeft:
+                    return m_rxDistanceLeft->Get();
+                case SonarSides::kRight:
+                    return m_rxDistanceRight->Get();
             }
             return false;
         }
-        bool rx() {
+        bool getSonarSkew(const int &skewDirection) {
 
-            std::string receivedRegister;
-            for (int currentPosition = 0; currentPosition != 32; ++currentPosition) {
+            switch (skewDirection) {
 
-                char *currentCharacter;
-                if (arduino->Read(currentCharacter, 1)) {
-
-                    receivedRegister += *currentCharacter;
-                }
-                else {
-
-                    return false;
-                }
+                case SonarSides::kLeft:
+                    return m_rxSkewLeft->Get();
+                case SonarSides::kRight:
+                    return m_rxSkewRight->Get();
             }
-            m_registry = receivedRegister;
-            return true;
+            return false;
         }
 
-        //These values are used to pass registry locations to functions. kBegin, kEnd, and kRegistry are
-        //arbitrary, whereas the rest of the register names indicate their own start positions
-        //in the registry.
-        enum Registry {
+        enum SonarDistances {
 
-            kBegin,
-            kRegisterTx0 = 1, kRegisterTx1 = 6, kRegisterTx2 = 11,
-            kRegisterRx0 = 16, kRegisterRx1 = 21, kRegisterRx2 = 26,
-            kEnd = 31,
-            kRegistry
+            kIdle, kClose, kFar
+        };
+        enum SonarSides {
+
+            kLeft, kRight
         };
 
     private:
-        //Setup a string to operate on the registry, and refer a StringRef to it for seial use
-        std::string m_registry;
-        wpi::StringRef m_registryRef = m_registry;
+        frc::DigitalOutput *m_txReportFar;
+        frc::DigitalOutput *m_txReportClose;
 
-        frc::SerialPort *arduino;
+        frc::DigitalInput *m_rxDistanceLeft;
+        frc::DigitalInput *m_rxDistanceRight;
+        frc::DigitalInput *m_rxSkewLeft;
+        frc::DigitalInput *m_rxSkewRight;
 };
