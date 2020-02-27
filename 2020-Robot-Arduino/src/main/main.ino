@@ -50,15 +50,17 @@ void loop() {
     if (registry.length() > 0) {
 
         //If there's data left over (more than 32 chars sent)...
+        delay(5);
         if (Serial.available() > 0) {
 
             //Discard and read the rest of the data to null...
-            Serial.println("NACK(TooLen):");
             while (Serial.available()) {
 
                 Serial.read();
                 delay(5);
             }
+            //And error.
+            Serial.println("NACK(TooLen)");
         }
         //If there wasn't enough data (less than 32 chars sent)...
         else if (registry.length() < 32) {
@@ -84,7 +86,7 @@ void loop() {
 
                 optionRegister[x - 1] = registry.charAt(x);
             }
-            //Step through it and assign 1s and 0s to LEDs on even pins 12-2 sequentially
+            //Step through it and assign 1s and 0s to LEDs on even pins 12-4 sequentially
             for (unsigned x = 0; x != 5; ++x) {
 
                 if (optionRegister.charAt(x) == '1') {
