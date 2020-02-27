@@ -7,9 +7,9 @@
 
 /*_____RoboRIO PWM Pin Declarations_____*/
 const int R_PWMPortClimberMotorClimb = 0;
-const int R_PWMPortClimberMotorTranslate = 1;
+const int R_PWMPortClimberMotorTranslate = 3;
 const int R_PWMPortClimberMotorWheel = 2;
-const int R_PWMPortClimberServoLock = 3;
+const int R_PWMPortClimberServoLock = 1;
 /*___End RoboRIO PWM Pin Declarations___*/
 
 /*_____RoboRIO DIO Pin Declarations_____*/
@@ -64,7 +64,7 @@ const double R_executionCapIntake = .75;
 //This is the default launcher index speed.
 const double R_launcherDefaultSpeedIndex = 1;
 //And this the default launcher launch speed.
-const double R_launcherDefaultSpeedLaunch = .745;
+const double R_launcherDefaultSpeedLaunch = .7425;
 
 //This is the speed for automatic lateral movement in autonomous.
 const double R_zionAutoMovementSpeedLateral = .4;

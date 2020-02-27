@@ -38,17 +38,6 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     //TODO: why inverted?
     VectorDouble translationVector(-x, y);
 
-    //This conditional stops the robot from being field oriented
-    //TODO: Make it more usable and state why
-    /*if ((abs(x) > 0 || abs(y) > 0) && abs(z) > 0) {
-
-        angle = navX->getYawFull();
-    }
-    else {
-
-        navX->resetYaw();
-    }*/
-
     /*
     The rotational vectors are found by multiplying the controller's
     rotational axis [-1, 1] by the cosine of the wheel's RELATIVE yaw (the
@@ -104,6 +93,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         this behavior to occur...
         */
         setDriveSpeed(0);
+        assumeNearestZeroPosition();
     }
     //Otherwise, go to the result vectors and use the magnitude to set the
     //speed of driving, and set each wheel's swerve position based on its
