@@ -9,7 +9,7 @@ Constructors
 
 Public Methods
 
-    void zionAssumeAngle(const double&)
+    void zionAssumeAnglePosition(const double&)
         Rotates to the supplied angle based on the current angle of the NavX
         attached to Zion, with speed to do so found via regression.
     void zionAssumeDirection(const int&)
@@ -83,7 +83,7 @@ class Hal {
             zion = &refZion;
         }
 
-        void zionAssumeAngle(const double &angle) {
+        void zionAssumeAnglePosition(const double &angle) {
 
             const double currentAngleOff = navX->getYaw() - angle;
 
@@ -164,7 +164,7 @@ class Hal {
                 }
             }
             //Next, if we're plumb with the wall, but not centered:
-            else if (abs(limelight->horizontalOffset()) > R_zionAutoToleranceDistance) {
+            else if (abs(limelight->horizontalOffset()) > R_zionAutoToleranceHorizontalOffset) {
 
                 //Move left or right based on the x-offset to be centered.
                 if (limelight->horizontalOffset() > 0) {
@@ -212,7 +212,7 @@ class Hal {
             double distanceForward = 60;
 
             //Rotate 90* to line up the intake to the trench. TODO: Which direction?
-            zionAssumeAngle(navX->getAngle() + 90.);
+            zionAssumeAnglePosition(navX->getAngle() + 90.);
 
             //Move left the appropriate distance.
             zionAssumeDirection(ZionDirections::kLeft);
@@ -231,7 +231,7 @@ class Hal {
             zionAssumeDirection(ZionDirections::kRight);
             zionAssumeDistance(distanceRight);
 
-            zionAssumeAngle(navX->getAngle() + 90.);
+            zionAssumeAnglePosition(navX->getAngle() + 90.);
         }
         //TODO: Inline function documentation
         void zionTurn(const bool &direction = true) {

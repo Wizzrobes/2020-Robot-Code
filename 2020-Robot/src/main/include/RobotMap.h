@@ -70,9 +70,12 @@ const double R_launcherDefaultSpeedLaunch = .7425;
 const double R_zionAutoMovementSpeedLateral = .4;
 //And for rotational movement.
 const double R_zionAutoMovementSpeedRotational = .4;
-//How many inches the robot can be off in assuming a distance.
-const double R_zionAutoToleranceDistance = 10;
+//This is how close to zero the Limelight's horizontal target offset can be
+//in order to be considered centered.
+const double R_zionAutoToleranceHorizontalOffset = .5;
 //This is the tolerance for autonomous angle assumption in degrees.
+//THIS IS NOT SKEW "NORMAL" ANGLE TOLERANCE - that and distance tolerance
+//for auto are defined with the Arduino. This is used ONLY with the NavX.
 const double R_zionAutoToleranceAngle = 10;
 
 //The amount of REV rotations it takes for a swerve assembly to make a full rotation.
