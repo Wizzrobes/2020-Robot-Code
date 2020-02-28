@@ -36,7 +36,7 @@ double getSonarPinInches(const int &pin) {
     //to propagate to a target and then return to the sensor. Divide by two
     //as we want the distance to the target, not to the target and back.
     pinMode(pin, INPUT);
-    return pulseIn(pinSonarLeft, HIGH) / 74 / 2;
+    return pulseIn(pin, HIGH) / 74 / 2;
 }
 
 void setup() {
@@ -50,22 +50,11 @@ void setup() {
 void loop() {
 
     double sonarInchesLeft = 0, sonarInchesRight = 0;
-    //Average 5 samples of each sonar sensor to its variable for accuracy
-    //(measurements are so fast that there isn't a reason not to)
-    for (int trial = 0; trial != 5; ++trial) {
 
-        sonarInchesLeft += getSonarPinInches(pinSonarLeft);
-    }
-    sonarInchesLeft /= 5;
-
-    //Take a short delay to prevent cross-sensor interference
+    sonarInchesLeft = getSonarPinInches(pinSonarLeft);
+    //Take a short delay in getting to prevent cross-sensor interference.
     delay(10);
-
-    for (int trial = 0; trial != 5; ++trial) {
-
-        sonarInchesRight += getSonarPinInches(pinSonarLeft);
-    }
-    sonarInchesRight /= 5;
+    sonarInchesRight = getSonarPinInches(pinSonarRight);
 
     //Check the left sensor's distance to fulfill the conditions required
     //on the distance-related pins
@@ -101,4 +90,6 @@ void loop() {
         digitalWrite(pinSonarLeftSkew, HIGH);
         digitalWrite(pinSonarRightSkew, HIGH);
     }
+    //Take a system break - measurement every 10ms is just wear-and-tear.
+    delay(50);
 }
