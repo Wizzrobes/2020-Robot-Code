@@ -75,12 +75,12 @@ class Hal {
     public:
         Hal(Arduino &refArduino, Intake &refIntake, Launcher &refLauncher, Limelight &refLimelight, NavX &refNavX, SwerveTrain &refZion) {
 
-            *arduino = refArduino;
-            *intake = refIntake;
-            *launcher = refLauncher;
-            *limelight = refLimelight;
-            *navX = refNavX;
-            *zion = refZion;
+            arduino = &refArduino;
+            intake = &refIntake;
+            launcher = &refLauncher;
+            limelight = &refLimelight;
+            navX = &refNavX;
+            zion = &refZion;
         }
 
         void zionAssumeAngle(const double &angle) {
@@ -150,11 +150,11 @@ class Hal {
                 //counterclockwise if left distance is less than the right,
                 //and set straught if equal, as this is the direction in
                 //which rotation must commence to be plumb with the wall.
-                if (arduino->getSonarSkew(Arduino::SonarSides::kLeft)) {
+                if (arduino->getSonarSkew(Arduino::SonarSkews::kLeft)) {
 
                     zionTurn(true);
                 }
-                else if (arduino->getSonarSkew(Arduino::SonarSides::kRight)) {
+                else if (arduino->getSonarSkew(Arduino::SonarSkews::kRight)) {
 
                     zionTurn(false);
                 }
