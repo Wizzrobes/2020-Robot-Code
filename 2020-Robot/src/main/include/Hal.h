@@ -15,7 +15,11 @@ Public Methods
     void zionAssumeDirection(const int&)
         Uses a supplied ZionDirections to set the swerves to the
         appropriate position to move in that direction. Sets no speed
-        to the motors!
+        to the motors! Thus, the normal order is direction, distance, then
+        back to original direction. This system allows precise movement in
+        setting the swerves to one position and then moving back and forth
+        between them without swerve wobble, such as when lining up laterally
+        with the high goal.
     void zionAssumeDistance(const double&)
         Uses the supplied distance to move that far in whatever direction
         the swerves are currently set for. As such, the usual order is a
