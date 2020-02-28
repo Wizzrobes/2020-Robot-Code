@@ -68,7 +68,6 @@ Public Methods
 #pragma once
 
 #include <frc/DigitalInput.h>
-#include <frc/DigitalOutput.h>
 
 class Arduino {
 
@@ -93,9 +92,9 @@ class Arduino {
 
             switch (skewDirection) {
 
-                case SonarSides::kLeft:
+                case SonarSkews::kLeft:
                     return m_rxSkewLeft->Get();
-                case SonarSides::kRight:
+                case SonarSkews::kRight:
                     return m_rxSkewRight->Get();
             }
             return false;
@@ -109,7 +108,7 @@ class Arduino {
             return !m_rxSkewLeft->Get() && !m_rxSkewRight->Get() ? true : false;
         }
 
-        enum SonarSides {
+        enum SonarSkews {
 
             kLeft, kRight
         };
