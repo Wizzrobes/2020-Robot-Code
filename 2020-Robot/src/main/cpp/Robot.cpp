@@ -41,10 +41,15 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutNumber("Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
     frc::SmartDashboard::PutNumber("Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
 
+    //Unlock the swerve brake as the robot turns on for easy zeroing
+    //on the field, relocking at the beginning of autonomous for the match.
     zion.setSwerveBrake(false);
 }
 void Robot::RobotPeriodic() {}
-void Robot::AutonomousInit() {}
+void Robot::AutonomousInit() {
+
+    zion.setSwerveBrake(true);
+}
 void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {
 
