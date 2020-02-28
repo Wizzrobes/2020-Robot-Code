@@ -75,12 +75,12 @@ class Hal {
     public:
         Hal(Arduino &refArduino, Intake &refIntake, Launcher &refLauncher, Limelight &refLimelight, NavX &refNavX, SwerveTrain &refZion) {
 
-            *arduino = refArduino;
-            *intake = refIntake;
-            *launcher = refLauncher;
-            *limelight = refLimelight;
-            *navX = refNavX;
-            *zion = refZion;
+            arduino = &refArduino;
+            intake = &refIntake;
+            launcher = &refLauncher;
+            limelight = &refLimelight;
+            navX = &refNavX;
+            zion = &refZion;
         }
 
         void zionAssumeAngle(const double &angle) {
@@ -137,28 +137,24 @@ class Hal {
                 zion->setDriveSpeed();
             }
         }
-        void zionLineupToTarget(const double &leftDistToWall, const double &rightDistToWall, const double &targetOffset, const double &targetDistance) {
-
-            double averageDistanceFromWall = (leftDistToWall + rightDistToWall) / 2;
-            //The distance to shoot from away from the wall in inches.
-            double shotDistance = 144;
+        void zionLineupToTarget(const double &targetDistance) {
 
             //if and else if statements make sure the program runs in proper order-
             //rotation to be square with the wall, left-to-right lateral motion to be
             //centered with the target, and then front-to-back motion to set the proper
             //distance from the target.
             //If Zion is not plumb with the wall:
-            if (abs(leftDistToWall - rightDistToWall) > R_zionAutoToleranceDistance) {
+            if (!arduino->getSonarNormal()) {
 
                 //Rotate clockwise if right distance is less than the left,
                 //counterclockwise if left distance is less than the right,
                 //and set straught if equal, as this is the direction in
                 //which rotation must commence to be plumb with the wall.
-                if (leftDistToWall > rightDistToWall) {
+                if (arduino->getSonarSkew(Arduino::SonarSkews::kLeft)) {
 
                     zionTurn(true);
                 }
-                else if (rightDistToWall > leftDistToWall) {
+                else if (arduino->getSonarSkew(Arduino::SonarSkews::kRight)) {
 
                     zionTurn(false);
                 }
@@ -168,15 +164,15 @@ class Hal {
                 }
             }
             //Next, if we're plumb with the wall, but not centered:
-            else if (abs(targetOffset) < R_zionAutoToleranceDistance) {
+            else if (abs(limelight->horizontalOffset()) > R_zionAutoToleranceDistance) {
 
                 //Move left or right based on the x-offset to be centered.
-                if (targetOffset > 0) {
+                if (limelight->horizontalOffset() > 0) {
 
                     zionAssumeDirection(ZionDirections::kLeft);
                     zion->setDriveSpeed(R_zionAutoMovementSpeedLateral);
                 }
-                else if (targetOffset < 0) {
+                else if (limelight->horizontalOffset() < 0) {
 
                     zionAssumeDirection(ZionDirections::kRight);
                     zion->setDriveSpeed(R_zionAutoMovementSpeedLateral);
@@ -188,20 +184,21 @@ class Hal {
                 }
             }
             //Finally, if we're plumb and centered but off of target distance:
-            else if (abs(averageDistanceFromWall - targetDistance) > R_zionAutoToleranceDistance) {
+            else if (arduino->getSonarTooCloseTarget() || arduino->getSonarTooFarTarget()) {
 
-                if (averageDistanceFromWall > shotDistance) {
+                if (arduino->getSonarTooCloseTarget()) {
 
                     zion->setDriveSpeed(-R_zionAutoMovementSpeedLateral);
                 }
-                else if (averageDistanceFromWall < shotDistance) {
+                else if (arduino->getSonarTooFarTarget()) {
 
                     zion->setDriveSpeed(R_zionAutoMovementSpeedLateral);
                 }
-                else {
+            }
+            //If we're here, we're done! Stop :)
+            else {
 
-                    zion->setDriveSpeed();
-                }
+                zion->setDriveSpeed();
             }
         }
         void zionShootingPositionToTrenchGrab() {
