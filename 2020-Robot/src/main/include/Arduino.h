@@ -12,17 +12,19 @@ PhoneBook
     ------------------------------
     |RIOPort|Dir|ArduPin|Function|
     ------------------------------
-    2       <-  4       RefA: Low if no measuring, high if left sonar is target
-    3       <-  5       RefB: Low if no measuring, high if rght sonar is target
-    4       <-  6       RefC: Low if no measure, high if sonar skewed left
-    5       <-  7       RefD: Low if no measure, high if sonar skewed right
+    2       <-  4       RefA: High if left sonar too close or at target
+    3       <-  5       RefB: High if left sonar too far or at target
+    4       <-  6       RefC: High if sonar skewed left or plumb, low if OOR
+    5       <-  7       RefD: High if sonar skewed right or plumb, low if OOR
 
     RefA
         Once measurement begins, this pin is high if the left sonar sensor
-        is in tolerance for the target distance. Targets and tolerances
-        are defined in the Arduino sketch.
+        is in tolerance for the target distance or is too close, otherwise
+        it is low.  Targets and tolerances are defined in the Arduino sketch.
     RefB
-        Same as above, but for the right sensor.
+        This is high if the left sonar sensor is in tolerance for the target
+        distance or is too far, otherwise it is low.
+        If both A and B are high, target is on.
     RefC
         Once measurement begins, this pin is high if the robot needs to
         rotate clockwise in order to be normal to the wall, within another
@@ -43,11 +45,12 @@ Constructors
 
 Public Methods
 
-    bool getSonarInTarget(const int&)
-        Takes a SonarSides argument, returns true if that side was in target,
-        false if it was not. Returns false in event of a malformed argument.
+    bool getSonarTooCloseTarget()
+        Returns true if the left sonar is too close to the target.
+    bool getSonarTooFarTarget()
+        Returns true if the left sonar is too far from the target.
     bool getSonarSkew(cosnt int&)
-        Takes a SonarSides argument, returns true if the robot is skewed
+        Takes a SonarSkews argument, returns true if the robot is skewed
         in that direciton, false if it was not. Returns false in event of a
         malformed argument.
     bool getSonarNormal()
@@ -57,9 +60,9 @@ Public Methods
         Returns true if either of the sonar sensors are within range of
         a target, false if they are not.
 
-    enum SonarSides
-        Used as a paramater for the target and skew functions to specify which
-        side of sensor to read, left or right.
+    enum SonarSkews
+        Used as a paramater for the skew function to specify which
+        skew to check.
 */
 
 #pragma once
@@ -72,22 +75,19 @@ class Arduino {
     public:
         Arduino() {
 
-            m_rxDistanceLeft = new frc::DigitalInput(2);
-            m_rxDistanceRight = new frc::DigitalInput(3);
+            m_rxDistanceLeftTooClose = new frc::DigitalInput(2);
+            m_rxDistanceLeftTooFar = new frc::DigitalInput(3);
             m_rxSkewLeft = new frc::DigitalInput(4);
             m_rxSkewRight = new frc::DigitalInput(5);
         }
 
-        bool getSonarInTarget(const int &side) {
+        bool getSonarTooCloseTarget() {
 
-            switch (side) {
+            return m_rxDistanceLeftTooClose && !m_rxDistanceLeftTooFar ? true : false;
+        }
+        bool getSonarTooFarTarget() {
 
-                case SonarSides::kLeft:
-                    return m_rxDistanceLeft->Get();
-                case SonarSides::kRight:
-                    return m_rxDistanceRight->Get();
-            }
-            return false;
+            return m_rxDistanceLeftTooFar && !m_rxDistanceLeftTooClose ? true : false;
         }
         bool getSonarSkew(const int &skewDirection) {
 
@@ -116,8 +116,8 @@ class Arduino {
 
     private:
 
-        frc::DigitalInput *m_rxDistanceLeft;
-        frc::DigitalInput *m_rxDistanceRight;
+        frc::DigitalInput *m_rxDistanceLeftTooClose;
+        frc::DigitalInput *m_rxDistanceLeftTooFar;
         frc::DigitalInput *m_rxSkewLeft;
         frc::DigitalInput *m_rxSkewRight;
 };

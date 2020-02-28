@@ -184,10 +184,18 @@ class Hal {
                 }
             }
             //Finally, if we're plumb and centered but off of target distance:
-            else if (!arduino->getSonarInTarget(Arduino::SonarSides::kLeft)) {
+            else if (arduino->getSonarTooCloseTarget() || arduino->getSonarTooFarTarget()) {
 
-                zion->setDriveSpeed(-R_zionAutoMovementSpeedLateral);
+                if (arduino->getSonarTooCloseTarget()) {
+
+                    zion->setDriveSpeed(-R_zionAutoMovementSpeedLateral);
+                }
+                else if (arduino->getSonarTooFarTarget()) {
+
+                    zion->setDriveSpeed(R_zionAutoMovementSpeedLateral);
+                }
             }
+            //If we're here, we're done! Stop :)
             else {
 
                 zion->setDriveSpeed();

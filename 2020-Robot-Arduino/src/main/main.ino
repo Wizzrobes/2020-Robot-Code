@@ -5,8 +5,8 @@
 const int pinSonarLeft = 2;
 const int pinSonarRight = 3;
 
-const int pinSonarLeftInTarget = 4;
-const int pinSonarRightInTarget = 5;
+const int pinSonarLeftTooClose = 4;
+const int pinSonarLeftTooFar = 5;
 const int pinSonarLeftSkew = 6;
 const int pinSonarRightSkew = 7;
 
@@ -41,8 +41,8 @@ double getSonarPinInches(const int &pin) {
 
 void setup() {
 
-    pinMode(pinSonarLeftInTarget, OUTPUT);
-    pinMode(pinSonarRightInTarget, OUTPUT);
+    pinMode(pinSonarLeftTooClose, OUTPUT);
+    pinMode(pinSonarLeftTooFar, OUTPUT);
     pinMode(pinSonarLeftSkew, OUTPUT);
     pinMode(pinSonarRightSkew, OUTPUT);
 }
@@ -67,10 +67,10 @@ void loop() {
     }
     sonarInchesRight /= 5;
 
-    //Check the left and right sensors for meeting their distance target, left
-    //and then right, and respond on the relay pins accordingly.
-    digitalWrite(pinSonarLeftInTarget, abs(sonarInchesLeft - sonarInchesTargetDistance) < sonarInchesTargetTolerance ? HIGH : LOW);
-    digitalWrite(pinSonarRightInTarget, abs(sonarInchesRight - sonarInchesTargetDistance) < sonarInchesTargetTolerance ? HIGH : LOW);
+    //Check the left sensor's distance to fulfill the conditions required
+    //on the distance-related pins
+    digitalWrite(pinSonarLeftTooClose, sonarInchesLeft < sonarInchesTargetDistance + sonarInchesTargetTolerance ? HIGH : LOW);
+    digitalWrite(pinSonarLeftTooFar, sonarInchesLeft > sonarInchesTargetDistance - sonarInchesTargetTolerance ? HIGH : LOW);
 
     //Assign the skew pins by comparing the left and right distance within
     //that tolerance, bearing in mind the special conditions laid out.
