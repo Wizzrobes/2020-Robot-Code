@@ -1,101 +1,104 @@
-//See Arduino.h in 2020-Robot for the theory of this system.
+//Documentation here is purely inline - see Arduino.h in the main robot
+//project for the theory of operation of this system as well as the RIO
+//side of things.
 
-//Since Serial operates on character arrays, set up one of those
-//along with a string for ease of access.
-char registryArray[32];
-String registry;
+const int pinSonarLeft = 2;
+const int pinSonarRight = 3;
+
+const int pinSonarLeftInTarget = 4;
+const int pinSonarRightInTarget = 5;
+const int pinSonarLeftSkew = 6;
+const int pinSonarRightSkew = 7;
+
+const double sonarInchesTargetDistance = 12;
+//If distances are less than this far away from target in either direction,
+//they are reported as target.
+const double sonarInchesTargetTolerance = 1;
+//If distances are this close together on each side, they are reported as
+//not skewed.
+const double sonarInchesSkewTolerance = 4;
+
+//Manipulates a sonar sensor on the supplied pin to return the amount of inches
+//between the sensor and a target as a double. Has no handling for out-of-range
+//targets.
+double getSonarPinInches(const int &pin) {
+
+    //Pulse the sensor pin to activate a return pulse as stated in datasheet
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(pin, HIGH);
+    delayMicroseconds(5);
+    digitalWrite(pin, LOW);
+
+    //Read the resulting pulse in as microseconds and convert it to inches
+    //using the speed of sound, as it is the duration it took a sound wave
+    //to propagate to a target and then return to the sensor. Divide by two
+    //as we want the distance to the target, not to the target and back.
+    pinMode(pin, INPUT);
+    return pulseIn(pinSonarLeft, HIGH) / 74 / 2;
+}
 
 void setup() {
 
-    Serial.begin(115200);
-    Serial.setTimeout(50);
-    for (int x = 2; x < 13; x += 2) {
-
-        pinMode(x, OUTPUT);
-    }
+    pinMode(pinSonarLeftInTarget, OUTPUT);
+    pinMode(pinSonarRightInTarget, OUTPUT);
+    pinMode(pinSonarLeftSkew, OUTPUT);
+    pinMode(pinSonarRightSkew, OUTPUT);
 }
+
 void loop() {
 
-    //At the beginning of each loop, set the array equal to 32 (the size
-    //of a full register) meaningless characters (which are not used by
-    //the registry) and the registry itself equal to 32 whitespaces.
-    for (unsigned currentChar = 0; currentChar != 32; ++currentChar) {
+    double sonarInchesLeft = 0, sonarInchesRight = 0;
+    //Average 5 samples of each sonar sensor to its variable for accuracy
+    //(measurements are so fast that there isn't a reason not to)
+    for (int trial = 0; trial != 5; ++trial) {
 
-        registryArray[currentChar] = '|';
+        sonarInchesLeft += getSonarPinInches(pinSonarLeft);
     }
-    registry = "                                ";
+    sonarInchesLeft /= 5;
 
-    //Once data is available from the Rio, try to read 32 chars of it
-    //into the array.
-    if (Serial.available() > 0) {
+    //Take a short delay to prevent cross-sensor interference
+    delay(10);
 
-        Serial.readBytes(registryArray, 32);
+    for (int trial = 0; trial != 5; ++trial) {
+
+        sonarInchesRight += getSonarPinInches(pinSonarLeft);
     }
-    //Set each of those chars which isn't the meaningnless character
-    //to the string. The meaningless character allows the string to
-    //represent the true amount of information transmitted by the Rio.
-    for (unsigned currentChar = 0; currentChar != 32; ++currentChar) {
+    sonarInchesRight /= 5;
 
-        if (registryArray[currentChar] != '|') {
+    //Check the left and right sensors for meeting their distance target, left
+    //and then right, and respond on the relay pins accordingly.
+    digitalWrite(pinSonarLeftInTarget, abs(sonarInchesLeft - sonarInchesTargetDistance) < sonarInchesTargetTolerance ? HIGH : LOW);
+    digitalWrite(pinSonarRightInTarget, abs(sonarInchesRight - sonarInchesTargetDistance) < sonarInchesTargetTolerance ? HIGH : LOW);
 
-            registry[currentChar] = registryArray[currentChar];
-        }
+    //Assign the skew pins by comparing the left and right distance within
+    //that tolerance, bearing in mind the special conditions laid out.
+    //Always set all pins for safety.
+    //If left is 10 and right is 5, for example, we are skewed left...
+    if (sonarInchesLeft - sonarInchesRight > sonarInchesSkewTolerance) {
+
+        digitalWrite(pinSonarLeftSkew, HIGH);
+        digitalWrite(pinSonarRightSkew, LOW);
     }
-    //To complete representing only the true amount of information,
-    //remove all of the whitespace from the registry that we added
-    //at the beginning. This turns "potential" into "actual".
-    registry.trim();
+    //And the inverse for being skewed right...
+    else if (sonarInchesRight - sonarInchesLeft > sonarInchesSkewTolerance) {
 
-    //If we actually received something...
-    if (registry.length() > 0) {
+        digitalWrite(pinSonarLeftSkew, LOW);
+        digitalWrite(pinSonarRightSkew, HIGH);
+    }
+    //If we're out of range (beyond 110 inches, as in the datasheet) fulfill
+    //a special condition...
+    else if (sonarInchesLeft > 110 && sonarInchesRight > 110) {
 
-        //If there's data left over (more than 32 chars sent)...
-        if (Serial.available() > 0) {
+        digitalWrite(pinSonarLeftSkew, LOW);
+        digitalWrite(pinSonarRightSkew, LOW);
+    }
+    //If we've made it here, we must be normal in range, so fulfill that
+    //full success condition and be done.
+    else {
 
-            //Discard and read the rest of the data to null...
-            Serial.println("NACK(TooLen):");
-            while (Serial.available()) {
-
-                Serial.read();
-                delay(5);
-            }
-        }
-        //If there wasn't enough data (less than 32 chars sent)...
-        else if (registry.length() < 32) {
-
-            Serial.println("NACK(BadLen):" + registry);
-        }
-        //If there was, but the beginning is incorrect...
-        else if (registry.charAt(0) != 'A') {
-
-            Serial.println("NACK(BadBeg):" + registry);
-        }
-        //If there was, but the ending is incorrect...
-        else if (registry.charAt(31) != 'Y') {
-
-            Serial.println("NACK(BadEnd):" + registry);
-        }
-        //If we did everything correctly...
-        else {
-
-            //Form a string of the first tx register (five characters after the first)
-            String optionRegister = "00000";
-            for (unsigned x = 1; x != 6; ++x) {
-
-                optionRegister[x - 1] = registry.charAt(x);
-            }
-            //Step through it and assign 1s and 0s to LEDs on even pins 12-2 sequentially
-            for (unsigned x = 0; x != 5; ++x) {
-
-                if (optionRegister.charAt(x) == '1') {
-
-                    digitalWrite(12 - 2 * x, HIGH);
-                }
-                else {
-
-                    digitalWrite(12 - 2 * x, LOW);
-                }
-            }
-        }
+        digitalWrite(pinSonarLeftSkew, HIGH);
+        digitalWrite(pinSonarRightSkew, HIGH);
     }
 }
