@@ -61,7 +61,14 @@ void Robot::TeleopPeriodic() {
 
         navX.resetYaw();
     }
-    zion.driveController(playerOne);
+    if (playerOne->GetRawButton(12)) {
+
+        zion.driveControllerPrecision(playerOne); 
+    }
+    else {
+
+        zion.driveController(playerOne);
+    }
 
     //The second controller works in control layers on top of the basic
     //driving mode engaged with function buttons. If one of the functions

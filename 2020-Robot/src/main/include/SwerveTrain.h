@@ -42,9 +42,13 @@ Public Methods
         value is. Useful for low-level things.
     void publishSwervePositions()
         Puts the current swerve encoder positions to the SmartDashboard.
-    void driveController()
+    void driveController(frc::Joystick *controller)
         Fully drives the swerve train on the supplied controller.
-    void zeroController()
+    void driveControllerPrecision(frc::Joystick *controller)
+        Same as above, but scales all values according to a R_ constant
+        and doesn't re-center after maneuvering to allow for slow, incredibly
+        precise positioning by hand in the full range of the controller.
+    void zeroController(frc::Joystick *controller)
         Allows use of a controller through a mapped button which is held down
         in correspondence to a motor to slowly override its zero from that
         controller's joystick value. This allows manual adjustment from an
@@ -167,6 +171,7 @@ class SwerveTrain {
         }
 
         void driveController(frc::Joystick *controller);
+        void driveControllerPrecision(frc::Joystick *controller); 
         void zeroController(frc::Joystick *controller);
 
     private:
