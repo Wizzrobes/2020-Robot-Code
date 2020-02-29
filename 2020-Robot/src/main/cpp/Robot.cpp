@@ -40,21 +40,17 @@ void Robot::RobotInit() {
 
     frc::SmartDashboard::PutNumber("Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
     frc::SmartDashboard::PutNumber("Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
-
-    //Unlock the swerve brake as the robot turns on for easy zeroing
-    //on the field, relocking at the beginning of autonomous for the match.
-    zion.setSwerveBrake(false);
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
 
-    zion.setSwerveBrake(true);
+    //Set the zero position before beginning auto, as it should have been
+    //calibrated before the match. This persists for the match duration unless
+    //overriden.
+    zion.setZeroPosition();
 }
 void Robot::AutonomousPeriodic() {}
-void Robot::TeleopInit() {
-
-    zion.setSwerveBrake(true);
-}
+void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
 
     if (playerOne->GetRawButtonPressed(3)) {
@@ -67,17 +63,48 @@ void Robot::TeleopPeriodic() {
     }
     zion.driveController(playerOne);
 
+    //The second controller works in control layers on top of the basic
+    //driving mode engaged with function buttons. If one of the functions
+    //running under a button loses its button press, it will be overriden
+    //by the regular mode. Useful for cancellation. Layers override each other.
 
+    //The back button is "manual override" control layer. No auto, simply
+    //writes unupdated values directly to motors, unlocking the climber,
+    //with no execution caps or impediments. Overrides all other layers.
     if (playerTwo->GetBackButton()) {
+
+        climber.lock(false);
+        climber.setSpeed(Climber::Motor::kClimb, -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand));
+        climber.setSpeed(Climber::Motor::kTranslate, playerTwo->GetX(frc::GenericHID::kLeftHand));
+        climber.setSpeed(Climber::Motor::kWheel, playerTwo->GetX(frc::GenericHID::kRightHand));
+        intake.setSpeed(-playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand));
+        launcher.setIndexSpeed(playerTwo->GetY(frc::GenericHID::kLeftHand));
+        launcher.setLaunchSpeed(playerTwo->GetY(frc::GenericHID::kRightHand));
+    }
+    else {
+
+        climber.lock();
+        climber.setSpeed(Climber::Motor::kClimb);
+        climber.setSpeed(Climber::Motor::kTranslate);
+        climber.setSpeed(Climber::Motor::kWheel);
+        intake.setSpeed();
+        launcher.setIndexSpeed();
+        launcher.setLaunchSpeed();
+    }
+
+    //The start button is "climber" control layer. Controls nothing but the
+    //climber. Overrides the auto layer.
+    if (!playerTwo->GetBackButton() && playerTwo->GetStartButton()) {
 
         double climbSpeed = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
         double translateSpeed = playerTwo->GetX(frc::GenericHID::kLeftHand);
         double wheelSpeed = playerTwo->GetX(frc::GenericHID::kRightHand);
+        double toUnlock = !playerTwo->GetBumper(frc::GenericHID::kRightHand);
 
         climber.setSpeed(Climber::Motor::kClimb, climbSpeed);
         climber.setSpeed(Climber::Motor::kTranslate, translateSpeed);
         climber.setSpeed(Climber::Motor::kWheel, wheelSpeed);
-        climber.lock(false);
+        climber.lock(toUnlock);
     }
     else {
 
@@ -87,15 +114,14 @@ void Robot::TeleopPeriodic() {
         climber.lock();
     }
 
-    if (!playerTwo->GetBackButton()) {
+    //The center button is the "auto" control layer. Enables auto functions.
+    //Overrides regular driving, but is overriden by all other layers.
+    if (!playerTwo->GetBackButton() && !playerTwo->GetStartButton() && playerTwo->GetRawButton(9)) {}
+    else {}
 
-        intake.setSpeed(-playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) * R_executionCapIntake + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand) * R_executionCapIntake);
-    }
-    else {
+    intake.setSpeed(-playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) * R_executionCapIntake + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand) * R_executionCapIntake);
 
-        intake.setSpeed();
-    }
-
+    //If no layers were engaged, regular driving can begin.
     if (playerTwo->GetXButton()) {
 
         frc::SmartDashboard::PutNumber("Launcher::Speed-Index:", playerTwo->GetY(frc::GenericHID::kLeftHand));
