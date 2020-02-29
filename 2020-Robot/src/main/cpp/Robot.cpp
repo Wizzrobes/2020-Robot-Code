@@ -40,6 +40,14 @@ void Robot::RobotInit() {
 
     frc::SmartDashboard::PutNumber("Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
     frc::SmartDashboard::PutNumber("Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
+
+    m_booleanClimberLock = true;
+    m_speedClimberClimb     = 0;
+    m_speedClimberTranslate = 0;
+    m_speedClimberWheel     = 0;
+    m_speedIntake           = 0;
+    m_speedLauncherIndex    = 0;
+    m_speedLauncherLaunch   = 0;
 }
 void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
@@ -80,45 +88,40 @@ void Robot::TeleopPeriodic() {
     //with no execution caps or impediments. Overrides all other layers.
     if (playerTwo->GetBackButton()) {
 
-        climber.lock(false);
-        climber.setSpeed(Climber::Motor::kClimb, -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand));
-        climber.setSpeed(Climber::Motor::kTranslate, playerTwo->GetX(frc::GenericHID::kLeftHand));
-        climber.setSpeed(Climber::Motor::kWheel, playerTwo->GetX(frc::GenericHID::kRightHand));
-        intake.setSpeed(-playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand));
-        launcher.setIndexSpeed(playerTwo->GetY(frc::GenericHID::kLeftHand));
-        launcher.setLaunchSpeed(playerTwo->GetY(frc::GenericHID::kRightHand));
+        m_booleanClimberLock = false;
+        m_speedClimberClimb = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
+        m_speedClimberTranslate = playerTwo->GetX(frc::GenericHID::kLeftHand);
+        m_speedClimberWheel = playerTwo->GetX(frc::GenericHID::kRightHand);
+        m_speedIntake = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
+        m_speedLauncherIndex = playerTwo->GetY(frc::GenericHID::kLeftHand);
+        m_speedLauncherLaunch = playerTwo->GetY(frc::GenericHID::kRightHand);
     }
     else {
 
-        climber.lock();
-        climber.setSpeed(Climber::Motor::kClimb);
-        climber.setSpeed(Climber::Motor::kTranslate);
-        climber.setSpeed(Climber::Motor::kWheel);
-        intake.setSpeed();
-        launcher.setIndexSpeed();
-        launcher.setLaunchSpeed();
+        m_booleanClimberLock = true;
+        m_speedClimberClimb     = 0;
+        m_speedClimberTranslate = 0;
+        m_speedClimberWheel     = 0;
+        m_speedIntake           = 0;
+        m_speedLauncherIndex    = 0;
+        m_speedLauncherLaunch   = 0;
     }
 
     //The start button is "climber" control layer. Controls nothing but the
     //climber. Overrides the auto layer.
     if (!playerTwo->GetBackButton() && playerTwo->GetStartButton()) {
 
-        double climbSpeed = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
-        double translateSpeed = playerTwo->GetX(frc::GenericHID::kLeftHand);
-        double wheelSpeed = playerTwo->GetX(frc::GenericHID::kRightHand);
-        double toUnlock = !playerTwo->GetBumper(frc::GenericHID::kRightHand);
-
-        climber.setSpeed(Climber::Motor::kClimb, climbSpeed);
-        climber.setSpeed(Climber::Motor::kTranslate, translateSpeed);
-        climber.setSpeed(Climber::Motor::kWheel, wheelSpeed);
-        climber.lock(toUnlock);
+        m_speedClimberClimb = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
+        m_speedClimberTranslate = playerTwo->GetX(frc::GenericHID::kLeftHand);
+        m_speedClimberWheel = playerTwo->GetX(frc::GenericHID::kRightHand);
+        m_booleanClimberLock = !playerTwo->GetBumper(frc::GenericHID::kRightHand);
     }
     else {
 
-        climber.setSpeed(Climber::Motor::kClimb);
-        climber.setSpeed(Climber::Motor::kTranslate);
-        climber.setSpeed(Climber::Motor::kWheel);
-        climber.lock();
+        m_speedClimberClimb = 0;
+        m_speedClimberTranslate = 0;
+        m_speedClimberWheel = 0;
+        m_booleanClimberLock = true;
     }
 
     //The center button is the "auto" control layer. Enables auto functions.
@@ -126,33 +129,45 @@ void Robot::TeleopPeriodic() {
     if (!playerTwo->GetBackButton() && !playerTwo->GetStartButton() && playerTwo->GetRawButton(9)) {}
     else {}
 
-    intake.setSpeed(-playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) * R_executionCapIntake + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand) * R_executionCapIntake);
-
     //If no layers were engaged, regular driving can begin.
-    if (playerTwo->GetXButton()) {
+    if (!playerTwo->GetBackButton() && !playerTwo->GetStartButton() && !playerTwo->GetRawButton(9)) {
 
-        frc::SmartDashboard::PutNumber("Launcher::Speed-Index:", playerTwo->GetY(frc::GenericHID::kLeftHand));
-    }
-    if (playerTwo->GetYButton()) {
+        m_speedIntake = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) * R_executionCapIntake + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand) * R_executionCapIntake;
 
-        frc::SmartDashboard::PutNumber("Launcher::Speed-Launch:", playerTwo->GetY(frc::GenericHID::kLeftHand));
-    }
-    if (playerTwo->GetAButton()) {
+        if (playerTwo->GetXButton()) {
 
-        launcher.setIndexSpeed(frc::SmartDashboard::GetNumber("Launcher::Speed-Index:", 0));
-    }
-    else {
+            frc::SmartDashboard::PutNumber("Launcher::Speed-Index:", playerTwo->GetY(frc::GenericHID::kLeftHand));
+        }
+        if (playerTwo->GetYButton()) {
 
-        launcher.setIndexSpeed(0);
-    }
-    if (playerTwo->GetBButton()) {
+            frc::SmartDashboard::PutNumber("Launcher::Speed-Launch:", playerTwo->GetY(frc::GenericHID::kLeftHand));
+        }
+        if (playerTwo->GetAButton()) {
 
-        launcher.setLaunchSpeed(frc::SmartDashboard::GetNumber("Launcher::Speed-Launch:", 0));
-    }
-    else {
+            m_speedLauncherIndex = frc::SmartDashboard::GetNumber("Launcher::Speed-Index:", 0);
+        }
+        else {
 
-        launcher.setLaunchSpeed(0);
+            m_speedLauncherIndex = 0;
+        }
+        if (playerTwo->GetBButton()) {
+
+            m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Launcher::Speed-Launch:", 0);
+        }
+        else {
+
+            m_speedLauncherLaunch = 0;
+        }
     }
+
+    //Once all layers have been evaluated, write out all of their values.
+    climber.lock(m_booleanClimberLock);
+    climber.setSpeed(Climber::Motor::kClimb, m_speedClimberClimb);
+    climber.setSpeed(Climber::Motor::kTranslate, m_speedClimberTranslate);
+    climber.setSpeed(Climber::Motor::kWheel, m_speedClimberWheel);
+    intake.setSpeed(m_speedIntake);
+    launcher.setIndexSpeed(m_speedLauncherIndex);
+    launcher.setLaunchSpeed(m_speedLauncherLaunch);
 }
 
 void Robot::TestPeriodic() {}

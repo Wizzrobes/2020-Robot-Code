@@ -48,7 +48,7 @@ class Climber {
                 //This motor is mounted upside-down, so invert it.
                 case Motor::kTranslate: m_translateMotor->Set(-speedToSet); break;
                 case Motor::kWheel: m_wheelMotor->Set(speedToSet); break;
-                case Motor::kBoth:
+                case Motor::kAll:
                     m_climbMotor->Set(speedToSet);
                     m_translateMotor->Set(speedToSet);
                     m_wheelMotor->Set(speedToSet);
@@ -64,13 +64,13 @@ class Climber {
             }
             else {
 
-                m_ratchetServo->SetAngle(65);
+                m_ratchetServo->SetAngle(50);
             }
         }
 
         enum Motor {
 
-            kClimb, kTranslate, kWheel, kBoth
+            kClimb, kTranslate, kWheel, kAll
         };
 
     private:

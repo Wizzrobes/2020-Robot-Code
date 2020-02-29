@@ -6,13 +6,14 @@
 #include <math.h>
 
 /*_____RoboRIO PWM Pin Declarations_____*/
-const int R_PWMPortClimberMotorClimb = 0;
+const int R_PWMPortClimberMotorClimb     = 0;
+const int R_PWMPortClimberServoLock      = 1;
+const int R_PWMPortClimberMotorWheel     = 2;
 const int R_PWMPortClimberMotorTranslate = 3;
-const int R_PWMPortClimberMotorWheel = 2;
-const int R_PWMPortClimberServoLock = 1;
 /*___End RoboRIO PWM Pin Declarations___*/
 
 /*_____RoboRIO DIO Pin Declarations_____*/
+//DIO declarations for Arduino interfacing are in Arduino.h :)
 /*___End RoboRIO DIO Pin Declarations___*/
 
 /*_____RoboRIO CAN Bus ID Declarations_____*/
