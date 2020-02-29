@@ -167,6 +167,7 @@ class SwerveTrain {
         }
 
         void driveController(frc::Joystick *controller);
+        void driveControllerPrecision(frc::Joystick *controller); 
         void zeroController(frc::Joystick *controller);
 
     private:

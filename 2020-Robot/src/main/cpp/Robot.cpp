@@ -60,7 +60,14 @@ void Robot::TeleopPeriodic() {
 
         navX.resetYaw();
     }
-    zion.driveController(playerOne);
+    
+    if(playerOne->GetRawButton(12)) {
+
+        zion.driveControllerPrecision(playerOne); 
+    } else {
+
+        zion.driveController(playerOne);
+    }
 
 
     if (playerTwo->GetBackButton()) {

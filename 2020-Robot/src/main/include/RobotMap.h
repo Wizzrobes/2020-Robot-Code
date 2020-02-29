@@ -61,6 +61,8 @@ const double R_executionCapZion = .75;
 //This one is for running the intake motors.
 const double R_executionCapIntake = .75;
 
+const double R_executionCapZionPrecision = .25 * R_executionCapZion;
+
 //This is the default launcher index speed.
 const double R_launcherDefaultSpeedIndex = 1;
 //And this the default launcher launch speed.
