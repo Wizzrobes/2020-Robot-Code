@@ -1,4 +1,6 @@
 #include <cameraserver/CameraServer.h>
+#include <frc/DigitalInput.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/Joystick.h>
 #include <frc/XboxController.h>
 
@@ -15,7 +17,8 @@
 #include "SwerveTrain.h"
 
 Arduino arduino;
-Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock);
+Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
+frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
 Intake intake(R_CANIDmotorIntake);
 Launcher launcher(R_CANIDmotorLauncherIndex, R_CANIDmotorLauncherLaunch);
 Limelight limelight;
@@ -49,7 +52,13 @@ void Robot::RobotInit() {
     m_speedLauncherIndex    = 0;
     m_speedLauncherLaunch   = 0;
 }
-void Robot::RobotPeriodic() {}
+void Robot::RobotPeriodic() {
+
+    //Whenever Zion is on, if the unlock swerve button is pressed and held,
+    //unlock the swerves for zeroing. Once released, lock them again. The
+    //switch is inverted by default.
+    zion.setSwerveBrake(switchSwerveUnlock.Get());
+}
 void Robot::AutonomousInit() {
 
     //Set the zero position before beginning auto, as it should have been
@@ -132,7 +141,7 @@ void Robot::TeleopPeriodic() {
     //If no layers were engaged, regular driving can begin.
     if (!playerTwo->GetBackButton() && !playerTwo->GetStartButton() && !playerTwo->GetRawButton(9)) {
 
-        m_speedIntake = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) * R_executionCapIntake + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand) * R_executionCapIntake;
+        m_speedIntake = (-playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand)) * R_executionCapIntake;
 
         if (playerTwo->GetXButton()) {
 
@@ -144,7 +153,7 @@ void Robot::TeleopPeriodic() {
         }
         if (playerTwo->GetAButton()) {
 
-            m_speedLauncherIndex = frc::SmartDashboard::GetNumber("Launcher::Speed-Index:", 0);
+            m_speedLauncherIndex = frc::SmartDashboard::GetNumber("Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
         }
         else {
 
@@ -152,7 +161,7 @@ void Robot::TeleopPeriodic() {
         }
         if (playerTwo->GetBButton()) {
 
-            m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Launcher::Speed-Launch:", 0);
+            m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
         }
         else {
 

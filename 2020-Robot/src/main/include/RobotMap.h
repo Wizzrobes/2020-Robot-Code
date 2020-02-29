@@ -14,6 +14,8 @@ const int R_PWMPortClimberMotorTranslate = 3;
 
 /*_____RoboRIO DIO Pin Declarations_____*/
 //DIO declarations for Arduino interfacing are in Arduino.h :)
+const int R_DIOPortSwitchClimberBottom = 0;
+const int R_DIOPortSwitchSwerveUnlock  = 1;
 /*___End RoboRIO DIO Pin Declarations___*/
 
 /*_____RoboRIO CAN Bus ID Declarations_____*/
