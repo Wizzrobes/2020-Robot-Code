@@ -4,7 +4,6 @@
 #include <frc/Joystick.h>
 #include <frc/XboxController.h>
 
-#include "Arduino.h"
 #include "Climber.h"
 #include "Hal.h"
 #include "Intake.h"
@@ -16,7 +15,6 @@
 #include "SwerveModule.h"
 #include "SwerveTrain.h"
 
-Arduino arduino;
 Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
 frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
 Intake intake(R_CANIDmotorIntake);
@@ -29,7 +27,7 @@ SwerveModule rearLeftModule(R_CANIDzionRearLeftDrive, R_CANIDzionRearLeftSwerve)
 SwerveModule rearRightModule(R_CANIDzionRearRightDrive, R_CANIDzionRearRightSwerve);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 
-Hal Hal9000(arduino, intake, launcher, limelight, navX, zion);
+Hal Hal9000(intake, launcher, limelight, navX, zion);
 
 frc::Joystick *playerOne;
 frc::XboxController *playerTwo;
@@ -102,8 +100,8 @@ void Robot::TeleopPeriodic() {
         m_speedClimberTranslate = playerTwo->GetX(frc::GenericHID::kLeftHand);
         m_speedClimberWheel = playerTwo->GetX(frc::GenericHID::kRightHand);
         m_speedIntake = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
-        m_speedLauncherIndex = playerTwo->GetY(frc::GenericHID::kLeftHand);
-        m_speedLauncherLaunch = playerTwo->GetY(frc::GenericHID::kRightHand);
+        m_speedLauncherIndex = -playerTwo->GetY(frc::GenericHID::kLeftHand);
+        m_speedLauncherLaunch = -playerTwo->GetY(frc::GenericHID::kRightHand);
     }
     else {
 

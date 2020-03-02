@@ -65,7 +65,7 @@ Private Methods
              {(1)/(1+e^((-1 * abs(z)) + 5)); z >= R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt
         s(z)={R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed; z < R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt
              {R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed; z < R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt
-            where
+            for
                 s = speed at which the motor rotates to assume a position
                 z = remaining REV revolutions of the position assumption
         to assign a speed with which to proceed towards the final position. It
