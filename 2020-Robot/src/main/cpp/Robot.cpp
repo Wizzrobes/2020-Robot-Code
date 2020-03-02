@@ -102,8 +102,8 @@ void Robot::TeleopPeriodic() {
         m_speedClimberTranslate = playerTwo->GetX(frc::GenericHID::kLeftHand);
         m_speedClimberWheel = playerTwo->GetX(frc::GenericHID::kRightHand);
         m_speedIntake = -playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand);
-        m_speedLauncherIndex = playerTwo->GetY(frc::GenericHID::kLeftHand);
-        m_speedLauncherLaunch = playerTwo->GetY(frc::GenericHID::kRightHand);
+        m_speedLauncherIndex = -playerTwo->GetY(frc::GenericHID::kLeftHand);
+        m_speedLauncherLaunch = -playerTwo->GetY(frc::GenericHID::kRightHand);
     }
     else {
 
