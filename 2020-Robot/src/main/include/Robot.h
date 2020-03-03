@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+
+#include <frc/smartdashboard/SendableChooser.h>
 #include <frc/TimedRobot.h>
 
 class Robot : public frc::TimedRobot {
@@ -12,9 +15,10 @@ class Robot : public frc::TimedRobot {
         void TeleopInit() override;
         void TeleopPeriodic() override;
 
-        void TestPeriodic() override;
-
     private:
+        frc::SendableChooser<std::string> *m_chooserAuto;
+        std::string *m_chooserAutoSelected;
+
         //These are used such that each speed is only set once for P2.
         //Prevents weird assignment bugs with motor speeds.
         bool m_booleanClimberLock;
