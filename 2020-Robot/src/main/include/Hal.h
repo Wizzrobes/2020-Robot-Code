@@ -203,7 +203,9 @@ class Hal {
             //Perform each step of the process wih a utilityVar so each
             //step only occurs once and in order. Evaluate the utilityVar
             //first so that the functions only run when necessary and as order
-            //necessitates.
+            //necessitates, as && is a short-circuiting operator. Thus, if it
+            //is not a function's turn to run, it does not run, and if it is,
+            //it is the only one that runs.
             //Rotate 90* to line up the intake to the trench. TODO: Which direction?
             if (m_utilityVarOne == 0 && zionAssumeRotationDegrees(90)) {
 

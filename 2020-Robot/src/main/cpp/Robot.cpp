@@ -1,5 +1,6 @@
 #include <cameraserver/CameraServer.h>
 #include <frc/DigitalInput.h>
+#include <frc/smartdashboard/SendableChooser.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/Joystick.h>
 #include <frc/XboxController.h>
@@ -39,8 +40,16 @@ void Robot::RobotInit() {
 
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
 
-    frc::SmartDashboard::PutNumber("Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
-    frc::SmartDashboard::PutNumber("Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
+    m_chooserAuto = new frc::SendableChooser<std::string>;
+    m_chooserAuto->AddDefault("Chooser::Auto::Do-Nothing", "doNothing");
+    m_chooserAuto->AddDefault("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
+    m_chooserAuto->AddOption("Chooser::Auto::3Cell", "threeCell");
+    m_chooserAuto->AddOption("Chooser::Auto::3Cell-Trench-3Cell", "winOut");
+    frc::SmartDashboard::PutData(m_chooserAuto);
+
+    frc::SmartDashboard::PutNumber("Field::Auto::3Cell-Delay", 0);
+    frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
+    frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
 
     m_booleanClimberLock = true;
     m_speedClimberClimb     = 0;
@@ -54,7 +63,7 @@ void Robot::RobotPeriodic() {
 
     //Whenever Zion is on, if the unlock swerve button is pressed and held,
     //unlock the swerves for zeroing. Once released, lock them again. The
-    //switch is inverted by default.
+    //switch is inverted by default, so no inversion is required.
     zion.setSwerveBrake(switchSwerveUnlock.Get());
 }
 void Robot::AutonomousInit() {
@@ -63,8 +72,27 @@ void Robot::AutonomousInit() {
     //calibrated before the match. This persists for the match duration unless
     //overriden.
     zion.setZeroPosition();
+    //Get which auto was selected to run in auto.
+    *m_chooserAutoSelected = m_chooserAuto->GetSelected();
 }
-void Robot::AutonomousPeriodic() {}
+void Robot::AutonomousPeriodic() {
+
+    //Run whichever auto we selected, setting the string to garbage
+    //once it is complete so that it only runs once. This way, only one loop
+    //has to be controlled. See Hal.h for examples of how complex autonomous
+    //control is accomplished with flow-of-control.
+    if (*m_chooserAutoSelected == "doNothing") {
+
+        *m_chooserAutoSelected = "done";
+    }
+    if (*m_chooserAutoSelected == "dotl") {
+
+        if (Hal9000.zionAssumeDistance(12)) {
+
+            *m_chooserAutoSelected = "done";
+        }
+    }
+}
 void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
 
@@ -176,8 +204,6 @@ void Robot::TeleopPeriodic() {
     launcher.setIndexSpeed(m_speedLauncherIndex);
     launcher.setLaunchSpeed(m_speedLauncherLaunch);
 }
-
-void Robot::TestPeriodic() {}
 
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
