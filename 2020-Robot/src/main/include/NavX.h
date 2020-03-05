@@ -14,13 +14,13 @@ Public Methods
         Returns the yaw value from 0-360.
         Rolls over at extremes; used with the standard unit circle.
     double getAngle()
-        Returns the angle value.
+        Returns the angle value (-infinity to infinity, beginning at 0).
     double getAbsoluteAngle()
         Returns the absolute value of the angle value.
     void resetYaw()
         Sets the yaw value to zero.
     void resetAll()
-        Resets all NavX return values.
+        Resets all NavX return values and calibrates the sensor.
 
     enum ConnectionType
         Used with the constructor to specify which interface to construct on.
@@ -55,7 +55,6 @@ class NavX {
 
             return navX->GetYaw();
         }
-        //TODO: Does this promote any benefit over getAngle()?
         double getYawFull(){
 
             if (getYaw() < 0) {

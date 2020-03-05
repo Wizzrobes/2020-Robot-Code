@@ -8,15 +8,20 @@ Constructors
 
 Public Methods
 
-    double horizontalOffset()
+    double getHorizontalOffset()
         Returns the horizontal offset of the target (tx).
-    double verticalOffset()
+    double getVerticalOffset()
         Returns the vertical offset of the target (ty).
-    double targetArea()
+    double getTargetArea()
         Returns the area of the target in-sight.
-    bool target()
+    bool getTarget()
         Returns true if there is a target in-sight, false otherwise.
     All return 0 in event of a null target.
+    void setProcessing(const bool& = true)
+        Turns on or off the vision processing for using the Limelight
+        as a camera. Defaults to on.
+    void setLime(const bool& = true)
+        Turns the Limelight LEDs on or off. Defaults to on.
 */
 
 #pragma once
@@ -32,46 +37,33 @@ class Limelight {
             table = nt::NetworkTableInstance::GetDefault().GetTable("limelight-lnchr");
         }
 
-        double horizontalOffset() {
+        double getHorizontalOffset() {
 
             return table->GetNumber("tx",0.0);
         }
-        double verticalOffset() {
+        double getVerticalOffset() {
 
             return table->GetNumber("ty", 0);
         }
-        double targetArea() {
+        double getTargetArea() {
 
             return table->GetNumber("ta", 0);
         }
-        bool target() {
+        bool getTarget() {
 
             return table->GetNumber("tv", 0);
         }
 
+        void setProcessing(const bool &toSet = true) {
+
+            //According to doc, 1 is off, 0 is on
+            table->PutNumber("camMode", toSet ? 0 : 1);
+        }
+        void setLime(const bool &toSet = true) {
+
+            //According to doc, 3 is on, 1 is off, and 2 is blink.
+            table->PutNumber("ledMode", toSet ? 3 : 1);
+        }
     private:
         std::shared_ptr<NetworkTable> table;
 };
-
-/*
-double limelightTest() {
-
-    //Radian angle of limelight from horizon
-    const double limelightAngleRad = 0.392699;
-    // Height difference between limelight and target
-    const double sensorHeight = 73.25;
-    //Trig behind finding distance from Zion to wall
-    const double targetDistance = sensorHeight / tan(limelightAngleRad);
-
-    if (174 < targetDistance && targetDistance < 186) {
-
-        return 0;
-        //Continue firing the cannon
-    }
-    else {
-
-        return 0;
-        //Stop firing the cannoon
-    }
-}
-*/

@@ -11,9 +11,16 @@ Constructors
 Public Methods
 
     void setDriveSpeed(const double&)
-        Sets the driving speed to a double.
+        Sets the driving speed to a double. Defaults to zero.
     void setSwerveSpeed(const double&)
-        Sets the swerve speed to a double.
+        Sets the swerve speed to a double. Defaults to zero.
+        void setSwerveBrake(const bool &)
+        If true, sets the swerve to brake mode, if false, to coast mode.
+        This is used in SwerveTrain to allow "unlocking" the swerve wheels
+        for zeroing by overriding the default brake initialization.
+    void setDriveBrake(const bool &)
+        If true, sets the drive to brake mode, if false, to coast mode.
+        This is used in auto functions to allow stopping on a dime.
     void setSwerveBrake(const bool &)
         If true, sets the swerve to brake mode, if false, to coast mode.
         This is used in SwerveTrain to allow "unlocking" the swerve wheels
@@ -65,7 +72,7 @@ Private Methods
              {(1)/(1+e^((-1 * abs(z)) + 5)); z >= R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt
         s(z)={R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorSpeed; z < R_swerveTrainAssumePositionSpeedCalculationFirstEndBehaviorAt
              {R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed; z < R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt
-            where
+            for
                 s = speed at which the motor rotates to assume a position
                 z = remaining REV revolutions of the position assumption
         to assign a speed with which to proceed towards the final position. It
@@ -101,13 +108,24 @@ class SwerveModule {
             m_swerveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
         }
 
-        void setDriveSpeed(const double &speedToSet) {
+        void setDriveSpeed(const double &speedToSet = 0) {
 
             m_driveMotor->Set(speedToSet);
         }
-        void setSwerveSpeed(const double &speedToSet) {
+        void setSwerveSpeed(const double &speedToSet = 0) {
 
             m_swerveMotor->Set(speedToSet);
+        }
+        void setDriveBrake(const bool &brake) {
+
+            if (brake) {
+
+                m_driveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+            }
+            else {
+
+                m_driveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
+            }
         }
         void setSwerveBrake(const bool &brake) {
 

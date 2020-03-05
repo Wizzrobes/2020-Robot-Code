@@ -14,12 +14,15 @@ Constructors
 Public Methods
 
     void setDriveSpeed(const double&)
-        Sets a speed to the driving motors on the train.
+        Sets a speed to the driving motors on the train. Defaults to zero.
     void setSwerveSpeed(const double&)
-        Sets a speed to all swerve motors on the train.
+        Sets a speed to all swerve motors on the train. Defaults to zero.
+    void setDriveBrake(const double&)
+        If true, sets the drives to brake mode (as defaultly constructed),
+        if false, sets them to coast. Persists across calls. This is used in
+        the autonomous to allow the swervetrain to stop very precisely.
     void setSwerveBrake(const bool&)
-        If true, sets the swerves to brake mode (as defaultly constructed),
-        if false, sets them to coast. Persists across calls. This is used to
+        Same as above for swerve. This is used to
         "unlock and lock" all of the swerve wheels for easy manual zeroing,
         instead of fighting the wheel brake as defaultly constructed.
     void setZeroPosition(const bool& = false)
@@ -117,12 +120,19 @@ class SwerveTrain {
             m_rearLeft->setDriveSpeed(driveSpeed);
             m_rearRight->setDriveSpeed(driveSpeed);
         }
-        void setSwerveSpeed(const double &swerveSpeed) {
+        void setSwerveSpeed(const double &swerveSpeed = 0) {
 
             m_frontRight->setSwerveSpeed(swerveSpeed);
             m_frontLeft->setSwerveSpeed(swerveSpeed);
             m_rearLeft->setSwerveSpeed(swerveSpeed);
             m_rearRight->setSwerveSpeed(swerveSpeed);
+        }
+        void setDriveBrake(const bool &brake) {
+
+            m_frontRight->setDriveBrake(brake);
+            m_frontLeft->setDriveBrake(brake);
+            m_rearLeft->setDriveBrake(brake);
+            m_rearRight->setDriveBrake(brake);
         }
         void setSwerveBrake(const bool &brake) {
 
