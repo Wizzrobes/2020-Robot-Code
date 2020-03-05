@@ -71,14 +71,14 @@ const double R_launcherDefaultSpeedIndex = 1;
 const double R_launcherDefaultSpeedLaunch = .7425;
 
 //This is the speed for automatic lateral movement in autonomous.
-const double R_zionAutoMovementSpeedLateral = .4;
+const double R_zionAutoMovementSpeedLateral = .35;
 //And for rotational movement.
-const double R_zionAutoMovementSpeedRotational = .4;
+const double R_zionAutoMovementSpeedRotational = .2;
+//This is the tolerance for autonomous angle assumption in degrees.
+const double R_zionAutoToleranceAngle = 10;
 //This is how close to zero the Limelight's horizontal target offset can be
 //in order to be considered centered.
 const double R_zionAutoToleranceHorizontalOffset = .5;
-//This is the tolerance for autonomous angle assumption in degrees.
-const double R_zionAutoToleranceAngle = 10;
 
 //The amount of REV rotations it takes for a swerve assembly to make a full rotation.
 //Often, a REV Rotation is referred to as a Nic, although they mean different things.

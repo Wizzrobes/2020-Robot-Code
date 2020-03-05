@@ -29,10 +29,6 @@ Constructors
 
 Public Methods
 
-    bool zionAssumeRotationDegrees(const double&)
-        Rotates the desired number of degrees using the NavX sensor. Does
-        so at a constant global speed; could likely be regressed similarly
-        to the swerve modules. Returns to zero position when done.
     bool zionAssumeDirection(const int&)
         Uses a supplied ZionDirections to set the swerves to the
         appropriate position to move in that direction. Sets no speed
@@ -47,6 +43,10 @@ Public Methods
         zionAssumeDirection followed by this. Zero speed is set once the
         distance is achieved; distance measured by the circumference of a
         wheel.
+    bool zionAssumeRotationDegrees(const double&)
+        Rotates the desired number of degrees using the NavX sensor. Does
+        so at a constant global speed; could likely be regressed similarly
+        to the swerve modules. Returns to zero position when done.
     void zionShootingPositionToTrenchGrab()
         Moves laterally and rotationally from the auto shooting position
         in front of the high goal through the trench to pick up more
@@ -90,11 +90,106 @@ class Hal {
             m_navX = &refNavX;
             m_zion = &refZion;
 
-            m_utilityVarsSet = true;
+            m_utilityVarsSet = false;
             m_utilityVarOne = 0;
             m_utilityVarTwo = 0;
         }
 
+        //TODO: DOCUMENT ME
+        bool zionAssumeDirection(const int &directionToMove) {
+
+            //TODO: Why inverted?
+            VectorDouble right(-1,0);
+            VectorDouble backward(0,1);
+            VectorDouble left(1,0);
+            //Since all wheels are turning very close to the same distance,
+            //grab the beginning and end of one of them for use in checking
+            //when positioning is complete once at the beginning of the loop
+            if (!m_utilityVarsSet) {
+
+                m_utilityVarOne = m_zion->m_frontRight->getSwervePosition();
+                m_utilityVarTwo = m_zion->getClockwiseREVRotationsFromCenter(directionToMove == Hal::ZionDirections::kBackward ? backward : directionToMove == Hal::ZionDirections::kLeft ? left : right);
+                m_utilityVarsSet = true;
+            }
+
+            switch (directionToMove) {
+
+                case kForward: m_zion->assumeNearestZeroPosition(); break;
+                case kRight: setZionMotorsToVector(right); break;
+                case kBackward: setZionMotorsToVector(backward); break;
+                case kLeft: setZionMotorsToVector(left); break;
+            }
+
+            if (directionToMove != ZionDirections::kForward) {
+
+                if (m_utilityVarOne + m_utilityVarTwo - m_zion->m_frontRight->getSwervePosition() < .25) {
+
+                    m_zion->m_frontRight->setSwerveSpeed();
+                    m_zion->m_frontLeft->setSwerveSpeed();
+                    m_zion->m_rearLeft->setSwerveSpeed();
+                    m_zion->m_rearRight->setSwerveSpeed();
+                    m_utilityVarOne = 0;
+                    m_utilityVarTwo = 0;
+                    m_utilityVarsSet = false;
+                    return true;
+                }
+                else {
+
+                    return false;
+                }
+            }
+            if ((m_zion->m_frontRight->getSwervePosition() - m_zion->m_frontRight->getSwerveZeroPosition()) < .1 && (m_zion->m_frontLeft->getSwervePosition() - m_zion->m_frontLeft->getSwerveZeroPosition()) < .1 && (m_zion->m_rearLeft->getSwervePosition() - m_zion->m_rearLeft->getSwerveZeroPosition()) < .1 && (m_zion->m_rearRight->getSwervePosition() - m_zion->m_rearRight->getSwerveZeroPosition()) < .1) {
+
+                m_zion->m_frontRight->setSwerveSpeed();
+                m_zion->m_frontLeft->setSwerveSpeed();
+                m_zion->m_rearLeft->setSwerveSpeed();
+                m_zion->m_rearRight->setSwerveSpeed();
+                m_utilityVarOne = 0;
+                m_utilityVarTwo = 0;
+                m_utilityVarsSet = false;
+                return true;
+            }
+            else {
+
+                return false;
+            }
+        }
+        bool zionAssumeDistance(const double &distanceToMove) {
+
+            //At the first iteration, set the starting and goal values to
+            //memory for comparison once operating (since we're translating
+            //in a lateral direction, we only have to care about one encoder
+            //value)...
+            if (!m_utilityVarsSet) {
+
+                m_utilityVarOne = m_zion->m_frontRight->getDrivePosition();
+                //Calculate the end goal encoder value with circumference and the
+                //known amount of encoder values per rotation...
+                m_utilityVarTwo = m_utilityVarOne + ((distanceToMove / m_circumferenceWheel) * R_kuhnsConstant);
+                m_utilityVarsSet = true;
+            }
+
+            //If we're not in tolerance for meeting the goal value (since
+            //going to a distance generates no oscillation, zero can be
+            //used as a tolerance)...
+            if (m_utilityVarTwo - m_zion->m_frontRight->getDrivePosition() > 0) {
+
+                m_zion->setDriveSpeed(R_zionAutoMovementSpeedLateral);
+            }
+            //If we were...
+            else {
+
+                //Stop moving, clean up, and return true.
+                m_zion->setDriveSpeed();
+                m_utilityVarsSet = false;
+                m_utilityVarOne = 0;
+                m_utilityVarTwo = 0;
+                return true;
+            }
+            //If we made it to here, we didn't succeed, so return false for
+            //another go at it.
+            return false;
+        }
         bool zionAssumeRotationDegrees(const double &degreesToRotate) {
 
             //At the first iteration, set the starting and goal angles to
@@ -107,7 +202,9 @@ class Hal {
             }
 
             //Set the wheels to their diagonal positions (at incremental 45*
-            //angles found with radians converted into Nics)...
+            //angles found with radians converted into Nics). This works as
+            //this section of the code also runs as a loop, and these functions
+            //handle setting values down to zero once correct...
             m_zion->m_frontRight->assumeSwervePosition((1.0 / 8.0) * R_nicsConstant);
             m_zion->m_frontLeft->assumeSwervePosition((3.0 / 8.0) * R_nicsConstant);
             m_zion->m_rearLeft->assumeSwervePosition((5.0 / 8.0) * R_nicsConstant);
@@ -118,69 +215,18 @@ class Hal {
 
                 //If rotation needs to be clockwise (goal is greater than init)
                 //set the turning speed to be positive, otherise, set it
-                //negative...
-                m_zion->setDriveSpeed(m_utilityVarTwo > m_utilityVarOne ? R_zionAutoMovementSpeedLateral : -R_zionAutoMovementSpeedLateral);
+                //negative (due to the way the wheels align, these values are
+                //inverted)...
+                m_zion->setDriveSpeed(m_utilityVarTwo > m_utilityVarOne ? -R_zionAutoMovementSpeedLateral : R_zionAutoMovementSpeedLateral);
             }
             //If we were within tolerance that iteration...
             else {
 
-                //Stop moving, clean up, and return true.
+                //Stop moving, reset the wheels, clean up, and return true.
                 m_zion->setDriveSpeed();
-                m_zion->assumeNearestZeroPosition();
-                m_utilityVarsSet = false;
-                m_utilityVarOne = 0;
-                m_utilityVarTwo = 0;
-                return true;
-            }
-            //If we made it to here, we didn't succeed, so return false for
-            //another go at it.
-            return false;
-        }
-        bool zionAssumeDirection(const int &directionToMove) {
-
-            //TODO: Why inverted?
-            VectorDouble forward(0,-1);
-            VectorDouble right(-1,0);
-            VectorDouble backward(0,1);
-            VectorDouble left(1,0);
-
-            switch (directionToMove) {
-
-                case kForward: setZionMotorsToVector(forward); break;
-                case kRight: setZionMotorsToVector(right); break;
-                case kBackward: setZionMotorsToVector(backward); break;
-                case kLeft: setZionMotorsToVector(left); break;
-            }
-            //If all of the swerve speeds are exceedingly close to zero, it
-            //means that all of the motors are done positioning, so return
-            //true; otherwise, return false for another go at it.
-            return m_zion->m_frontRight->getSwerveSpeed() < .05 && m_zion->m_frontLeft->getSwerveSpeed() < .05 && m_zion->m_rearLeft->getSwerveSpeed() < .05 && m_zion->m_rearRight->getSwerveSpeed() < .05 ? true : false; 
-        }
-        bool zionAssumeDistance(const double &distanceToMove) {
-
-            //At the first iteration, set the starting and goal values to
-            //memory for comparison once operating (since we're translating
-            //in a lateral direction, we only have to care about one encoder
-            //value)...
-            if (!m_utilityVarsSet) {
-
-                m_utilityVarOne = m_zion->m_frontRight->getDrivePosition();
-                //Calculate the end goal encoder value with circumference and the
-                //known amount of encoder values per rotation.
-                m_utilityVarTwo = m_utilityVarOne + ((distanceToMove / m_circumferenceWheel) * R_kuhnsConstant);
-                m_utilityVarsSet = true;
-            }
-
-            //If we're not in tolerance for meeting the goal value...
-            if (m_utilityVarTwo - m_zion->m_frontRight->getDrivePosition()) {
-
-                m_zion->setDriveSpeed(R_zionAutoMovementSpeedLateral);
-            }
-            //If we were...
-            else {
-
-                //Stop moving, clean up, and return true.
-                m_zion->setDriveSpeed();
+                //Since this is a core auto function, it must be run as
+                //a loop, so do so and then continue with the rest of cleanup.
+                while (!zionAssumeDirection(ZionDirections::kForward));
                 m_utilityVarsSet = false;
                 m_utilityVarOne = 0;
                 m_utilityVarTwo = 0;
@@ -209,26 +255,26 @@ class Hal {
             //Rotate 90* to line up the intake to the trench. TODO: Which direction?
             if (m_utilityVarOne == 0 && zionAssumeRotationDegrees(90)) {
 
-                ++m_utilityVarOne;
+                m_utilityVarOne = 1;
             }
             //Move left the appropriate distance.
             if (m_utilityVarOne == 1 && zionAssumeDirection(ZionDirections::kLeft)) {
 
-                ++m_utilityVarOne;
+                m_utilityVarOne = 2;
             }
             if (m_utilityVarOne == 2 && zionAssumeDistance(distanceLeft)) {
 
-                ++m_utilityVarOne;
+                m_utilityVarOne = 3;
             }
             //Same for forward.
             if (m_utilityVarOne == 3 && zionAssumeDirection(ZionDirections::kForward)) {
 
-                ++m_utilityVarOne;
+                m_utilityVarOne = 4;
             }
             if (m_utilityVarOne == 4 && zionAssumeDistance(distanceForward)) {
 
-                //This is the last step, so if it was successful, return true
-                //and clean up.
+                //This is the last step, so if it was successful, clean up and
+                //return true.
                 m_utilityVarOne = 0;
                 return true;
             }
