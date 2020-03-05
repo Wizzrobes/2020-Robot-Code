@@ -56,8 +56,8 @@ class Limelight {
 
         void setProcessing(const bool &toSet = true) {
 
-            //According to doc, 0 is off, 1 is on
-            table->PutNumber("camMode", toSet ? 1 : 0);
+            //According to doc, 1 is off, 0 is on
+            table->PutNumber("camMode", toSet ? 0 : 1);
         }
         void setLime(const bool &toSet = true) {
 

@@ -18,6 +18,8 @@
 
 Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PWMPortClimberMotorWheel, R_PWMPortClimberServoLock, R_DIOPortSwitchClimberBottom);
 frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
+frc::Joystick *playerOne;
+frc::XboxController *playerTwo;
 Intake intake(R_CANIDmotorIntake);
 Launcher launcher(R_CANIDmotorLauncherIndex, R_CANIDmotorLauncherLaunch);
 Limelight limelight;
@@ -30,26 +32,10 @@ SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightMod
 
 Hal Hal9000(intake, launcher, limelight, navX, zion);
 
-frc::Joystick *playerOne;
-frc::XboxController *playerTwo;
-
 void Robot::RobotInit() {
 
     playerOne = new frc::Joystick(R_controllerPortPlayerOne);
     playerTwo = new frc::XboxController(R_controllerPortPlayerTwo);
-
-    frc::CameraServer::GetInstance()->StartAutomaticCapture();
-
-    m_chooserAuto = new frc::SendableChooser<std::string>;
-    m_chooserAuto->AddDefault("Chooser::Auto::Do-Nothing", "doNothing");
-    m_chooserAuto->AddDefault("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
-    m_chooserAuto->AddOption("Chooser::Auto::3Cell", "threeCell");
-    m_chooserAuto->AddOption("Chooser::Auto::3Cell-Trench-3Cell", "winOut");
-    frc::SmartDashboard::PutData(m_chooserAuto);
-
-    frc::SmartDashboard::PutNumber("Field::Auto::3Cell-Delay", 0);
-    frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
-    frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
 
     m_booleanClimberLock = true;
     m_speedClimberClimb     = 0;
@@ -58,13 +44,28 @@ void Robot::RobotInit() {
     m_speedIntake           = 0;
     m_speedLauncherIndex    = 0;
     m_speedLauncherLaunch   = 0;
+
+    m_autoStep = 0;
+
+    m_chooserAuto = new frc::SendableChooser<std::string>;
+    m_chooserAuto->SetDefaultOption("Chooser::Auto::Do-Nothing", "doNothing");
+    m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
+    m_chooserAuto->AddOption("Chooser::Auto::3Cell", "threeCell");
+    //m_chooserAuto->AddOption("Chooser::Auto::3Cell-Trench-3Cell", "winOut");
+    frc::SmartDashboard::PutData(m_chooserAuto);
+
+    frc::SmartDashboard::PutNumber("Field::Auto::3Cell-Delay", 0);
+    frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
+    frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
+
+    frc::CameraServer::GetInstance()->StartAutomaticCapture();
 }
 void Robot::RobotPeriodic() {
 
-    //Whenever Zion is on, if the unlock swerve button is pressed and held,
-    //unlock the swerves for zeroing. Once released, lock them again. The
-    //switch is inverted by default, so no inversion is required.
-    zion.setSwerveBrake(switchSwerveUnlock.Get());
+    //Whenever Zion is on, allow control of the Limelight from P2. This permits
+    //using it for manual alignment at any time, before or after the match.
+    limelight.setLime(playerTwo->GetBumper(frc::GenericHID::kLeftHand));
+    limelight.setProcessing(playerTwo->GetBumper(frc::GenericHID::kRightHand));
 }
 void Robot::AutonomousInit() {
 
@@ -72,28 +73,69 @@ void Robot::AutonomousInit() {
     //calibrated before the match. This persists for the match duration unless
     //overriden.
     zion.setZeroPosition();
-    //Get which auto was selected to run in auto.
-    *m_chooserAutoSelected = m_chooserAuto->GetSelected();
+    //Get which auto was selected to run in auto to test against.
+    m_chooserAutoSelected = m_chooserAuto->GetSelected();
 }
 void Robot::AutonomousPeriodic() {
+
+    //Lock the drive wheels before beginning for accuracy.
+    zion.setDriveBrake(true);
 
     //Run whichever auto we selected, setting the string to garbage
     //once it is complete so that it only runs once. This way, only one loop
     //has to be controlled. See Hal.h for examples of how complex autonomous
     //control is accomplished with flow-of-control.
-    if (*m_chooserAutoSelected == "doNothing") {
+    //Do-Nothing does nothing, default.
+    if (m_chooserAutoSelected == "doNothing") {
 
-        *m_chooserAutoSelected = "done";
+        m_chooserAutoSelected = "done";
     }
-    if (*m_chooserAutoSelected == "dotl") {
+    //If-We-Gotta-Do-It simply drives off the line.
+    if (m_chooserAutoSelected == "dotl") {
 
-        if (Hal9000.zionAssumeDistance(12)) {
+        if (m_autoStep == 0 && Hal9000.zionAssumeDirection(Hal::ZionDirections::kLeft)) {
 
-            *m_chooserAutoSelected = "done";
+            m_autoStep = 1;
+        }
+        if (m_autoStep == 1 && Hal9000.zionAssumeDistance(30)) {
+
+            m_chooserAutoSelected = "done";
+        }
+    }
+    //Three-Cell unloads three cells and drives off the line.
+    if (m_chooserAutoSelected == "threeCell") {
+
+        //Spin up launcher, feed it cells, turn it off, and drive off the line.
+        if (m_autoStep == 0) {
+
+            Wait(frc::SmartDashboard::GetNumber("Field::Auto::3Cell-Delay", 0));
+            launcher.setLaunchSpeed(R_launcherDefaultSpeedLaunch);
+            Wait(1);
+            launcher.setIndexSpeed(R_launcherDefaultSpeedIndex);
+            Wait(3);
+            launcher.setLaunchSpeed(0);
+            launcher.setIndexSpeed(0);
+            m_autoStep = 1;
+        }
+        if (m_autoStep == 1 && Hal9000.zionAssumeDirection(Hal::ZionDirections::kLeft)) {
+
+            m_autoStep = 2;
+        }
+        if (m_autoStep == 2 && Hal9000.zionAssumeDistance(30)) {
+
+            m_chooserAutoSelected = "done";
         }
     }
 }
-void Robot::TeleopInit() {}
+void Robot::TeleopInit() {
+
+    //To clean up adter auto, confirm the swerves are locked and unlock
+    //the drive train, and go to the pre-calibrated zero position set up at the
+    //beginning of auto to begin the match.
+    zion.setSwerveBrake(true);
+    zion.setDriveBrake(false);
+    zion.assumeNearestZeroPosition();
+}
 void Robot::TeleopPeriodic() {
 
     if (playerOne->GetRawButtonPressed(3)) {
@@ -113,11 +155,12 @@ void Robot::TeleopPeriodic() {
         zion.driveController(playerOne);
     }
 
+
     //The second controller works in control layers on top of the basic
     //driving mode engaged with function buttons. If one of the functions
     //running under a button loses its button press, it will be overriden
     //by the regular mode. Useful for cancellation. Layers override each other.
-
+    //
     //The back button is "manual override" control layer. No auto, simply
     //writes unupdated values directly to motors, unlocking the climber,
     //with no execution caps or impediments. Overrides all other layers.
@@ -134,12 +177,12 @@ void Robot::TeleopPeriodic() {
     else {
 
         m_booleanClimberLock = true;
-        m_speedClimberClimb     = 0;
+        m_speedClimberClimb = 0;
         m_speedClimberTranslate = 0;
-        m_speedClimberWheel     = 0;
-        m_speedIntake           = 0;
-        m_speedLauncherIndex    = 0;
-        m_speedLauncherLaunch   = 0;
+        m_speedClimberWheel = 0;
+        m_speedIntake = 0;
+        m_speedLauncherIndex = 0;
+        m_speedLauncherLaunch = 0;
     }
 
     //The start button is "climber" control layer. Controls nothing but the
@@ -196,6 +239,8 @@ void Robot::TeleopPeriodic() {
     }
 
     //Once all layers have been evaluated, write out all of their values.
+    //Doing this only once prevents weird bugs in which multiple different
+    //values get set at different times in the loop.
     climber.lock(m_booleanClimberLock);
     climber.setSpeed(Climber::Motor::kClimb, m_speedClimberClimb);
     climber.setSpeed(Climber::Motor::kTranslate, m_speedClimberTranslate);
@@ -203,6 +248,14 @@ void Robot::TeleopPeriodic() {
     intake.setSpeed(m_speedIntake);
     launcher.setIndexSpeed(m_speedLauncherIndex);
     launcher.setLaunchSpeed(m_speedLauncherLaunch);
+}
+void Robot::DisabledPeriodic() {
+
+    //Whenever Zion is disabled, if the unlock swerve button is pressed and
+    //held, unlock the swerves for zeroing. Once released, lock them again. The
+    //switch is inverted by default, so no inversion is required. This is in
+    //disabled on the off-chance that the switch got bumped during match play.
+    zion.setSwerveBrake(switchSwerveUnlock.Get());
 }
 
 #ifndef RUNNING_FRC_TESTS
