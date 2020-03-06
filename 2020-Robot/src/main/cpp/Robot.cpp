@@ -48,9 +48,9 @@ void Robot::RobotInit() {
     m_autoStep = 0;
 
     m_chooserAuto = new frc::SendableChooser<std::string>;
-    m_chooserAuto->SetDefaultOption("Chooser::Auto::Do-Nothing", "doNothing");
+    m_chooserAuto->AddOption("Chooser::Auto::Do-Nothing", "doNothing");
     m_chooserAuto->AddOption("Chooser::Auto::If-We-Gotta-Do-It", "dotl");
-    m_chooserAuto->AddOption("Chooser::Auto::3Cell", "threeCell");
+    m_chooserAuto->SetDefaultOption("Chooser::Auto::3Cell", "threeCell");
     //m_chooserAuto->AddOption("Chooser::Auto::3Cell-Trench-3Cell", "winOut");
     frc::SmartDashboard::PutData(m_chooserAuto);
 
@@ -112,7 +112,7 @@ void Robot::AutonomousPeriodic() {
             launcher.setLaunchSpeed(R_launcherDefaultSpeedLaunch);
             Wait(1);
             launcher.setIndexSpeed(R_launcherDefaultSpeedIndex);
-            Wait(3);
+            Wait(5);
             launcher.setLaunchSpeed(0);
             launcher.setIndexSpeed(0);
             m_autoStep = 1;

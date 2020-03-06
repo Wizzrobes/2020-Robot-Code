@@ -12,7 +12,8 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     //TODO: Why does inverting certain things work?
     double x = -controller->GetX();
     double y = -controller->GetY();
-    double z = controller->GetZ();
+    //Limit the Z axis by the cap, as turning can be violent
+    double z = controller->GetZ() * R_executionCapZion;
 
     //TODO: What is this?
     double angle = navX->getYawFull();
