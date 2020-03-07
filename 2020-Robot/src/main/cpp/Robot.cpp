@@ -219,15 +219,15 @@ void Robot::TeleopPeriodic() {
 
             m_speedLauncherIndex = 0;
         }
-        if (playerTwo->GetYButton()) {
+        if (playerTwo->GetXButton()) {
 
             m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Close:", R_launcherDefaultSpeedLaunchClose);
         }
-        else if (playerTwo->GetBButton()) {
+        if (playerTwo->GetBButton()) {
 
             m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Far:", R_launcherDefaultSpeedLaunchFar);
         }
-        else {
+        if (!playerTwo->GetXButton() && !playerTwo->GetBButton()) {
 
             m_speedLauncherLaunch = 0;
         }
