@@ -56,9 +56,8 @@ void Robot::RobotInit() {
 
     frc::SmartDashboard::PutNumber("Field::Auto::3Cell-Delay", 0);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
-    frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
-
-    frc::CameraServer::GetInstance()->StartAutomaticCapture();
+    frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Close", R_launcherDefaultSpeedLaunchClose);
+    frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Far", R_launcherDefaultSpeedLaunchFar);
 }
 void Robot::RobotPeriodic() {
 
@@ -109,7 +108,7 @@ void Robot::AutonomousPeriodic() {
         if (m_autoStep == 0) {
 
             Wait(frc::SmartDashboard::GetNumber("Field::Auto::3Cell-Delay", 0));
-            launcher.setLaunchSpeed(R_launcherDefaultSpeedLaunch);
+            launcher.setLaunchSpeed(R_launcherDefaultSpeedLaunchClose);
             Wait(1);
             launcher.setIndexSpeed(R_launcherDefaultSpeedIndex);
             Wait(5);
@@ -212,25 +211,21 @@ void Robot::TeleopPeriodic() {
 
         m_speedIntake = (-playerTwo->GetTriggerAxis(frc::GenericHID::kLeftHand) + playerTwo->GetTriggerAxis(frc::GenericHID::kRightHand)) * R_executionCapIntake;
 
-        if (playerTwo->GetXButton()) {
-
-            frc::SmartDashboard::PutNumber("Launcher::Speed-Index:", playerTwo->GetY(frc::GenericHID::kLeftHand));
-        }
-        if (playerTwo->GetYButton()) {
-
-            frc::SmartDashboard::PutNumber("Launcher::Speed-Launch:", playerTwo->GetY(frc::GenericHID::kLeftHand));
-        }
         if (playerTwo->GetAButton()) {
 
-            m_speedLauncherIndex = frc::SmartDashboard::GetNumber("Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
+            m_speedLauncherIndex = frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Index:", R_launcherDefaultSpeedIndex);
         }
         else {
 
             m_speedLauncherIndex = 0;
         }
-        if (playerTwo->GetBButton()) {
+        if (playerTwo->GetYButton()) {
 
-            m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Launcher::Speed-Launch:", R_launcherDefaultSpeedLaunch);
+            m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Close:", R_launcherDefaultSpeedLaunchClose);
+        }
+        else if (playerTwo->GetBButton()) {
+
+            m_speedLauncherLaunch = frc::SmartDashboard::GetNumber("Field::Launcher::Speed-Launch-Far:", R_launcherDefaultSpeedLaunchFar);
         }
         else {
 

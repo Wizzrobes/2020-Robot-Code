@@ -67,8 +67,9 @@ const double R_executionCapIntake = .75;
 
 //This is the default launcher index speed.
 const double R_launcherDefaultSpeedIndex = 1;
-//And this the default launcher launch speed.
-const double R_launcherDefaultSpeedLaunch = .7425;
+//And this the default launcher launch speed, for both distances.
+const double R_launcherDefaultSpeedLaunchClose = .7425;
+const double R_launcherDefaultSpeedLaunchFar = .76378;
 
 //This is the speed for automatic lateral movement in autonomous.
 const double R_zionAutoMovementSpeedLateral = .35;
