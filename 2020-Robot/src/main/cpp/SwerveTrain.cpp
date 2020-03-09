@@ -181,6 +181,41 @@ void SwerveTrain::driveControllerPrecision(frc::Joystick *controller) {
     }
 }
 
+void driveControllerTank(frc::Joystick *controller) {
+
+    //Make swerve motors coast, becuase we do not want them to hold any certain
+    //position
+    setSwerveBrake(false);
+    setSwerveSpeed();
+
+    //TODO: Why does inverting certain things work?
+    double x = -controller->GetX();
+    double y = -controller->GetY();
+    //Notice there is no controller z input, becuase tank drive does not
+    //require a z
+    
+    forceControllerXYZToZeroInDeadzone(x, y);
+
+    if (y != 0) {
+
+        m_frontRight->setDriveSpeed(y);
+        m_frontLeft->setDriveSpeed(y);
+        m_rearLeft->setDriveSpeed(y);
+        m_rearRight->setDriveSpeed(y);
+    }
+    else if (x != 0) {
+
+        m_frontRight->setDriveSpeed(-x);
+        m_frontLeft->setDriveSpeed(x);
+        m_rearLeft->setDriveSpeed(x);
+        m_rearRight->setDriveSpeed(-x);
+    }
+    else {
+
+        setDriveSpeed();
+    }
+}
+
 void SwerveTrain::zeroController(frc::Joystick *controller) {
 
     //This one is also built for being upside down, so invert it.

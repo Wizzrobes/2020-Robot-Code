@@ -149,6 +149,10 @@ void Robot::TeleopPeriodic() {
 
         zion.driveControllerPrecision(playerOne); 
     }
+    else if (playerOne->GetRawButton(11)) {
+
+        zion.driveControllerTank(playerOne);
+    }
     else {
 
         zion.driveController(playerOne);

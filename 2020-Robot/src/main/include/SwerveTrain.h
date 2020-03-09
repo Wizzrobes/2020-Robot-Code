@@ -182,6 +182,7 @@ class SwerveTrain {
 
         void driveController(frc::Joystick *controller);
         void driveControllerPrecision(frc::Joystick *controller); 
+        void driveControllerTank(frc::Joystick *controller);
         void zeroController(frc::Joystick *controller);
 
     private:
@@ -221,6 +222,15 @@ class SwerveTrain {
                 return true;
             }
             return false;
+        }
+        //forceControllerXYZToZeroInDeadzone overloaded for no z for tank drive
+        void forceControllerXYZToZeroInDeadzone(double &x, double &y) {
+
+            double absX = abs(x);
+            double absY = abs(y);
+
+            if (absX < R_deadzoneController) {x = 0;}
+            if (absY < R_deadzoneController) {y = 0;}
         }
         void forceControllerXYZToZeroInDeadzone(double &x, double &y, double &z) {
 
