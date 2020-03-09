@@ -147,14 +147,19 @@ void Robot::TeleopPeriodic() {
     }
     if (playerOne->GetRawButton(12)) {
 
+        zion.setSwerveBrake(true);
         zion.driveControllerPrecision(playerOne); 
     }
     else if (playerOne->GetRawButton(11)) {
 
+        //Make swerve motors coast, becuase we do not want them to hold any certain
+        //position
+        zion.setSwerveBrake(false);
         zion.driveControllerTank(playerOne);
     }
     else {
 
+        zion.setSwerveBrake(true);
         zion.driveController(playerOne);
     }
 

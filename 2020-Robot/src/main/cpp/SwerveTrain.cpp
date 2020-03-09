@@ -181,11 +181,8 @@ void SwerveTrain::driveControllerPrecision(frc::Joystick *controller) {
     }
 }
 
-void driveControllerTank(frc::Joystick *controller) {
+void SwerveTrain::driveControllerTank(frc::Joystick *controller) {
 
-    //Make swerve motors coast, becuase we do not want them to hold any certain
-    //position
-    setSwerveBrake(false);
     setSwerveSpeed();
 
     //TODO: Why does inverting certain things work?

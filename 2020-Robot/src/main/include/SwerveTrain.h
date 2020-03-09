@@ -51,6 +51,10 @@ Public Methods
         Same as above, but scales all values according to a R_ constant
         and doesn't re-center after maneuvering to allow for slow, incredibly
         precise positioning by hand in the full range of the controller.
+    void driveControllerTank():
+        Drives with swerves in coast mode, simulating a tank or a commmon
+        non-swerve drivetrain.  Uses for this are if we improperly zeroed
+        or for some reason cannot drive regualr swerve code.
     void zeroController(frc::Joystick *controller)
         Allows use of a controller through a mapped button which is held down
         in correspondence to a motor to slowly override its zero from that
