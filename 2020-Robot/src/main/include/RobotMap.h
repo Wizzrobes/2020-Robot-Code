@@ -18,19 +18,20 @@ const int R_DIOPortSwitchSwerveUnlock  = 1;
 /*___End RoboRIO DIO Pin Declarations___*/
 
 /*_____RoboRIO CAN Bus ID Declarations_____*/
-const int R_CANIDzionFrontRightSwerve = 1;
-const int R_CANIDzionFrontRightDrive  = 2;
-const int R_CANIDzionFrontLeftSwerve  = 3;
-const int R_CANIDzionFrontLeftDrive   = 4;
-const int R_CANIDzionRearLeftDrive    = 5;
-const int R_CANIDzionRearLeftSwerve   = 6;
-const int R_CANIDzionRearRightDrive   = 7;
-const int R_CANIDzionRearRightSwerve  = 8;
+const int R_CANIDZionFrontRightSwerve = 1;
+const int R_CANIDZionFrontRightDrive  = 2;
+const int R_CANIDZionFrontLeftSwerve  = 3;
+const int R_CANIDZionFrontLeftDrive   = 4;
+const int R_CANIDZionRearLeftDrive    = 5;
+const int R_CANIDZionRearLeftSwerve   = 6;
+const int R_CANIDZionRearRightDrive   = 7;
+const int R_CANIDZionRearRightSwerve  = 8;
 
-const int R_CANIDmotorIntake = 9;
+const int R_CANIDMotorIntake = 9;
 
-const int R_CANIDmotorLauncherIndex  = 10;
-const int R_CANIDmotorLauncherLaunch = 11;
+const int R_CANIDMotorLauncherIndex  = 10;
+const int R_CANIDMotorLauncherLaunchOne = 11;
+const int R_CANIDMotorLauncherLaunchTwo = 12;
 /*___End RoboRIO CAN Bus ID Declarations___*/
 
 /*_____Controller Settings_____*/
@@ -67,7 +68,8 @@ const double R_executionCapIntake = .75;
 
 //This is the default launcher index speed.
 const double R_launcherDefaultSpeedIndex = 1;
-//And this the default launcher launch speed, for both distances.
+//And this the default launcher launch speed, for both distances and idle.
+const double R_launcherDefaultSpeedLaunch = .2;
 const double R_launcherDefaultSpeedLaunchClose = .7425;
 const double R_launcherDefaultSpeedLaunchFar = .76378;
 

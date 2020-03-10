@@ -104,6 +104,7 @@ class SwerveModule {
             m_swerveZeroPosition = m_swerveMotorEncoder->GetPosition();
 
             //Allow the drive motor to coast, but brake the swerve motor for accuracy.
+            //These must be set as they become overwritten from code.
             m_driveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
             m_swerveMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
         }

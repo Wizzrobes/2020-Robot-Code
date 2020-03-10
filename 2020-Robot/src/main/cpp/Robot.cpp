@@ -20,14 +20,14 @@ Climber climber(R_PWMPortClimberMotorClimb, R_PWMPortClimberMotorTranslate, R_PW
 frc::DigitalInput switchSwerveUnlock(R_DIOPortSwitchSwerveUnlock);
 frc::Joystick *playerOne;
 frc::XboxController *playerTwo;
-Intake intake(R_CANIDmotorIntake);
-Launcher launcher(R_CANIDmotorLauncherIndex, R_CANIDmotorLauncherLaunch);
+Intake intake(R_CANIDMotorIntake);
+Launcher launcher(R_CANIDMotorLauncherIndex, R_CANIDMotorLauncherLaunchOne, R_CANIDMotorLauncherLaunchTwo);
 Limelight limelight;
 NavX navX(NavX::ConnectionType::kMXP);
-SwerveModule frontRightModule(R_CANIDzionFrontRightDrive, R_CANIDzionFrontRightSwerve);
-SwerveModule frontLeftModule(R_CANIDzionFrontLeftDrive, R_CANIDzionFrontLeftSwerve);
-SwerveModule rearLeftModule(R_CANIDzionRearLeftDrive, R_CANIDzionRearLeftSwerve);
-SwerveModule rearRightModule(R_CANIDzionRearRightDrive, R_CANIDzionRearRightSwerve);
+SwerveModule frontRightModule(R_CANIDZionFrontRightDrive, R_CANIDZionFrontRightSwerve);
+SwerveModule frontLeftModule(R_CANIDZionFrontLeftDrive, R_CANIDZionFrontLeftSwerve);
+SwerveModule rearLeftModule(R_CANIDZionRearLeftDrive, R_CANIDZionRearLeftSwerve);
+SwerveModule rearRightModule(R_CANIDZionRearRightDrive, R_CANIDZionRearRightSwerve);
 SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
 
 Hal Hal9000(intake, launcher, limelight, navX, zion);
@@ -159,7 +159,7 @@ void Robot::TeleopPeriodic() {
     //driving mode engaged with function buttons. If one of the functions
     //running under a button loses its button press, it will be overriden
     //by the regular mode. Useful for cancellation. Layers override each other.
-    //
+
     //The back button is "manual override" control layer. No auto, simply
     //writes unupdated values directly to motors, unlocking the climber,
     //with no execution caps or impediments. Overrides all other layers.
