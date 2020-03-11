@@ -41,7 +41,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
 
     //This if block is for driving in limelight lock mode.  This means that no
     //matter which way we are driving, we will always be pointed at the goal.
-    if (playerOne->GetRawButton(2)) {
+    if (controller->GetRawButton(2)) {
 
         //Turn on the limelight so that we can check if a target is found.
         limelight->setLime();
