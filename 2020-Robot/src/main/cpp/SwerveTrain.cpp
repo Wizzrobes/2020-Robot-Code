@@ -39,6 +39,27 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     //TODO: why inverted?
     VectorDouble translationVector(-x, y);
 
+    //This if block is for driving in limelight lock mode.  This means that no
+    //matter which way we are driving, we will always be pointed at the goal.
+    if (playerOne->GetRawButton(2)) {
+
+        //Turn on the limelight so that we can check if a target is found.
+        limelight->setLime();
+
+        //Check if we are looking at a valid target...
+        if (limelight->getTarget()) {
+
+            //Update our rotational speed so that we turn towards the goal.
+            z = calculateLimelightLockSpeed(limelight->getHorizontalOffset());
+        }
+    }
+    else {
+
+        //If we want to drive normally, turn off the limelight
+        //(because it is blinding).
+        limelight->setLime(false);
+    }
+    
     /*
     The rotational vectors are found by multiplying the controller's
     rotational axis [-1, 1] by the cosine of the wheel's RELATIVE yaw (the

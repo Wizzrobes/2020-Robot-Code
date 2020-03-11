@@ -46,7 +46,9 @@ Public Methods
     void publishSwervePositions()
         Puts the current swerve encoder positions to the SmartDashboard.
     void driveController(frc::Joystick *controller)
-        Fully drives the swerve train on the supplied controller.
+        Fully drives the swerve train on the supplied controller.  The driver
+        can also choose to drive in limelight-locked mode, which means that if
+        a target is found, the limelight will always be pointed towards it.
     void driveControllerPrecision(frc::Joystick *controller)
         Same as above, but scales all values according to a R_ constant
         and doesn't re-center after maneuvering to allow for slow, incredibly
@@ -100,17 +102,19 @@ Private Methods
 #include "NavX.h"
 #include "SwerveModule.h"
 #include "VectorDouble.h"
+#include "Limelight.h"
 
 class SwerveTrain {
 
     public:
-        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet) {
+        SwerveTrain(SwerveModule &frontRightModule, SwerveModule &frontLeftModule, SwerveModule &rearLeftModule, SwerveModule &rearRightModule, NavX &navXToSet, Limelight &limelightToSet) {
 
             m_frontRight = &frontRightModule;
             m_frontLeft = &frontLeftModule;
             m_rearLeft = &rearLeftModule;
             m_rearRight = &rearRightModule;
             navX = &navXToSet;
+            limelight = &limelightToSet;
         }
 
         void setDriveSpeed(const double &driveSpeed = 0) {
@@ -253,6 +257,31 @@ class SwerveTrain {
             }
         }
 
+        //Almost exactly the same function as
+        //SwerveModule::calculateAssumePositionSpeed, except with constants for
+        //limelight lock
+        double calculateLimelightLockSpeed(const double &howFarRemainingInTravelInDegrees) {
+
+            //Begin initally with a double calculated with the simplex function...
+            double toReturn = ((1) / (1 + exp((-1 * abs(howFarRemainingInTravelInDegrees)) + 5)));
+            //If we satisfy conditions for the first linear piecewise, take that speed instead...
+            if (abs(howFarRemainingInTravelInDegrees) < R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorAt) {
+
+                toReturn = R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorSpeed;
+            }
+            //Do the same for the second...
+            if (abs(howFarRemainingInTravelInDegrees) < R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorAt) {
+
+                toReturn = R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorSpeed;
+            }
+            //And if we needed to travel negatively to get where we need to be, make the final speed negative...
+            if (howFarRemainingInTravelInDegrees < 0) {
+
+                toReturn = -toReturn;
+            }
+            return toReturn;
+        }
+
     //Allow the peices of the SwerveTrain to be public for convenient
     //low-level access when needed. SwerveTrain is a great container.
     //This is primarily used for Hal, the auto driver, so he can set low-level
@@ -263,4 +292,6 @@ class SwerveTrain {
         SwerveModule *m_rearLeft;
         SwerveModule *m_rearRight;
         NavX *navX;
+        Limelight *limelight;
+        
 };

@@ -28,7 +28,7 @@ SwerveModule frontRightModule(R_CANIDzionFrontRightDrive, R_CANIDzionFrontRightS
 SwerveModule frontLeftModule(R_CANIDzionFrontLeftDrive, R_CANIDzionFrontLeftSwerve);
 SwerveModule rearLeftModule(R_CANIDzionRearLeftDrive, R_CANIDzionRearLeftSwerve);
 SwerveModule rearRightModule(R_CANIDzionRearRightDrive, R_CANIDzionRearRightSwerve);
-SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX);
+SwerveTrain zion(frontRightModule, frontLeftModule, rearLeftModule, rearRightModule, navX, limelight);
 
 Hal Hal9000(intake, launcher, limelight, navX, zion);
 
