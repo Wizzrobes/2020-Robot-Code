@@ -21,6 +21,8 @@ Public Methods
 
 #include <rev/CANSparkMax.h>
 
+#include "RobotMap.h"
+
 class Launcher {
 
     public:

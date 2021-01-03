@@ -46,11 +46,10 @@ Public Methods
     void publishSwervePositions()
         Puts the current swerve encoder positions to the SmartDashboard.
     void driveController(frc::Joystick *controller)
-        Fully drives the swerve train on the supplied controller.
-    void driveControllerPrecision(frc::Joystick *controller)
-        Same as above, but scales all values according to a R_ constant
-        and doesn't re-center after maneuvering to allow for slow, incredibly
-        precise positioning by hand in the full range of the controller.
+        Fully drives the swerve train on the supplied controller. If precise,
+        it scales all values according to a R_ constant and doesn't re-center
+        after maneuvering to allow for slow, incredibly precise positioning by
+        hand in the full range of the controller.
     void zeroController(frc::Joystick *controller)
         Allows use of a controller through a mapped button which is held down
         in correspondence to a motor to slowly override its zero from that
@@ -180,8 +179,7 @@ class SwerveTrain {
             frc::SmartDashboard::PutNumber("Zion::Swerve::PosRR", m_rearRight->getSwervePosition());
         }
 
-        void driveController(frc::Joystick *controller);
-        void driveControllerPrecision(frc::Joystick *controller); 
+        void driveController(frc::Joystick *controller, bool precision);
         void zeroController(frc::Joystick *controller);
 
     private:

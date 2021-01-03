@@ -7,7 +7,7 @@
 #include "Launcher.h"
 #include "Limelight.h"
 
-void SwerveTrain::driveController(frc::Joystick *controller) {
+void SwerveTrain::driveController(frc::Joystick *controller, bool precision = false) {
 
     //TODO: Why does inverting certain things work?
     double x = -controller->GetX();
@@ -35,7 +35,8 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         this behavior to occur...
         */
         setDriveSpeed(0);
-        assumeNearestZeroPosition();
+        if (precision) setSwerveSpeed(0);
+        else assumeNearestZeroPosition();
     }
     //Otherwise, go to the result vectors and use the magnitude to set the
     //speed of driving, and set each wheel's swerve position based on its
@@ -112,71 +113,11 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         m_rearLeft->assumeSwervePosition(m_rearLeft->getStandardDegreeSwervePosition(rearLeftResultVector, angle));
         m_rearRight->assumeSwervePosition(m_rearRight->getStandardDegreeSwervePosition(rearRightResultVector, angle));
 
-        m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * R_executionCapZion);
-        m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * R_executionCapZion);
-        m_rearLeft->setDriveSpeed(rearLeftResultVector.magnitude() * R_executionCapZion);
-        m_rearRight->setDriveSpeed(rearRightResultVector.magnitude() * R_executionCapZion);
-    }
-}
-void SwerveTrain::driveControllerPrecision(frc::Joystick *controller) {
-
-    double x = -controller->GetX();
-    double y = -controller->GetY();
-    double z = controller->GetZ();
-
-    double angle = navX->getYawFull();
-
-    forceControllerXYZToZeroInDeadzone(x, y, z);
-
-    optimizeControllerXYToZ(x, y, z);
-
-    VectorDouble translationVector(-x, y);
-
-    VectorDouble frontRightRotationVector (
-
-        z * cos((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180)),
-        z * sin((R_angleFromCenterToFrontRightWheel - angle) * (M_PI / 180))
-    );
-
-    VectorDouble frontLeftRotationVector (
-
-        z * cos((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180)),
-        z * sin((R_angleFromCenterToFrontLeftWheel - angle) * (M_PI / 180))
-    );
-
-    VectorDouble rearLeftRotationVector (
-
-        z * cos((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180)),
-        z * sin((R_angleFromCenterToRearLeftWheel - angle) * (M_PI / 180))
-    );
-
-    VectorDouble rearRightRotationVector (
-
-        z * cos((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180)),
-        z * sin((R_angleFromCenterToRearRightWheel - angle) * (M_PI / 180))
-    );
-
-    VectorDouble frontRightResultVector = translationVector + frontRightRotationVector;
-    VectorDouble frontLeftResultVector = translationVector + frontLeftRotationVector;
-    VectorDouble rearLeftResultVector = translationVector + rearLeftRotationVector;
-    VectorDouble rearRightResultVector = translationVector + rearRightRotationVector;
-
-    if (getControllerInDeadzone(controller)) {
-
-        setDriveSpeed(0);
-        setSwerveSpeed(0);
-    }
-    else {
-
-        m_frontRight->assumeSwervePosition(m_frontRight->getStandardDegreeSwervePosition(frontRightResultVector, angle));
-        m_frontLeft->assumeSwervePosition(m_frontLeft->getStandardDegreeSwervePosition(frontLeftResultVector, angle));
-        m_rearLeft->assumeSwervePosition(m_rearLeft->getStandardDegreeSwervePosition(rearLeftResultVector, angle));
-        m_rearRight->assumeSwervePosition(m_rearRight->getStandardDegreeSwervePosition(rearRightResultVector, angle));
-
-        m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * R_executionCapZionPrecision);
-        m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * R_executionCapZionPrecision);
-        m_rearLeft->setDriveSpeed(rearLeftResultVector.magnitude() * R_executionCapZionPrecision);
-        m_rearRight->setDriveSpeed(rearRightResultVector.magnitude() * R_executionCapZionPrecision);
+        const double executionCap = precision ? R_executionCapZionPrecision : R_executionCapZion;
+        m_frontRight->setDriveSpeed(frontRightResultVector.magnitude() * executionCap);
+        m_frontLeft->setDriveSpeed(frontLeftResultVector.magnitude() * executionCap);
+        m_rearLeft->setDriveSpeed(rearLeftResultVector.magnitude() * executionCap);
+        m_rearRight->setDriveSpeed(rearRightResultVector.magnitude() * executionCap);
     }
 }
 
