@@ -262,8 +262,8 @@ class SwerveTrain {
         //limelight lock
         double calculateLimelightLockSpeed(const double &howFarRemainingInTravelInDegrees) {
 
-            //Begin initally with a double calculated with the simplex function...
-            double toReturn = ((1) / (1 + exp((-1 * abs(howFarRemainingInTravelInDegrees)) + 5)));
+            //Begin initally with a double calculated with the simplex function with a horizontal stretch of factor two...
+            double toReturn = ((1) / (1 + exp((-1 * (0.5 * abs(howFarRemainingInTravelInDegrees))) + 5)));
             //If we satisfy conditions for the first linear piecewise, take that speed instead...
             if (abs(howFarRemainingInTravelInDegrees) < R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorAt) {
 

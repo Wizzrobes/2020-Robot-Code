@@ -12,8 +12,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     //TODO: Why does inverting certain things work?
     double x = -controller->GetX();
     double y = -controller->GetY();
-    //Limit the Z axis by the cap, as turning can be violent
-    double z = controller->GetZ() * R_executionCapZion;
+    double z = controller->GetZ();
 
     //TODO: What is this?
     double angle = navX->getYawFull();
@@ -45,6 +44,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
 
         //Turn on the limelight so that we can check if a target is found.
         limelight->setLime();
+        limelight->setProcessing();
 
         //Check if we are looking at a valid target...
         if (limelight->getTarget()) {
@@ -58,8 +58,9 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
         //If we want to drive normally, turn off the limelight
         //(because it is blinding).
         limelight->setLime(false);
+        limelight->setProcessing(false);
     }
-    
+
     /*
     The rotational vectors are found by multiplying the controller's
     rotational axis [-1, 1] by the cosine of the wheel's RELATIVE yaw (the
@@ -103,7 +104,7 @@ void SwerveTrain::driveController(frc::Joystick *controller) {
     VectorDouble rearRightResultVector = translationVector + rearRightRotationVector;
 
     //If the controller is in the total deadzone (entirely still)...
-    if (getControllerInDeadzone(controller)) {
+    if (x == 0 && y == 0 && z == 0) {
 
         /*
         Go to the nearest zero position, take it as the new zero, and

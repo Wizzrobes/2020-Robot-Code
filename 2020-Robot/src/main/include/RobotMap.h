@@ -59,7 +59,7 @@ const int R_zeroButtonRR = 0;
 
 /*_____Global Robot Variable Settigns_____*/
 //This is the highest decimal percentage of full speed that Zion can actually go.
-const double R_executionCapZion = .80;
+const double R_executionCapZion = .8;
 //This is at what rate the regular execution cap is scaled for precision driving.
 const double R_executionCapZionPrecision = .25 * R_executionCapZion;
 //This one is for running the intake motors.
@@ -106,8 +106,8 @@ const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorAt = 1;
 const double R_swerveTrainAssumePositionSpeedCalculationSecondEndBehaviorSpeed = .02;
 
 const double R_swerveTrainLimelightLockTolerance = 1;
-const double R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorAt = 5;
+const double R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorAt = 2.5;
 const double R_swerveTrainLimelightLockPositionSpeedCalculatonFirstEndBehaviorSpeed = .2;
-const double R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorAt = 2.5;
+const double R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorAt = 1.25;
 const double R_swerveTrainLimelightLockPositionSpeedCalculatonSecondEndBehaviorSpeed = .02;
 /*___End Global Robot Variable Settings___*/
