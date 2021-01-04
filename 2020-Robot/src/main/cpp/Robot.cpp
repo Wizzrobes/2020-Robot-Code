@@ -59,13 +59,7 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Close", R_launcherDefaultSpeedLaunchClose);
     frc::SmartDashboard::PutNumber("Field::Launcher::Speed-Launch-Far", R_launcherDefaultSpeedLaunchFar);
 }
-void Robot::RobotPeriodic() {
-
-    //Whenever Zion is on, allow control of the Limelight from P2. This permits
-    //using it for manual alignment at any time, before or after the match.
-    limelight.setLime(playerTwo->GetBumper(frc::GenericHID::kLeftHand));
-    limelight.setProcessing(playerTwo->GetBumper(frc::GenericHID::kRightHand));
-}
+void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
 
     //Set the zero position before beginning auto, as it should have been
@@ -244,6 +238,10 @@ void Robot::DisabledPeriodic() {
     //switch is inverted by default, so no inversion is required. This is in
     //disabled on the off-chance that the switch got bumped during match play.
     zion.setSwerveBrake(switchSwerveUnlock.Get());
+    //Whenever Zion is on, allow control of the Limelight from P2. This permits
+    //using it for manual alignment at any time, before or after the match.
+    limelight.setLime(playerTwo->GetBumper(frc::GenericHID::kLeftHand));
+    limelight.setProcessing(playerTwo->GetBumper(frc::GenericHID::kRightHand));
 }
 
 #ifndef RUNNING_FRC_TESTS
